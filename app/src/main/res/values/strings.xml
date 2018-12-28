@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Reservation</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="createCustomer">Create Customer Account</string>
+    <string name="createShop">Create Shop Account</string>
+</resources>
