@@ -10,6 +10,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -56,6 +58,11 @@ public class MainActivity extends AppCompatActivity
     //Buttons
     private Button createCustomerButton;
     private Button createShopButton;
+    //Progress bar
+    private ProgressBar startupProgressBar;
+    //Text view
+    private TextView startupText;
+    
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -82,6 +89,8 @@ public class MainActivity extends AppCompatActivity
         //Initialize UI elements
         createCustomerButton = findViewById(R.id.createCustomerButton);
         createShopButton = findViewById(R.id.createShopButton);
+        startupProgressBar = findViewById(R.id.startupProgressBar);
+        startupText = findViewById(R.id.startupText);
         
         //Firebase Authentication
         authStateListener = new FirebaseAuth.AuthStateListener()
@@ -219,8 +228,20 @@ public class MainActivity extends AppCompatActivity
         } else
         {
             //Stay here and make the user create a either a shop or a customer account
+            DisableProgressEnableButtons();
             Toast.makeText(this, "NOTHING", Toast.LENGTH_SHORT).show();
         }
+    }
+    
+    /**
+     * Disables loading animation UI and enables buttons
+     */
+    private void DisableProgressEnableButtons()
+    {
+        createCustomerButton.setVisibility(View.VISIBLE);
+        createShopButton.setVisibility(View.VISIBLE);
+        startupProgressBar.setVisibility(View.GONE);
+        startupText.setVisibility(View.GONE);
     }
     
     @Override

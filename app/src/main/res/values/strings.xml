@@ -3,4 +3,5 @@
     <string name="sign_out">Sign Out</string>
     <string name="createCustomer">Create Customer Account</string>
     <string name="createShop">Create Shop Account</string>
+    <string name="startupText">Retreiving data from database</string>
 </resources>
