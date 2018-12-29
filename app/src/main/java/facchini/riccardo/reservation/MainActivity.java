@@ -31,13 +31,13 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity
 {
     //Constants
-    public static final String ANONYMOUS = "anonymous";
     public static final int RC_SIGN_IN = 1;
     
     //Firebase instance variables
     //Authentication
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
+    private FirebaseUser user;
     //Firestore
     private FirebaseFirestore db;
     private CollectionReference customers;
@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity
     private StorageReference storageReference;
     
     //Strings
-    private String username;
     private String uid;
     
     //Booleans
@@ -70,7 +69,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        username = ANONYMOUS;
         
         //Initialize Firebase Components
         firebaseAuth = FirebaseAuth.getInstance();
@@ -98,7 +96,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
             {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                user = firebaseAuth.getCurrentUser();
                 if (user != null)
                 {
                     onSignedInInitialize(user.getDisplayName(), user.getUid());
@@ -141,7 +139,12 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                customers.document(uid).set(new Customer(uid, "Giuseppe", "Rossi", "012345678", "P@libero.it"));
+                Intent createCustomerIntent = new Intent(MainActivity.this, CreateCustomerActivity.class);
+                createCustomerIntent.putExtra("uid", uid);
+                createCustomerIntent.putExtra("mail", user.getEmail());
+                createCustomerIntent.putExtra("phone", user.getPhoneNumber());
+                startActivity(createCustomerIntent);
+                //customers.document(uid).set(new Customer(uid, "Giuseppe", "Rossi", "012345678", "P@libero.it"));
             }
         });
     }
@@ -238,10 +241,17 @@ public class MainActivity extends AppCompatActivity
      */
     private void DisableProgressEnableButtons()
     {
-        createCustomerButton.setVisibility(View.VISIBLE);
-        createShopButton.setVisibility(View.VISIBLE);
-        startupProgressBar.setVisibility(View.GONE);
-        startupText.setVisibility(View.GONE);
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                createCustomerButton.setVisibility(View.VISIBLE);
+                createShopButton.setVisibility(View.VISIBLE);
+                startupProgressBar.setVisibility(View.GONE);
+                startupText.setVisibility(View.GONE);
+            }
+        });
     }
     
     @Override
@@ -266,7 +276,6 @@ public class MainActivity extends AppCompatActivity
      */
     private void onSignedOutCleanup()
     {
-        username = ANONYMOUS;
         detachDatabaseReadListener();
         isShop = false;
         isCustomer = false;
@@ -280,7 +289,6 @@ public class MainActivity extends AppCompatActivity
      */
     private void onSignedInInitialize(String displayName, String uid)
     {
-        username = displayName;
         this.uid = uid;
         attachDatabaseReadListener();
         

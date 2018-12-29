@@ -4,4 +4,11 @@
     <string name="createCustomer">Create Customer Account</string>
     <string name="createShop">Create Shop Account</string>
     <string name="startupText">Retreiving data from database</string>
+    <string name="customerRegistration">Customer registration</string>
+    <string name="createCustomerText">Fill missing information (if any)</string>
+    <string name="firstNameHint">First Name</string>
+    <string name="surnameHint">Surname</string>
+    <string name="phoneHint">Phone number (optional)</string>
+    <string name="mailHint">Email address</string>
+    <string name="sendButtonText">Send</string>
 </resources>
