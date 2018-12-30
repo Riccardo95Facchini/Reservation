@@ -25,7 +25,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity
@@ -116,21 +115,23 @@ public class MainActivity extends AppCompatActivity
             }
         };
         
-        AddButtonsListeners();
+        addButtonsListeners();
     }
     
     /**
      * Adds listeners to the buttons in this page
      */
-    private void AddButtonsListeners()
+    private void addButtonsListeners()
     {
         createShopButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                Shop shop = TestShop();
-                shops.document(uid).set(shop);
+                Intent createShopIntent = new Intent(MainActivity.this, CreateShopActivity.class);
+                createShopIntent.putExtra("uid", uid);
+                createShopIntent.putExtra("mail", user.getEmail());
+                startActivity(createShopIntent);
             }
         });
         
@@ -150,23 +151,9 @@ public class MainActivity extends AppCompatActivity
     }
     
     /**
-     * Creates a test shop for now
-     * TODO remove it
-     *
-     * @return
+     * Checks if the user exists as a customer, if it exists calls userTypeDecision() if not calls for check as a shop
      */
-    private Shop TestShop()
-    {
-        ArrayList<String> p = new ArrayList<>();
-        p.add("Ciao");
-        p.add("Pluto");
-        return (new Shop(uid, "Prova", "Via pluto", "12", "Milano", "01234", p));
-    }
-    
-    /**
-     * Checks if the user exists as a customer, if it exists calls UserTypeDecision() if not calls for check as a shop
-     */
-    private void CheckCustomerExists()
+    private void checkCustomerExists()
     {
         customers.document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
         {
@@ -176,9 +163,9 @@ public class MainActivity extends AppCompatActivity
                 if (documentSnapshot.exists())
                 {
                     isCustomer = true;
-                    UserTypeDecision();
+                    userTypeDecision();
                 } else
-                    CheckShopExists();
+                    checkShopExists();
             }
         }).addOnFailureListener(new OnFailureListener()
         {
@@ -191,9 +178,9 @@ public class MainActivity extends AppCompatActivity
     }
     
     /**
-     * Checks if the user exists as a shop and then always calls UserTypeDecision() when successful
+     * Checks if the user exists as a shop and then always calls userTypeDecision() when successful
      */
-    private void CheckShopExists()
+    private void checkShopExists()
     {
         shops.document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
         {
@@ -203,7 +190,7 @@ public class MainActivity extends AppCompatActivity
                 if (documentSnapshot.exists())
                     isShop = true;
                 
-                UserTypeDecision();
+                userTypeDecision();
             }
         }).addOnFailureListener(new OnFailureListener()
         {
@@ -218,7 +205,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Decides what to do bases on the user type that logged in
      */
-    private void UserTypeDecision()
+    private void userTypeDecision()
     {
         if (isCustomer)
         {
@@ -231,7 +218,7 @@ public class MainActivity extends AppCompatActivity
         } else
         {
             //Stay here and make the user create a either a shop or a customer account
-            DisableProgressEnableButtons();
+            disableProgressEnableButtons();
             Toast.makeText(this, "NOTHING", Toast.LENGTH_SHORT).show();
         }
     }
@@ -239,7 +226,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * Disables loading animation UI and enables buttons
      */
-    private void DisableProgressEnableButtons()
+    private void disableProgressEnableButtons()
     {
         runOnUiThread(new Runnable()
         {
@@ -292,7 +279,7 @@ public class MainActivity extends AppCompatActivity
         this.uid = uid;
         attachDatabaseReadListener();
         
-        CheckCustomerExists(); //When signed in check what type of user it is
+        checkCustomerExists(); //When signed in check what type of user it is
     }
     
     /**

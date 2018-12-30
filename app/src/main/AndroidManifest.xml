@@ -11,7 +11,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <!--Main/starting activity-->
+
+        <!-- Main/starting activity -->
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,12 +20,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--Create customer activity-->
+
+        <!-- Create customer activity -->
         <activity
             android:name=".CreateCustomerActivity"
             android:label="@string/customerRegistration"
             android:parentActivityName=".MainActivity" />
 
+        <!-- Create customer activity -->
+        <activity
+            android:name=".CreateShopActivity"
+            android:label="@string/shopRegistration"
+            android:parentActivityName=".MainActivity" />
+        <!-- Add tags activity -->
+        <activity
+            android:name=".ShopTagActivity"
+            android:label="@string/addTags" />
     </application>
 
 </manifest>

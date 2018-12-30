@@ -3,12 +3,27 @@
     <string name="sign_out">Sign Out</string>
     <string name="createCustomer">Create Customer Account</string>
     <string name="createShop">Create Shop Account</string>
-    <string name="startupText">Retreiving data from database</string>
+    <string name="startupText">Retrieving data from database</string>
     <string name="customerRegistration">Customer registration</string>
-    <string name="createCustomerText">Fill missing information (if any)</string>
+    <string name="createCustomerText">Fill any missing information</string>
     <string name="firstNameHint">First Name</string>
     <string name="surnameHint">Surname</string>
-    <string name="phoneHint">Phone number (optional)</string>
+    <string name="phoneHintOptional">Phone number (optional)</string>
     <string name="mailHint">Email address</string>
     <string name="sendButtonText">Send</string>
+    <string name="shopRegistration">Shop registration</string>
+    <string name="shopNameHint">Shop Name</string>
+    <string name="address1Text">Street Address</string>
+    <string name="address2Text">Street Address Line 2</string>
+    <string name="continueButton">Continue</string>
+    <string name="cityHint">City</string>
+    <string name="zipText">ZIP code</string>
+    <string name="phoneHint">Phone Number</string>
+    <string name="title_activity_scrolling">ScrollingActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="tagsTextView">Insert at least one tag, customers will use it to find your shop.
+        \nTags are single words of letters only, separate them with a space
+        \nNumbers and symbols will be removed</string>
+    <string name="noTagWarning">Enter at least one word that describes your shop</string>
+    <string name="addTags">Add tags</string>
 </resources>

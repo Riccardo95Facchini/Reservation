@@ -8,15 +8,12 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class CreateCustomerActivity extends AppCompatActivity
 {
-    
     private String uid;
     private String mail;
     private String phone;
@@ -49,8 +46,8 @@ public class CreateCustomerActivity extends AppCompatActivity
         
         //Initialize UI elements
         sendButton = findViewById(R.id.sendButton);
-        firstNameText = findViewById(R.id.firstNameText);
-        surnameText = findViewById(R.id.surnameText);
+        firstNameText = findViewById(R.id.shopNameText);
+        surnameText = findViewById(R.id.address1Text);
         phoneText = findViewById(R.id.phoneText);
         mailText = findViewById(R.id.mailText);
         
@@ -61,18 +58,18 @@ public class CreateCustomerActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                SendData();
+                sendData();
             }
         });
         
-        HandleTextsOnCreate();
+        handleTextsOnCreate();
     }
     
     /**
      * If mail or phone number already given, cache them and hide the EditText.
      * Adds listeners to EditText
      */
-    private void HandleTextsOnCreate()
+    private void handleTextsOnCreate()
     {
         runOnUiThread(new Runnable()
         {
@@ -123,7 +120,7 @@ public class CreateCustomerActivity extends AppCompatActivity
         });
     }
     
-    private void SendData()
+    private void sendData()
     {
         db = FirebaseFirestore.getInstance();
         customers = db.collection("customers");

@@ -24,15 +24,17 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="@string/createCustomerText"
+            android:layout_marginEnd="8dp"
 
+            android:text="@string/createCustomerText"
             android:textSize="18sp"
             android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/firstNameText"
+            android:id="@+id/shopNameText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -46,7 +48,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textView" />
 
         <EditText
-            android:id="@+id/surnameText"
+            android:id="@+id/address1Text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -57,7 +59,7 @@
             android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/firstNameText" />
+            app:layout_constraintTop_toBottomOf="@+id/shopNameText" />
 
         <EditText
             android:id="@+id/phoneText"
@@ -67,11 +69,11 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
             android:ems="10"
-            android:hint="@string/phoneHint"
+            android:hint="@string/phoneHintOptional"
             android:inputType="phone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/surnameText" />
+            app:layout_constraintTop_toBottomOf="@+id/address1Text" />
 
         <EditText
             android:id="@+id/mailText"
