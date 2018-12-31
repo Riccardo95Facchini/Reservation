@@ -25,5 +25,14 @@
         \nTags are single words of letters only, separate them with a space
         \nNumbers and symbols will be removed</string>
     <string name="noTagWarning">Enter at least one word that describes your shop</string>
-    <string name="addTags">Add tags</string>
+    <string name="tagsAndHours">Tags and open hours</string>
+    <string name="mondayText">Monday</string>
+    <string name="fromText">From</string>
+    <string name="toText">To</string>
+    <string name="hoursText">Touch buttons to set opening hours, leave same time to set closed.</string>
+    <string name="tuesdayText">Tuesday</string>
+    <string name="wednesdayText">Wednesday</string>
+    <string name="thursdayText">Thursday</string>
+    <string name="morningText">Morning</string>
+    <string name="afternoonText">Afternoon</string>
 </resources>

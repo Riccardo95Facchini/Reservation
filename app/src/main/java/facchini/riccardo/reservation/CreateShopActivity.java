@@ -224,7 +224,7 @@ public class CreateShopActivity extends AppCompatActivity
     
     private void continueToTags()
     {
-        Intent intent = new Intent(this, ShopTagActivity.class);
+        Intent intent = new Intent(this, ShopTagHoursActivity.class);
         intent.putExtra("uid", uid)
                 .putExtra("name", shopNameText.getText().toString().trim())
                 .putExtra("address1", address1Text.getText().toString().trim())

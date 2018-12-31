@@ -32,10 +32,11 @@
             android:name=".CreateShopActivity"
             android:label="@string/shopRegistration"
             android:parentActivityName=".MainActivity" />
-        <!-- Add tags activity -->
+
+        <!-- Add tags and hours activity -->
         <activity
-            android:name=".ShopTagActivity"
-            android:label="@string/addTags" />
+            android:name=".ShopTagHoursActivity"
+            android:label="@string/tagsAndHours" />
     </application>
 
 </manifest>
