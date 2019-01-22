@@ -1,6 +1,9 @@
 package facchini.riccardo.reservation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Shop
 {
@@ -13,8 +16,9 @@ public class Shop
     private String zip;
     private String phone;
     private ArrayList<String> tags;
+    private Map<String, List<String>> hours;
     
-    public Shop(String uid, String name, String mail, String address1, String address2, String city, String zip, String phone, ArrayList<String> tags)
+    public Shop(String uid, String name, String mail, String address1, String address2, String city, String zip, String phone, ArrayList<String> tags, Map<String, List<String>> hours)
     {
         this.uid = uid;
         this.name = name;
@@ -24,7 +28,8 @@ public class Shop
         this.city = city;
         this.zip = zip;
         this.phone = phone;
-        this.tags = new ArrayList<String>(tags);
+        this.tags = new ArrayList<>(tags);
+        this.hours = new HashMap<>(hours);
     }
     
     public String getPhone() {return phone;}
@@ -44,4 +49,6 @@ public class Shop
     public String getZip() {return zip;}
     
     public ArrayList<String> getTags() {return new ArrayList<String>(tags);}
+    
+    public Map<String, List<String>> getHours() {return new HashMap<>(hours);}
 }

@@ -33,6 +33,9 @@
     <string name="tuesdayText">Tuesday</string>
     <string name="wednesdayText">Wednesday</string>
     <string name="thursdayText">Thursday</string>
+    <string name="fridayText">Friday</string>
+    <string name="saturdayText">Saturday</string>
+    <string name="sundayText">Sunday</string>
     <string name="morningText">Morning</string>
     <string name="afternoonText">Afternoon</string>
 </resources>

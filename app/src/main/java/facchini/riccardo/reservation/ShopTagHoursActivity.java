@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.engine.Resource;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -23,6 +25,7 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ShopTagHoursActivity extends AppCompatActivity
@@ -34,11 +37,13 @@ public class ShopTagHoursActivity extends AppCompatActivity
     
     //UI
     //Buttons
-    private Button sendButton, mondayButton;
+    private Button sendButton, mondayButton, tuesdayButton, wednesdayButton, thursdayButton, fridayButton, saturdayButton, sundayButton;
     //EditText
     private EditText tagsText;
     
     private ArrayList<String> tags;
+    private Map<String, List<String>> hours;
+    
     private String uid, mail, phone, name, address1, address2, city, zip;
     
     private ArrayAdapter<String> adapter;
@@ -49,6 +54,8 @@ public class ShopTagHoursActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop_tag_hours);
         
+        hours = new HashMap<>();
+        hoursInit();
         
         getIntentAndExtras(getIntent());
         
@@ -77,10 +84,21 @@ public class ShopTagHoursActivity extends AppCompatActivity
         });
     }
     
+    /**
+     * Sets UI elements
+     */
     private void getUI()
     {
         sendButton = findViewById(R.id.sendButton);
+        
         mondayButton = findViewById(R.id.mondayButton);
+        tuesdayButton = findViewById(R.id.tuesdayButton);
+        thursdayButton = findViewById(R.id.thursdayButton);
+        wednesdayButton = findViewById(R.id.wednesdayButton);
+        fridayButton = findViewById(R.id.fridayButton);
+        saturdayButton = findViewById(R.id.saturdayButton);
+        sundayButton = findViewById(R.id.sundayButton);
+        
         tagsText = findViewById(R.id.tagsText);
         
         createSpinnerAdapter();
@@ -90,73 +108,131 @@ public class ShopTagHoursActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ShopTagHoursActivity.this);
-                View view = getLayoutInflater().inflate(R.layout.alert_opening_hours, null);
-                builder.setTitle("Monday hours");
-                final Spinner timeSpinner1 = view.findViewById(R.id.timeSpinner1);
-                final Spinner timeSpinner2 = view.findViewById(R.id.timeSpinner2);
-                final Spinner timeSpinner3 = view.findViewById(R.id.timeSpinner3);
-                final Spinner timeSpinner4 = view.findViewById(R.id.timeSpinner4);
-                timeSpinner1.setAdapter(adapter);
-                timeSpinner2.setAdapter(adapter);
-                timeSpinner3.setAdapter(adapter);
-                timeSpinner4.setAdapter(adapter);
-                
-                builder.setPositiveButton("Set", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        int t1 = timeSpinner1.getSelectedItemPosition();
-                        int t2 = timeSpinner2.getSelectedItemPosition();
-                        int t3 = timeSpinner3.getSelectedItemPosition();
-                        int t4 = timeSpinner4.getSelectedItemPosition();
-                        
-                        if (!(t1 <= t2 && t1 <= t3 && t3 <= t4 && t2 <= t3))
-                            Toast.makeText(ShopTagHoursActivity.this, "Wrong times selected, try again", Toast.LENGTH_LONG).show();
-                        else
-                        {
-                            tagsText.setText(String.format("%s %s\n%s %s", timeSpinner1.getSelectedItem().toString(), timeSpinner2.getSelectedItem().toString(), timeSpinner3.getSelectedItem().toString(), timeSpinner4.getSelectedItem().toString()));
-                        }
-                        dialog.dismiss();
-                    }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        dialog.dismiss();
-                    }
-                });
-                builder.setView(view);
-                builder.show();
+                dayButtonListenerSet(getString(R.string.mondayText));
             }
         });
-        
+        tuesdayButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                dayButtonListenerSet(getString(R.string.tuesdayText));
+            }
+        });
+        thursdayButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                dayButtonListenerSet(getString(R.string.thursdayText));
+            }
+        });
+        wednesdayButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                dayButtonListenerSet(getString(R.string.wednesdayText));
+            }
+        });
+        fridayButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                dayButtonListenerSet(getString(R.string.fridayText));
+            }
+        });
+        saturdayButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                dayButtonListenerSet(getString(R.string.saturdayText));
+            }
+        });
+        sundayButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                dayButtonListenerSet(getString(R.string.sundayText));
+            }
+        });
     }
     
+    private void dayButtonListenerSet(final String day)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ShopTagHoursActivity.this);
+        View view = getLayoutInflater().inflate(R.layout.alert_opening_hours, null);
+        builder.setTitle(day + " hours");
+        final Spinner timeSpinner1 = view.findViewById(R.id.timeSpinner1);
+        final Spinner timeSpinner2 = view.findViewById(R.id.timeSpinner2);
+        final Spinner timeSpinner3 = view.findViewById(R.id.timeSpinner3);
+        final Spinner timeSpinner4 = view.findViewById(R.id.timeSpinner4);
+        timeSpinner1.setAdapter(adapter);
+        timeSpinner2.setAdapter(adapter);
+        timeSpinner3.setAdapter(adapter);
+        timeSpinner4.setAdapter(adapter);
+        
+        builder.setPositiveButton("Set", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                int t1 = timeSpinner1.getSelectedItemPosition();
+                int t2 = timeSpinner2.getSelectedItemPosition();
+                int t3 = timeSpinner3.getSelectedItemPosition();
+                int t4 = timeSpinner4.getSelectedItemPosition();
+                
+                if (!checkHours(t1, t2, t3, t4))
+                    Toast.makeText(ShopTagHoursActivity.this, "Wrong times selected, try again", Toast.LENGTH_LONG).show();
+                else
+                {
+                    
+                    ArrayList ret = new ArrayList<String>();
+                    ret.add(timeSpinner1.getSelectedItem().toString());
+                    ret.add(timeSpinner2.getSelectedItem().toString());
+                    ret.add(timeSpinner3.getSelectedItem().toString());
+                    ret.add(timeSpinner4.getSelectedItem().toString());
+                    
+                    hours.put(day, ret);
+                }
+                dialog.dismiss();
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.dismiss();
+            }
+        });
+        builder.setView(view);
+        builder.show();
+    }
+    
+    /**
+     * Creates all values from 00:00 to 23:30 to be placed in the spinners at 30 minutes steps
+     */
     private void createSpinnerAdapter()
     {
         ArrayList<String> spinnerText = new ArrayList<>();
+        spinnerText.add("Closed");
+        
         final String oClock = ":00";
-        final String quarter = ":15";
         final String half = ":30";
-        final String quarterTo = ":45";
         
         for (int hours = 0; hours < 24; hours++)
         {
             if (hours < 10)
             {
                 spinnerText.add("0" + hours + oClock);
-                spinnerText.add("0" + hours + quarter);
                 spinnerText.add("0" + hours + half);
-                spinnerText.add("0" + hours + quarterTo);
             } else
             {
                 spinnerText.add(hours + oClock);
-                spinnerText.add(hours + quarter);
                 spinnerText.add(hours + half);
-                spinnerText.add(hours + quarterTo);
             }
         }
         adapter = new ArrayAdapter<>(ShopTagHoursActivity.this, android.R.layout.simple_spinner_item, spinnerText);
@@ -165,7 +241,14 @@ public class ShopTagHoursActivity extends AppCompatActivity
     
     private boolean checkHours(int t1, int t2, int t3, int t4)
     {
-        return t1 <= t2 && t1 <= t3 && t3 <= t4 && t2 <= t3;
+        if (t1 > t2 || t3 > t4)
+            return false;
+        if ((t1 != 0 && t2 == 0) || (t2 != 0 && t1 == 0) || (t3 != 0 && t4 == 0) || (t4 != 0 && t3 == 0))
+            return false;
+        if ((t1 >= t3 && t3 != 0) || (t2 >= t3 && t3 != 0))
+            return false;
+        
+        return true;
     }
     
     private void getIntentAndExtras(Intent intent)
@@ -207,8 +290,15 @@ public class ShopTagHoursActivity extends AppCompatActivity
     {
         db = FirebaseFirestore.getInstance();
         shopsReference = db.collection("shops");
-        Shop newShop = new Shop(uid, name, mail, address1, address2, city, zip, phone, tags);
-        shopsReference.document(uid).set(newShop);
+        Shop newShop = new Shop(uid, name, mail, address1, address2, city, zip, phone, tags, hours);
+        try
+        {
+            
+            shopsReference.document(uid).set(newShop);
+        } catch (Exception e)
+        {
+            Log.d("ECCEZIONE", e.getMessage());
+        }
         
         tagsReference = db.collection("tags");
         for (String t : tags)
@@ -272,6 +362,22 @@ public class ShopTagHoursActivity extends AppCompatActivity
     private void updateDocumentTag(String t)
     {
         tagsReference.document(t).update(uid, uid);
+    }
+    
+    /**
+     * Inits all days as closed
+     */
+    private void hoursInit()
+    {
+        ArrayList<String> closed = new ArrayList<String>(Arrays.asList(new String[]{"Closed", "Closed", "Closed", "Closed"}));
+        
+        hours.put(getString(R.string.mondayText), closed);
+        hours.put(getString(R.string.tuesdayText), closed);
+        hours.put(getString(R.string.wednesdayText), closed);
+        hours.put(getString(R.string.thursdayText), closed);
+        hours.put(getString(R.string.fridayText), closed);
+        hours.put(getString(R.string.saturdayText), closed);
+        hours.put(getString(R.string.sundayText), closed);
     }
     
 }

@@ -17,9 +17,6 @@ public class CreateShopActivity extends AppCompatActivity
     private String uid;
     private String mail;
     
-    //Firestore
-    private FirebaseFirestore db;
-    private CollectionReference customers;
     
     //UI
     //Buttons
