@@ -128,5 +128,7 @@ public class CreateCustomerActivity extends AppCompatActivity
         phone = phone.isEmpty() ? phoneText.getText().toString() : phone;
         Customer newCustomer = new Customer(uid, firstNameText.getText().toString(), surnameText.getText().toString(), phone, mail);
         customers.document(uid).set(newCustomer);
+    
+        startActivity(new Intent(this, MainActivity.class));
     }
 }

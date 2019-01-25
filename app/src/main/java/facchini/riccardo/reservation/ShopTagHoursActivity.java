@@ -291,18 +291,12 @@ public class ShopTagHoursActivity extends AppCompatActivity
         db = FirebaseFirestore.getInstance();
         shopsReference = db.collection("shops");
         Shop newShop = new Shop(uid, name, mail, address1, address2, city, zip, phone, tags, hours);
-        try
-        {
-            
-            shopsReference.document(uid).set(newShop);
-        } catch (Exception e)
-        {
-            Log.d("ECCEZIONE", e.getMessage());
-        }
-        
+        shopsReference.document(uid).set(newShop);
         tagsReference = db.collection("tags");
         for (String t : tags)
             checkCustomerExists(t);
+        
+        startActivity(new Intent(this, MainActivity.class));
     }
     
     /**

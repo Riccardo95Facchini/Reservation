@@ -37,6 +37,9 @@
         <activity
             android:name=".ShopTagHoursActivity"
             android:label="@string/tagsAndHours" />
+
+        <!-- Customer Activity -->
+        <activity android:name=".CustomerActivity" />
     </application>
 
 </manifest>

@@ -67,7 +67,8 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+    
+        setTitle(R.string.loading);
         
         //Initialize Firebase Components
         firebaseAuth = FirebaseAuth.getInstance();
@@ -211,6 +212,7 @@ public class MainActivity extends AppCompatActivity
         {
             //TODO open customer activity
             Toast.makeText(this, "CUSTOMER", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, CustomerActivity.class));
         } else if (isShop)
         {
             //TODO open shop activity
@@ -220,6 +222,7 @@ public class MainActivity extends AppCompatActivity
             //Stay here and make the user create a either a shop or a customer account
             disableProgressEnableButtons();
             Toast.makeText(this, "NOTHING", Toast.LENGTH_SHORT).show();
+            setTitle(R.string.registrations);
         }
     }
     

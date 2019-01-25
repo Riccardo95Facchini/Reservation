@@ -38,4 +38,10 @@
     <string name="sundayText">Sunday</string>
     <string name="morningText">Morning</string>
     <string name="afternoonText">Afternoon</string>
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="reservations">Reservations</string>
+    <string name="search">Search</string>
+    <string name="loading">Loading</string>
+    <string name="registrations">Registration</string>
 </resources>
