@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity
         
         //Initialize Firebase Components
         firebaseAuth = FirebaseAuth.getInstance();
-        firebaseStorage = FirebaseStorage.getInstance();
+        //firebaseStorage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
         
         //Initialize Firebase references

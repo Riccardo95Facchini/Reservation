@@ -32,6 +32,19 @@ public class Shop
         this.hours = new HashMap<>(hours);
     }
     
+    public Shop(String uid, String name, String address1, String address2)
+    {
+        this.uid = uid;
+        this.name = name;
+        this.address1 = address1;
+        this.address2 = address2;
+    }
+    
+    public Shop()
+    {
+    
+    }
+    
     public String getPhone() {return phone;}
     
     public String getMail() {return mail;}

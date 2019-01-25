@@ -17,10 +17,11 @@ public class CustomerActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer);
-        setTitle(R.string.reservations);
         
         bottomMenu = findViewById(R.id.bottomMenu);
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
+    
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new CustomerHomeFragment()).commit();
     }
     
     private BottomNavigationView.OnNavigationItemSelectedListener selectedListener = new BottomNavigationView.OnNavigationItemSelectedListener()
