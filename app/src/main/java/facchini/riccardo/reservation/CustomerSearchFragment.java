@@ -1,5 +1,7 @@
 package facchini.riccardo.reservation;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,6 +11,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -30,12 +33,12 @@ import java.util.Map;
 public class CustomerSearchFragment extends Fragment
 {
     
-    View view;
-    EditText searchText;
-    ImageButton searchButton;
-    ListView foundShopsView;
+    private EditText searchText;
+    private ImageButton searchButton;
+    private ListView foundShopsView;
     
-    ArrayList<Shop> foundShops;
+    private SharedViewModel viewModel;
+    private ArrayList<Shop> foundShops = new ArrayList<>();
     
     //Firestore
     FirebaseFirestore db;
@@ -52,9 +55,15 @@ public class CustomerSearchFragment extends Fragment
     }
     
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        viewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
+    }
+    
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
-        view = getView();
         searchText = view.findViewById(R.id.searchText);
         searchButton = view.findViewById(R.id.searchButton);
         foundShopsView = view.findViewById(R.id.foundShopsView);
@@ -91,14 +100,27 @@ public class CustomerSearchFragment extends Fragment
             }
         });
         
+        foundShopsView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                viewModel.setSelectedShop(foundShops.get(position));
+                getActivity().getSupportFragmentManager().beginTransaction().
+                        replace(R.id.fragmentContainer, new CustomerSelectedShopFragment(), "ShopSelected").addToBackStack(null).commit();
+            }
+        });
+        
     }
     
     /**
      * Searches if the text in the search box corresponds to a tag in the system
+     *
      * @param text Tag to search
      */
     private void searchTag(String text)
     {
+        foundShops.clear();
         tagsCollection.document(text).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
         {
             @Override
@@ -106,8 +128,8 @@ public class CustomerSearchFragment extends Fragment
             {
                 if (documentSnapshot.exists())
                 {
-                    Map<String, Object> map = documentSnapshot.getData();
-                    displayShops(map);
+                    Map<String, Object> shopsFromTags = documentSnapshot.getData();
+                    displayShops(shopsFromTags);
                 }
             }
         }).addOnFailureListener(new OnFailureListener()
@@ -122,16 +144,16 @@ public class CustomerSearchFragment extends Fragment
     }
     
     /**
-     * If the tag exists pull all the info of the shops that have that tag
-     * @param map Map<uid, uid>, basically the entire document with the given tag
+     * If the tag exists pull all the info of the shops that have that tag and displays them in the listview
+     *
+     * @param shopsFromTags Map<uid, uid>, basically the entire document with the given tag
      */
-    private void displayShops(Map<String, Object> map)
+    private void displayShops(final Map<String, Object> shopsFromTags)
     {
-        foundShops = new ArrayList<>();
-        final List<Shop> shops = new ArrayList<>();
-        final List<String> names = new ArrayList<>();
-        final ArrayAdapter<Shop> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-        for (Map.Entry<String, Object> entry : map.entrySet())
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        foundShopsView.setAdapter(adapter);
+        
+        for (Map.Entry<String, Object> entry : shopsFromTags.entrySet())
         {
             shopsQuery = shopsCollection.whereEqualTo("uid", entry.getValue());
             
@@ -141,18 +163,16 @@ public class CustomerSearchFragment extends Fragment
                 public void onSuccess(QuerySnapshot queryDocumentSnapshots)
                 {
                     for (QueryDocumentSnapshot snap : queryDocumentSnapshots)
+                        foundShops.add(snap.toObject(Shop.class)); //Add shop to the list of found ones
+                    
+                    //Since it's asynchronous we don't know when it's the last one and we have to check
+                    if (foundShops.size() == shopsFromTags.size())
                     {
-                        shops.add(snap.toObject(Shop.class));
-                    }
-                    for (Shop s : shops)
-                    {
-                        adapter.add(s);
-                        shops.clear();
+                        for (Shop s : foundShops)
+                            adapter.add(s.getInfo());
                     }
                 }
             });
-            
         }
-        foundShopsView.setAdapter(adapter);
     }
 }

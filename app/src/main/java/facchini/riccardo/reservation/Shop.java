@@ -32,17 +32,31 @@ public class Shop
         this.hours = new HashMap<>(hours);
     }
     
-    public Shop(String uid, String name, String address1, String address2)
-    {
-        this.uid = uid;
-        this.name = name;
-        this.address1 = address1;
-        this.address2 = address2;
-    }
-    
     public Shop()
     {
     
+    }
+    
+    public String getInfo()
+    {
+        return String.format("%s\nCity: %s \tAddress: %s %s", name, city, address1, address2);
+    }
+    
+    public String getHoursFormat()
+    {
+        StringBuilder h = new StringBuilder();
+        
+        for (Map.Entry<String, List<String>> entry : hours.entrySet())
+        {
+            if(!entry.getValue().get(0).equals("Closed") && !entry.getValue().get(2).equals("Closed"))
+                h.append(String.format("%s: \t %s-%s \t %s-%s\n", entry.getKey(),
+                    entry.getValue().get(0), entry.getValue().get(1), entry.getValue().get(2), entry.getValue().get(3)));
+            else if(!entry.getValue().get(0).equals("Closed"))
+                h.append(String.format("%s: \t %s-%s\n", entry.getKey(),entry.getValue().get(0), entry.getValue().get(1)));
+            else if(!entry.getValue().get(3).equals("Closed"))
+                h.append(String.format("%s: \t %s-%s\n", entry.getKey(),entry.getValue().get(2), entry.getValue().get(3)));
+        }
+        return h.toString();
     }
     
     public String getPhone() {return phone;}

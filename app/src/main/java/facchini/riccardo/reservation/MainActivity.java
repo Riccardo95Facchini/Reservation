@@ -213,10 +213,13 @@ public class MainActivity extends AppCompatActivity
             //TODO open customer activity
             Toast.makeText(this, "CUSTOMER", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, CustomerActivity.class));
+            finish();
         } else if (isShop)
         {
             //TODO open shop activity
             Toast.makeText(this, "SHOP", Toast.LENGTH_SHORT).show();
+            
+            finish();
         } else
         {
             //Stay here and make the user create a either a shop or a customer account
