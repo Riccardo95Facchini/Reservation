@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -14,14 +13,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.bumptech.glide.load.engine.Resource;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -166,7 +163,7 @@ public class ShopTagHoursActivity extends AppCompatActivity
         AlertDialog.Builder builder = new AlertDialog.Builder(ShopTagHoursActivity.this);
         View view = getLayoutInflater().inflate(R.layout.alert_opening_hours, null);
         builder.setTitle(day + " hours");
-        final Spinner timeSpinner1 = view.findViewById(R.id.timeSpinner1);
+        final Spinner timeSpinner1 = view.findViewById(R.id.spinner);
         final Spinner timeSpinner2 = view.findViewById(R.id.timeSpinner2);
         final Spinner timeSpinner3 = view.findViewById(R.id.timeSpinner3);
         final Spinner timeSpinner4 = view.findViewById(R.id.timeSpinner4);
@@ -293,8 +290,9 @@ public class ShopTagHoursActivity extends AppCompatActivity
         Shop newShop = new Shop(uid, name, mail, address1, address2, city, zip, phone, tags, hours);
         shopsReference.document(uid).set(newShop);
         tagsReference = db.collection("tags");
+        createDocumentReservation();
         for (String t : tags)
-            checkCustomerExists(t);
+            checkTagExists(t);
         
         startActivity(new Intent(this, MainActivity.class));
     }
@@ -305,7 +303,7 @@ public class ShopTagHoursActivity extends AppCompatActivity
      *
      * @param t Name of the document/tag
      */
-    private void checkCustomerExists(final String t)
+    private void checkTagExists(final String t)
     {
         tagsReference.document(t).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
         {
@@ -345,7 +343,22 @@ public class ShopTagHoursActivity extends AppCompatActivity
                 updateDocumentTag(t);
             }
         });
-        
+    }
+    
+    /**
+     * Creates the empty document to hold future reservations
+     */
+    private void createDocumentReservation()
+    {
+        Map<String, Object> docData = new HashMap<>();
+        docData.put("created", "");
+        db.collection("reservations").document(uid).set(docData).addOnSuccessListener(new OnSuccessListener<Void>()
+        {
+            @Override
+            public void onSuccess(Void aVoid)
+            {
+            }
+        });
     }
     
     /**

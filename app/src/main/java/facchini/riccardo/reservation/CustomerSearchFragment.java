@@ -108,20 +108,14 @@ public class CustomerSearchFragment extends Fragment
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 Shop selected = foundShops.get(position);
-                try
-                {
-                    viewModel.setSelectedShop(selected);
-                    getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
-                    Intent intent = new Intent();
-                    Bundle b = new Bundle();
-                    b.putParcelable("Selected", selected);
-                    intent.putExtras(b);
-                    intent.setClass(getContext(), CustomerSelectedShopActivity.class);
-                    startActivity(intent);
-                } catch (Exception e)
-                {
-                    Log.d("ECCEZIONE", e.getMessage());
-                }
+                viewModel.setSelectedShop(selected);
+                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
+                Intent intent = new Intent();
+                Bundle b = new Bundle();
+                b.putParcelable("Selected", selected);
+                intent.putExtras(b);
+                intent.setClass(getContext(), CustomerSelectedShopActivity.class);
+                startActivity(intent);
             }
         });
     }
