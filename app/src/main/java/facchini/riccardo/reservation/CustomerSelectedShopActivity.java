@@ -26,47 +26,33 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        try
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_customer_selected_shop);
+        
+        Bundle b = this.getIntent().getExtras();
+        if (b != null)
+            selectedShop = b.getParcelable("Selected");
+        
+        shopNameText = findViewById(R.id.shopNameText);
+        shopInfoText = findViewById(R.id.shopInfoText);
+        shopHoursText = findViewById(R.id.shopHoursText);
+        selectDateButton = findViewById(R.id.selectDateButton);
+        
+        shopNameText.setText(selectedShop.getName());
+        shopInfoText.setText(String.format("City: %s \tAddress: %s %s", selectedShop.getCity(),
+                selectedShop.getAddress1(), selectedShop.getAddress2()));
+        shopHoursText.setText(selectedShop.getHoursFormat());
+        
+        selectDateButton.setOnClickListener(new View.OnClickListener()
         {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_customer_selected_shop);
-            
-            Bundle b = this.getIntent().getExtras();
-            if (b != null)
-                selectedShop = b.getParcelable("Selected");
-            
-            shopNameText = findViewById(R.id.shopNameText);
-            shopInfoText = findViewById(R.id.shopInfoText);
-            shopHoursText = findViewById(R.id.shopHoursText);
-            selectDateButton = findViewById(R.id.selectDateButton);
-            
-            shopNameText.setText(selectedShop.getName());
-            shopInfoText.setText(String.format("City: %s \tAddress: %s %s", selectedShop.getCity(),
-                    selectedShop.getAddress1(), selectedShop.getAddress2()));
-            shopHoursText.setText(selectedShop.getHoursFormat());
-            
-            selectDateButton.setOnClickListener(new View.OnClickListener()
+            @Override
+            public void onClick(View v)
             {
-                @Override
-                public void onClick(View v)
-                {
-                    try
-                    {
-                        DialogFragment datePicker = new DatePickerFragment();
-                        datePicker.show(getSupportFragmentManager(), "DatePicker");
-                    } catch (Exception e)
-                    {
-                        Log.d("ECCEZIONE", e.getMessage());
-                    }
-                }
-            });
-            
-        } catch (Exception e)
-        {
-            Log.d("ECCEZIONE", e.getMessage());
-        }
+                DialogFragment datePicker = new DatePickerFragment();
+                datePicker.show(getSupportFragmentManager(), "DatePicker");
+            }
+        });
     }
-    
     
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
