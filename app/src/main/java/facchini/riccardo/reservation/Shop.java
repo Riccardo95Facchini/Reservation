@@ -1,11 +1,15 @@
 package facchini.riccardo.reservation;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Shop
+public class Shop implements Parcelable
 {
     private String uid;
     private String name;
@@ -32,6 +36,50 @@ public class Shop
         this.hours = new HashMap<>(hours);
     }
     
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(uid);
+        dest.writeString(name);
+        dest.writeString(mail);
+        dest.writeString(address1);
+        dest.writeString(address2);
+        dest.writeString(city);
+        dest.writeString(zip);
+        dest.writeString(phone);
+        dest.writeList(new ArrayList<>(tags));
+        dest.writeMap(new HashMap<>(hours));
+    }
+    
+    private Shop(Parcel in)
+    {
+        this.uid = in.readString();
+        this.name = in.readString();
+        this.mail = in.readString();
+        this.address1 = in.readString();
+        this.address2 = in.readString();
+        this.city = in.readString();
+        this.zip = in.readString();
+        this.phone = in.readString();
+        this.tags = in.readArrayList(Shop.class.getClassLoader());
+        this.hours = in.readHashMap(Shop.class.getClassLoader());
+    }
+    
+    public static final Parcelable.Creator<Shop> CREATOR = new Parcelable.Creator<Shop>()
+    {
+        @Override
+        public Shop createFromParcel(Parcel source)
+        {
+            return new Shop(source);
+        }
+        
+        @Override
+        public Shop[] newArray(int size)
+        {
+            return new Shop[size];
+        }
+    };
+    
     public Shop()
     {
     
@@ -48,13 +96,13 @@ public class Shop
         
         for (Map.Entry<String, List<String>> entry : hours.entrySet())
         {
-            if(!entry.getValue().get(0).equals("Closed") && !entry.getValue().get(2).equals("Closed"))
+            if (!entry.getValue().get(0).equals("Closed") && !entry.getValue().get(2).equals("Closed"))
                 h.append(String.format("%s: \t %s-%s \t %s-%s\n", entry.getKey(),
-                    entry.getValue().get(0), entry.getValue().get(1), entry.getValue().get(2), entry.getValue().get(3)));
-            else if(!entry.getValue().get(0).equals("Closed"))
-                h.append(String.format("%s: \t %s-%s\n", entry.getKey(),entry.getValue().get(0), entry.getValue().get(1)));
-            else if(!entry.getValue().get(3).equals("Closed"))
-                h.append(String.format("%s: \t %s-%s\n", entry.getKey(),entry.getValue().get(2), entry.getValue().get(3)));
+                        entry.getValue().get(0), entry.getValue().get(1), entry.getValue().get(2), entry.getValue().get(3)));
+            else if (!entry.getValue().get(0).equals("Closed"))
+                h.append(String.format("%s: \t %s-%s\n", entry.getKey(), entry.getValue().get(0), entry.getValue().get(1)));
+            else if (!entry.getValue().get(3).equals("Closed"))
+                h.append(String.format("%s: \t %s-%s\n", entry.getKey(), entry.getValue().get(2), entry.getValue().get(3)));
         }
         return h.toString();
     }
@@ -78,4 +126,10 @@ public class Shop
     public ArrayList<String> getTags() {return new ArrayList<String>(tags);}
     
     public Map<String, List<String>> getHours() {return new HashMap<>(hours);}
+    
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
 }

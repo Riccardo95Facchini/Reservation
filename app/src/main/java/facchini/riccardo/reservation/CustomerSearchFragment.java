@@ -2,6 +2,7 @@ package facchini.riccardo.reservation;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,6 +30,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class CustomerSearchFragment extends Fragment
 {
@@ -105,12 +107,23 @@ public class CustomerSearchFragment extends Fragment
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                viewModel.setSelectedShop(foundShops.get(position));
-                getActivity().getSupportFragmentManager().beginTransaction().
-                        replace(R.id.fragmentContainer, new CustomerSelectedShopFragment(), "ShopSelected").addToBackStack(null).commit();
+                Shop selected = foundShops.get(position);
+                try
+                {
+                    viewModel.setSelectedShop(selected);
+                    getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
+                    Intent intent = new Intent();
+                    Bundle b = new Bundle();
+                    b.putParcelable("Selected", selected);
+                    intent.putExtras(b);
+                    intent.setClass(getContext(), CustomerSelectedShopActivity.class);
+                    startActivity(intent);
+                } catch (Exception e)
+                {
+                    Log.d("ECCEZIONE", e.getMessage());
+                }
             }
         });
-        
     }
     
     /**
