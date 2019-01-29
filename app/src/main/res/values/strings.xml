@@ -51,4 +51,6 @@
     <string name="set">Set</string>
     <string name="cancel">Cancel</string>
     <string name="ok">Ok</string>
+    <string name="closedLowercase">closed</string>
+    <string name="availableHours">available hours</string>
 </resources>

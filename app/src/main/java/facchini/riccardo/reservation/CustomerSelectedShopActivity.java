@@ -92,92 +92,80 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
      */
     private void checkHoursDate()
     {
-        try
+        reservationsCollection.document(selectedShop.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
         {
-            reservationsCollection.document(selectedShop.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot)
             {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot)
-                {
-                    if (documentSnapshot.exists())
-                        createSpinnerAdapter((ArrayList<String>) documentSnapshot.get(sdf.format(selectedDate.getTime())));
-                    else
-                        createSpinnerAdapter(null);
-                }
-            });
-        } catch (Exception e)
-        {
-            Log.d("ECCEZIONE", e.getMessage());
-        }
+                if (documentSnapshot.exists())
+                    createSpinnerAdapter((ArrayList<String>) documentSnapshot.get(sdf.format(selectedDate.getTime())));
+                else
+                    createSpinnerAdapter(null);
+            }
+        });
     }
     
+    /**
+     * Creates the spinner adapter to select the reservation time based on opening hours and already reserved hours,
+     * if no slots are available displays an alert to the user asking to select a different date.
+     *
+     * @param takenHours Already reserved hours
+     */
     private void createSpinnerAdapter(ArrayList<String> takenHours)
     {
+        ArrayList<String> spinnerText = new ArrayList<>();
+        String dayOfTheWeek = getDayString();
+        List<String> hoursSelectedDay;
+        
         try
         {
-            ArrayList<String> spinnerText = new ArrayList<>();
-            String dayOfTheWeek = getDayString();
-            List<String> hoursSelectedDay;
+            /*Needed for testing, some shops don't have hours registered for a closed day, resulting in a NPE.
+             If a shop is registered with the system "closed" tags are generated automatically. */
+            hoursSelectedDay = new ArrayList<>(selectedShop.getHours().get(dayOfTheWeek));
             
-            try
-            {
-                hoursSelectedDay = new ArrayList<>(selectedShop.getHours().get(dayOfTheWeek));
-            } catch (NullPointerException npe)
-            {
-                hoursSelectedDay = null;
-            }
+            String h1 = hoursSelectedDay.get(0),
+                    h2 = hoursSelectedDay.get(1),
+                    h3 = hoursSelectedDay.get(2),
+                    h4 = hoursSelectedDay.get(3);
             
-            if (hoursSelectedDay != null)
-            {
-                String h1 = hoursSelectedDay.get(0),
-                        h2 = hoursSelectedDay.get(1),
-                        h3 = hoursSelectedDay.get(2),
-                        h4 = hoursSelectedDay.get(3);
-                
-                if (!h1.toLowerCase().equals("closed"))
-                    buildSpinnerArray(h1, h2, spinnerText);
-                if (!h3.toLowerCase().equals("closed"))
-                    buildSpinnerArray(h3, h4, spinnerText);
-                
-                if (takenHours != null)
-                    spinnerText.removeAll(takenHours); //Removes taken hours from the spinner list
-            }
-            if (spinnerText.isEmpty())
-            {
-                new AlertDialog.Builder(this).setTitle(getString(R.string.sorry)).setCancelable(false)
-                        .setMessage(getString(R.string.noFreeSlots))
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                //Do nothing
-                            }
-                        }).show();
-            } else
-            {
-                adapter = new ArrayAdapter<>(CustomerSelectedShopActivity.this, android.R.layout.simple_spinner_item, spinnerText);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-                dialogResult = "";
-                showSpinner(dayOfTheWeek);
-                
-            }
-        } catch (Exception ex)
+            if (!h1.toLowerCase().equals(getString(R.string.closedLowercase)))
+                buildSpinnerArray(h1, h2, spinnerText);
+            if (!h3.toLowerCase().equals(getString(R.string.closedLowercase)))
+                buildSpinnerArray(h3, h4, spinnerText);
+            
+            if (takenHours != null && !spinnerText.isEmpty())
+                spinnerText.removeAll(takenHours); //Removes taken hours from the spinner list
+            
+        } catch (NullPointerException npe)
         {
-            Log.d("ECCEZIONE", ex.getMessage());
+            //Nothing needs to be done since spinnerText will still be empty
+        }
+        
+        if (spinnerText.isEmpty())
+        {
+            new AlertDialog.Builder(this).setTitle(getString(R.string.sorry)).setCancelable(false)
+                    .setMessage(getString(R.string.noFreeSlots))
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            //Do nothing
+                        }
+                    }).show();
+        } else
+        {
+            adapter = new ArrayAdapter<>(CustomerSelectedShopActivity.this, android.R.layout.simple_spinner_item, spinnerText);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+            dialogResult = "";
+            showSpinner(dayOfTheWeek);
         }
     }
     
     private void setDialogResult(String s)
     {
-        try
-        {
-            dialogResult = s;
-            db.collection("reservations").document(selectedShop.getUid()).update(sdf.format(selectedDate.getTime()), FieldValue.arrayUnion(dialogResult));
-        } catch (Exception e)
-        {
-            Log.d("ECCEZIONE", e.getMessage());
-        }
+        dialogResult = s;
+        db.collection("reservations").document(selectedShop.getUid()).update(sdf.format(selectedDate.getTime()), FieldValue.arrayUnion(dialogResult));
     }
     
     /**
@@ -189,26 +177,20 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
      */
     private void buildSpinnerArray(String start, String finish, ArrayList<String> spinnerText)
     {
-        try
+        String oClock = ":00", half = ":30";
+        while (!start.equals(finish))
         {
-            String oClock = ":00", half = ":30";
-            while (!start.equals(finish))
+            spinnerText.add(start);
+            
+            if (start.endsWith(oClock))
             {
-                spinnerText.add(start);
+                start = (start.substring(0, start.indexOf(':'))).concat(half);
                 
-                if (start.endsWith(oClock))
-                {
-                    start = (start.substring(0, start.indexOf(':'))).concat(half);
-                    
-                } else if (start.endsWith(half))
-                {
-                    start = (start.substring(0, start.indexOf(':'))).concat(oClock);
-                    start = addHourToString(start);
-                }
+            } else if (start.endsWith(half))
+            {
+                start = (start.substring(0, start.indexOf(':'))).concat(oClock);
+                start = addHourToString(start);
             }
-        } catch (Exception e)
-        {
-            Log.d("ECCEZIONE", e.getMessage());
         }
     }
     
@@ -222,7 +204,11 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
     {
         int hourValue = Integer.parseInt(toIncrement.substring(0, toIncrement.indexOf(':')));
         hourValue++;
-        return Integer.toString(hourValue).concat(toIncrement.substring(toIncrement.indexOf(':')));
+        
+        if (hourValue < 10)
+            return "0".concat(Integer.toString(hourValue).concat(toIncrement.substring(toIncrement.indexOf(':'))));
+        else
+            return Integer.toString(hourValue).concat(toIncrement.substring(toIncrement.indexOf(':')));
     }
     
     
@@ -233,29 +219,23 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
      */
     private String getDayString()
     {
-        try
+        switch (selectedDate.get(Calendar.DAY_OF_WEEK))
         {
-            switch (selectedDate.get(Calendar.DAY_OF_WEEK))
-            {
-                case Calendar.SUNDAY:
-                    return getString(R.string.sundayText);
-                case Calendar.MONDAY:
-                    return getString(R.string.mondayText);
-                case Calendar.TUESDAY:
-                    return getString(R.string.tuesdayText);
-                case Calendar.WEDNESDAY:
-                    return getString(R.string.wednesdayText);
-                case Calendar.THURSDAY:
-                    return getString(R.string.thursdayText);
-                case Calendar.FRIDAY:
-                    return getString(R.string.fridayText);
-                case Calendar.SATURDAY:
-                    return getString(R.string.saturdayText);
-                
-            }
-        } catch (Exception e)
-        {
-            Log.d("ECCEZIONE", e.getMessage());
+            case Calendar.SUNDAY:
+                return getString(R.string.sundayText);
+            case Calendar.MONDAY:
+                return getString(R.string.mondayText);
+            case Calendar.TUESDAY:
+                return getString(R.string.tuesdayText);
+            case Calendar.WEDNESDAY:
+                return getString(R.string.wednesdayText);
+            case Calendar.THURSDAY:
+                return getString(R.string.thursdayText);
+            case Calendar.FRIDAY:
+                return getString(R.string.fridayText);
+            case Calendar.SATURDAY:
+                return getString(R.string.saturdayText);
+            
         }
         return null;
     }
@@ -267,35 +247,29 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
      */
     private void showSpinner(final String day)
     {
-        try
+        AlertDialog.Builder builder = new AlertDialog.Builder(CustomerSelectedShopActivity.this);
+        View view = getLayoutInflater().inflate(R.layout.alert_select_slot, null);
+        builder.setTitle(day + " " + getString(R.string.availableHours));
+        final Spinner spinner = view.findViewById(R.id.spinner);
+        spinner.setAdapter(adapter);
+        
+        builder.setPositiveButton(getString(R.string.set), new DialogInterface.OnClickListener()
         {
-            AlertDialog.Builder builder = new AlertDialog.Builder(CustomerSelectedShopActivity.this);
-            View view = getLayoutInflater().inflate(R.layout.alert_select_slot, null);
-            builder.setTitle(day + " hour selection");
-            final Spinner spinner = view.findViewById(R.id.spinner);
-            spinner.setAdapter(adapter);
-            
-            builder.setPositiveButton(getString(R.string.set), new DialogInterface.OnClickListener()
+            @Override
+            public void onClick(DialogInterface dialog, int which)
             {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    setDialogResult(spinner.getSelectedItem().toString());
-                    dialog.dismiss();
-                }
-            }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    dialog.dismiss();
-                }
-            });
-            builder.setView(view);
-            builder.show();
-        } catch (Exception e)
+                setDialogResult(spinner.getSelectedItem().toString());
+                dialog.dismiss();
+            }
+        }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener()
         {
-            Log.d("ECCEZIONE", e.getMessage());
-        }
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.dismiss();
+            }
+        });
+        builder.setView(view);
+        builder.show();
     }
 }
