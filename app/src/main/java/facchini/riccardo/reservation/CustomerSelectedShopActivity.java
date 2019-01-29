@@ -17,22 +17,26 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class CustomerSelectedShopActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener
 {
     //Firestore
     FirebaseFirestore db;
     CollectionReference reservationsCollection;
-    Query reservationsQuery;
     
     private Shop selectedShop;
     private ArrayAdapter<String> adapter;
+    private Calendar selectedDate;
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    
+    String dialogResult;
     
     private TextView shopNameText, shopInfoText, shopHoursText;
     private Button selectDateButton;
@@ -75,97 +79,223 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
     {
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.YEAR, year);
-        c.set(Calendar.MONTH, month);
-        c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-//        c.set(Calendar.HOUR, 0);
-//        c.set(Calendar.MINUTE, 0);
-//        c.set(Calendar.SECOND, 0);
-//        c.set(Calendar.MILLISECOND, 0);
+        selectedDate = Calendar.getInstance();
+        selectedDate.set(Calendar.YEAR, year);
+        selectedDate.set(Calendar.MONTH, month);
+        selectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
         
-        //db.collection("reservations").document(selectedShop.getUid()).update(sdf.format(c.getTime()), "NUOVO ORARIO PRESO");
-        checkHoursDate(c);
+        checkHoursDate();
     }
     
     /**
      * Checks if in the given day there are already reservations and passes them to the method that creates the spinner
-     *
-     * @param c Calendar object with the date
      */
-    private void checkHoursDate(final Calendar c)
+    private void checkHoursDate()
     {
-        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        
-        reservationsCollection.document(selectedShop.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+        try
         {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot)
+            reservationsCollection.document(selectedShop.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
             {
-                if (documentSnapshot.exists())
-                    createSpinnerAdapter((ArrayList<String>) documentSnapshot.get(sdf.format(c.getTime())));
-                else
-                    createSpinnerAdapter(null);
-            }
-        });
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot)
+                {
+                    if (documentSnapshot.exists())
+                        createSpinnerAdapter((ArrayList<String>) documentSnapshot.get(sdf.format(selectedDate.getTime())));
+                    else
+                        createSpinnerAdapter(null);
+                }
+            });
+        } catch (Exception e)
+        {
+            Log.d("ECCEZIONE", e.getMessage());
+        }
     }
     
     private void createSpinnerAdapter(ArrayList<String> takenHours)
     {
-        /*
-        ArrayList<String> spinnerText = new ArrayList<>();
-        spinnerText.add("Closed");
-        
-        final String oClock = ":00";
-        final String half = ":30";
-        
-        for (int hours = 0; hours < 24; hours++)
+        try
         {
-            if (hours < 10)
+            ArrayList<String> spinnerText = new ArrayList<>();
+            String dayOfTheWeek = getDayString();
+            List<String> hoursSelectedDay;
+            
+            try
             {
-                spinnerText.add("0" + hours + oClock);
-                spinnerText.add("0" + hours + half);
+                hoursSelectedDay = new ArrayList<>(selectedShop.getHours().get(dayOfTheWeek));
+            } catch (NullPointerException npe)
+            {
+                hoursSelectedDay = null;
+            }
+            
+            if (hoursSelectedDay != null)
+            {
+                String h1 = hoursSelectedDay.get(0),
+                        h2 = hoursSelectedDay.get(1),
+                        h3 = hoursSelectedDay.get(2),
+                        h4 = hoursSelectedDay.get(3);
+                
+                if (!h1.toLowerCase().equals("closed"))
+                    buildSpinnerArray(h1, h2, spinnerText);
+                if (!h3.toLowerCase().equals("closed"))
+                    buildSpinnerArray(h3, h4, spinnerText);
+                
+                if (takenHours != null)
+                    spinnerText.removeAll(takenHours); //Removes taken hours from the spinner list
+            }
+            if (spinnerText.isEmpty())
+            {
+                new AlertDialog.Builder(this).setTitle(getString(R.string.sorry)).setCancelable(false)
+                        .setMessage(getString(R.string.noFreeSlots))
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                //Do nothing
+                            }
+                        }).show();
             } else
             {
-                spinnerText.add(hours + oClock);
-                spinnerText.add(hours + half);
+                adapter = new ArrayAdapter<>(CustomerSelectedShopActivity.this, android.R.layout.simple_spinner_item, spinnerText);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+                dialogResult = "";
+                showSpinner(dayOfTheWeek);
+                
             }
+        } catch (Exception ex)
+        {
+            Log.d("ECCEZIONE", ex.getMessage());
         }
-        adapter = new ArrayAdapter<>(CustomerSelectedShopActivity.this, android.R.layout.simple_spinner_item, spinnerText);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        */
     }
     
-    private void setSpinner(final String day)
+    private void setDialogResult(String s)
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(CustomerSelectedShopActivity.this);
-        View view = getLayoutInflater().inflate(R.layout.alert_select_slot, null);
-        builder.setTitle(day + " hours");
-        final Spinner spinner = view.findViewById(R.id.spinner);
-        spinner.setAdapter(adapter);
-        
-        builder.setPositiveButton("Set", new DialogInterface.OnClickListener()
+        try
         {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                int t1 = spinner.getSelectedItemPosition();
-                
-                ArrayList ret = new ArrayList<String>();
-                ret.add(spinner.getSelectedItem().toString());
-                
-                //hours.put(day, ret);
-                dialog.dismiss();
-            }
-        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+            dialogResult = s;
+            db.collection("reservations").document(selectedShop.getUid()).update(sdf.format(selectedDate.getTime()), FieldValue.arrayUnion(dialogResult));
+        } catch (Exception e)
         {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
+            Log.d("ECCEZIONE", e.getMessage());
+        }
+    }
+    
+    /**
+     * Builds the spinner text with all the possible hours between start and finish, finish is not added
+     *
+     * @param start       Opening hour
+     * @param finish      Closing hour
+     * @param spinnerText ArrayList containing strings to be placed in the spinner
+     */
+    private void buildSpinnerArray(String start, String finish, ArrayList<String> spinnerText)
+    {
+        try
+        {
+            String oClock = ":00", half = ":30";
+            while (!start.equals(finish))
             {
-                dialog.dismiss();
+                spinnerText.add(start);
+                
+                if (start.endsWith(oClock))
+                {
+                    start = (start.substring(0, start.indexOf(':'))).concat(half);
+                    
+                } else if (start.endsWith(half))
+                {
+                    start = (start.substring(0, start.indexOf(':'))).concat(oClock);
+                    start = addHourToString(start);
+                }
             }
-        });
-        builder.setView(view);
-        builder.show();
+        } catch (Exception e)
+        {
+            Log.d("ECCEZIONE", e.getMessage());
+        }
+    }
+    
+    /**
+     * Increments the hour after adding 30 minutes to a value at half hour
+     *
+     * @param toIncrement string to increment
+     * @return Incremented string
+     */
+    private String addHourToString(String toIncrement)
+    {
+        int hourValue = Integer.parseInt(toIncrement.substring(0, toIncrement.indexOf(':')));
+        hourValue++;
+        return Integer.toString(hourValue).concat(toIncrement.substring(toIncrement.indexOf(':')));
+    }
+    
+    
+    /**
+     * Converts day of the week int into string used by the system
+     *
+     * @return Sunday to Saturday as string given the selected day
+     */
+    private String getDayString()
+    {
+        try
+        {
+            switch (selectedDate.get(Calendar.DAY_OF_WEEK))
+            {
+                case Calendar.SUNDAY:
+                    return getString(R.string.sundayText);
+                case Calendar.MONDAY:
+                    return getString(R.string.mondayText);
+                case Calendar.TUESDAY:
+                    return getString(R.string.tuesdayText);
+                case Calendar.WEDNESDAY:
+                    return getString(R.string.wednesdayText);
+                case Calendar.THURSDAY:
+                    return getString(R.string.thursdayText);
+                case Calendar.FRIDAY:
+                    return getString(R.string.fridayText);
+                case Calendar.SATURDAY:
+                    return getString(R.string.saturdayText);
+                
+            }
+        } catch (Exception e)
+        {
+            Log.d("ECCEZIONE", e.getMessage());
+        }
+        return null;
+    }
+    
+    /**
+     * Shows the spinner to select the reservation time
+     *
+     * @param day chosen day
+     */
+    private void showSpinner(final String day)
+    {
+        try
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(CustomerSelectedShopActivity.this);
+            View view = getLayoutInflater().inflate(R.layout.alert_select_slot, null);
+            builder.setTitle(day + " hour selection");
+            final Spinner spinner = view.findViewById(R.id.spinner);
+            spinner.setAdapter(adapter);
+            
+            builder.setPositiveButton(getString(R.string.set), new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    setDialogResult(spinner.getSelectedItem().toString());
+                    dialog.dismiss();
+                }
+            }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    dialog.dismiss();
+                }
+            });
+            builder.setView(view);
+            builder.show();
+        } catch (Exception e)
+        {
+            Log.d("ECCEZIONE", e.getMessage());
+        }
     }
 }

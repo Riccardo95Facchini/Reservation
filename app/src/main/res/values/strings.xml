@@ -46,4 +46,9 @@
     <string name="registrations">Registration</string>
     <string name="selectDate">Select Date</string>
     <string name="pressBackToExit">Press again to exit</string>
+    <string name="sorry">Sorry!</string>
+    <string name="noFreeSlots">No free slots are available for this day</string>
+    <string name="set">Set</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
 </resources>
