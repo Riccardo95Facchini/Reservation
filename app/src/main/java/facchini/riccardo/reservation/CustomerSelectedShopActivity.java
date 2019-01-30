@@ -103,7 +103,7 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
                 if (documentSnapshot.exists())
                     createSpinnerAdapter((ArrayList<Map<String, String>>) documentSnapshot.get(sdf.format(selectedDate.getTime())));
                 else
-                    createSpinnerAdapter(new ArrayList<Map<String, String>>());
+                    createSpinnerAdapter(null);
             }
         });
     }
@@ -121,8 +121,9 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
         List<String> hoursSelectedDay;
         List<String> takenHoursList = new ArrayList<>();
         
-        for (Map<String, String> map : takenHours)
-            takenHoursList.add(map.get(getString(R.string.timeLowercase)));
+        if (takenHours != null)
+            for (Map<String, String> map : takenHours)
+                takenHoursList.add(map.get(getString(R.string.timeLowercase)));
         
         try
         {
@@ -166,20 +167,6 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
             showSpinner(dayOfTheWeek);
         }
-    }
-    
-    /**
-     * Called by the spinner dialog on positive button press, calls the update of the array in the reservation collection
-     *
-     * @param result Selected element of the spinner
-     */
-    private void setDialogResult(String result)
-    {
-        Map<String, String> update = new HashMap<>();
-        update.put(getString(R.string.userLowercase), userUid);
-        update.put(getString(R.string.timeLowercase), result);
-        db.collection("reservations").document(selectedShop.getUid()).update(sdf.format(selectedDate.getTime()), FieldValue.arrayUnion(update));
-        Toast.makeText(this, "Reservation completed", Toast.LENGTH_LONG).show();
     }
     
     /**
@@ -286,5 +273,27 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
         });
         builder.setView(view);
         builder.show();
+    }
+    
+    /**
+     * Called by the spinner dialog on positive button press, calls the update of the array in the reservation collection
+     *
+     * @param result Selected element of the spinner
+     */
+    private void setDialogResult(String result)
+    {
+        Map<String, String> updateShopRes = new HashMap<>();
+        updateShopRes.put(getString(R.string.userLowercase), userUid);
+        updateShopRes.put(getString(R.string.timeLowercase), result);
+        db.collection("reservations").document(selectedShop.getUid()).update(sdf.format(selectedDate.getTime()), FieldValue.arrayUnion(updateShopRes));
+        
+        Map<String, String> updateCustomerRes = new HashMap<>();
+        updateCustomerRes.put("shop", selectedShop.getUid());
+        updateCustomerRes.put("date", sdf.format(selectedDate.getTime()));
+        updateCustomerRes.put(getString(R.string.timeLowercase), result);
+        
+        db.collection("customers").document(userUid).update("customerReservations", FieldValue.arrayUnion(updateCustomerRes));
+        
+        Toast.makeText(this, "Reservation completed", Toast.LENGTH_LONG).show();
     }
 }

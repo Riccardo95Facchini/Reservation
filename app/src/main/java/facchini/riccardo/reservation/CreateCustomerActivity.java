@@ -12,6 +12,9 @@ import android.widget.EditText;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 public class CreateCustomerActivity extends AppCompatActivity
 {
     private String uid;
@@ -126,9 +129,10 @@ public class CreateCustomerActivity extends AppCompatActivity
         customers = db.collection("customers");
         mail = mail.isEmpty() ? mailText.getText().toString() : mail;
         phone = phone.isEmpty() ? phoneText.getText().toString() : phone;
-        Customer newCustomer = new Customer(uid, firstNameText.getText().toString(), surnameText.getText().toString(), phone, mail);
+        Customer newCustomer = new Customer(uid, firstNameText.getText().toString(), surnameText.getText().toString(),
+                phone, mail, new ArrayList<Map<String, String>>());
         customers.document(uid).set(newCustomer);
-    
+        
         startActivity(new Intent(this, MainActivity.class));
     }
 }
