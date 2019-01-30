@@ -139,15 +139,7 @@ public class CustomerSearchFragment extends Fragment
                     displayShops(shopsFromTags);
                 }
             }
-        }).addOnFailureListener(new OnFailureListener()
-        {
-            @Override
-            public void onFailure(@NonNull Exception e)
-            {
-            
-            }
         });
-        
     }
     
     /**
