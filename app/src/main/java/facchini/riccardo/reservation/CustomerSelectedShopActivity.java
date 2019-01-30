@@ -6,15 +6,16 @@ import android.content.DialogInterface;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -23,7 +24,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CustomerSelectedShopActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener
 {
@@ -31,12 +34,11 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
     FirebaseFirestore db;
     CollectionReference reservationsCollection;
     
+    private String userUid;
     private Shop selectedShop;
     private ArrayAdapter<String> adapter;
     private Calendar selectedDate;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    
-    String dialogResult;
     
     private TextView shopNameText, shopInfoText, shopHoursText;
     private Button selectDateButton;
@@ -50,6 +52,7 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
         
         db = FirebaseFirestore.getInstance();
         reservationsCollection = db.collection("reservations");
+        userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         
         Bundle b = this.getIntent().getExtras();
         if (b != null)
@@ -98,9 +101,9 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
             public void onSuccess(DocumentSnapshot documentSnapshot)
             {
                 if (documentSnapshot.exists())
-                    createSpinnerAdapter((ArrayList<String>) documentSnapshot.get(sdf.format(selectedDate.getTime())));
+                    createSpinnerAdapter((ArrayList<Map<String, String>>) documentSnapshot.get(sdf.format(selectedDate.getTime())));
                 else
-                    createSpinnerAdapter(null);
+                    createSpinnerAdapter(new ArrayList<Map<String, String>>());
             }
         });
     }
@@ -111,11 +114,15 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
      *
      * @param takenHours Already reserved hours
      */
-    private void createSpinnerAdapter(ArrayList<String> takenHours)
+    private void createSpinnerAdapter(ArrayList<Map<String, String>> takenHours)
     {
         ArrayList<String> spinnerText = new ArrayList<>();
         String dayOfTheWeek = getDayString();
         List<String> hoursSelectedDay;
+        List<String> takenHoursList = new ArrayList<>();
+        
+        for (Map<String, String> map : takenHours)
+            takenHoursList.add(map.get(getString(R.string.timeLowercase)));
         
         try
         {
@@ -133,8 +140,8 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
             if (!h3.toLowerCase().equals(getString(R.string.closedLowercase)))
                 buildSpinnerArray(h3, h4, spinnerText);
             
-            if (takenHours != null && !spinnerText.isEmpty())
-                spinnerText.removeAll(takenHours); //Removes taken hours from the spinner list
+            if (!takenHoursList.isEmpty() && !spinnerText.isEmpty())
+                spinnerText.removeAll(takenHoursList); //Removes taken hours from the spinner list
             
         } catch (NullPointerException npe)
         {
@@ -157,15 +164,22 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
         {
             adapter = new ArrayAdapter<>(CustomerSelectedShopActivity.this, android.R.layout.simple_spinner_item, spinnerText);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-            dialogResult = "";
             showSpinner(dayOfTheWeek);
         }
     }
     
-    private void setDialogResult(String s)
+    /**
+     * Called by the spinner dialog on positive button press, calls the update of the array in the reservation collection
+     *
+     * @param result Selected element of the spinner
+     */
+    private void setDialogResult(String result)
     {
-        dialogResult = s;
-        db.collection("reservations").document(selectedShop.getUid()).update(sdf.format(selectedDate.getTime()), FieldValue.arrayUnion(dialogResult));
+        Map<String, String> update = new HashMap<>();
+        update.put(getString(R.string.userLowercase), userUid);
+        update.put(getString(R.string.timeLowercase), result);
+        db.collection("reservations").document(selectedShop.getUid()).update(sdf.format(selectedDate.getTime()), FieldValue.arrayUnion(update));
+        Toast.makeText(this, "Reservation completed", Toast.LENGTH_LONG).show();
     }
     
     /**
@@ -267,6 +281,7 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
             public void onClick(DialogInterface dialog, int which)
             {
                 dialog.dismiss();
+                Toast.makeText(CustomerSelectedShopActivity.this, "No reservation selected", Toast.LENGTH_SHORT).show();
             }
         });
         builder.setView(view);

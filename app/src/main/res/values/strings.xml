@@ -51,6 +51,8 @@
     <string name="set">Set</string>
     <string name="cancel">Cancel</string>
     <string name="ok">Ok</string>
-    <string name="closedLowercase">closed</string>
+    <string name="closedLowercase" translatable="false">closed</string>
     <string name="availableHours">available hours</string>
+    <string name="timeLowercase" translatable="false">time</string>
+    <string name="userLowercase" translatable="false">user</string>
 </resources>
