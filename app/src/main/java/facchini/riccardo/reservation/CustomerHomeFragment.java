@@ -37,6 +37,7 @@ public class CustomerHomeFragment extends Fragment
     private List<Reservation> reservationList;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private ArrayAdapter<String> adapter;
+    private final Reservation dummy = new Reservation(null, null);
     
     private ListView futureReservations;
     private TextView noReservationsText;
@@ -82,14 +83,14 @@ public class CustomerHomeFragment extends Fragment
     
     /**
      * Extracts and checks the future reservations of the user
+     *
      * @param customerReservations
      */
-    private void extractNextReservations(ArrayList<Map<String, String>> customerReservations)
+    private void extractNextReservations(final ArrayList<Map<String, String>> customerReservations)
     {
         Date now = Calendar.getInstance().getTime();
         Date res = null;
         String time;
-        int index = 0;
         boolean noReservations = true;
         for (Map<String, String> map : customerReservations)
         {
@@ -108,8 +109,6 @@ public class CustomerHomeFragment extends Fragment
             {
                 noReservations = false;
                 final Date finalRes = res;
-                final int finalIndex = index;
-                final int size = customerReservations.size() - 1;
                 shopsCollection.document(map.get("shop")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
                 {
                     @Override
@@ -118,15 +117,15 @@ public class CustomerHomeFragment extends Fragment
                         if (documentSnapshot.exists())
                         {
                             reservationList.add(new Reservation(documentSnapshot.toObject(Shop.class), finalRes));
-                            if (finalIndex == size)
+                            if (reservationList.size() == customerReservations.size())
                                 orderList();
                         }
                     }
                 });
-            }
+            } else
+                reservationList.add(dummy);
             
-            index++;
-            if (noReservations && index == customerReservations.size())
+            if (noReservations && reservationList.size() == customerReservations.size())
             {
                 futureReservations.setVisibility(View.GONE);
                 noReservationsText.setVisibility(View.VISIBLE);
@@ -139,6 +138,10 @@ public class CustomerHomeFragment extends Fragment
      */
     private void orderList()
     {
+        while(reservationList.remove(dummy))
+        {
+        }
+        
         Collections.sort(reservationList, reservationComparator);
         
         for (Reservation r : reservationList)
