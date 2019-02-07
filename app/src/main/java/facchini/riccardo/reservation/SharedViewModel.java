@@ -8,20 +8,21 @@ import java.util.ArrayList;
 public class SharedViewModel extends ViewModel
 {
     private MutableLiveData<Shop> selectedShop = new MutableLiveData<>();
-    //private MutableLiveData<ArrayList<Shop>> foundShops = new MutableLiveData<>();
+    private MutableLiveData<Customer> currentCustomer = new MutableLiveData<>();
     
     public void setSelectedShop(Shop s)
     {
         selectedShop.setValue(s);
     }
     
-    //public void foundShops(ArrayList<Shop> s) { foundShops.setValue(s); }
+    public void setCurrentCustomer(Customer c) {currentCustomer.setValue(c);}
     
     public Shop getSelectedShop()
     {
         return selectedShop.getValue();
     }
     
-    //public ArrayList<Shop> getFoundShops() { return foundShops.getValue(); }
+    public Customer getCurrentCustomer() {return currentCustomer.getValue();}
+    
     
 }

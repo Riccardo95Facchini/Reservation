@@ -262,12 +262,14 @@ public class ShopTagHoursActivity extends AppCompatActivity
     
     /**
      * Parses the text for the tags and stores them in an ArrayList
+     * Also adds the name of the shop to the tags
      *
      * @return false if no tag is found, true otherwise
      */
     private boolean storeTags()
     {
-        String parsedString = tagsText.getText().toString()
+        
+        String parsedString = (tagsText.getText().toString().concat(name))
                 .replaceAll("[^a-zA-Z\\s]", "")
                 .replaceAll("\\s+", " ")
                 .toLowerCase().trim();

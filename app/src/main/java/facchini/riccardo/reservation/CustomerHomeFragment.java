@@ -1,9 +1,11 @@
 package facchini.riccardo.reservation;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +36,7 @@ public class CustomerHomeFragment extends Fragment
     private CollectionReference customersCollection, shopsCollection;
     
     private String userUid;
+    private SharedViewModel viewModel;
     private List<Reservation> reservationList;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private ArrayAdapter<String> adapter;
@@ -67,6 +70,13 @@ public class CustomerHomeFragment extends Fragment
         adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
         futureReservations.setAdapter(adapter);
         reservationList = new ArrayList<>();
+    }
+    
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        viewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         
         customersCollection.document(userUid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
         {
@@ -75,6 +85,7 @@ public class CustomerHomeFragment extends Fragment
             {
                 if (documentSnapshot.exists())
                 {
+                    viewModel.setCurrentCustomer(new Customer(documentSnapshot.getData()));
                     extractNextReservations(((ArrayList<Map<String, String>>) documentSnapshot.get("customerReservations")));
                 }
             }
@@ -138,7 +149,7 @@ public class CustomerHomeFragment extends Fragment
      */
     private void orderList()
     {
-        while(reservationList.remove(dummy))
+        while (reservationList.remove(dummy))
         {
         }
         

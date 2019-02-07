@@ -23,6 +23,20 @@ public class Customer
         this.customerReservations = customerReservations;
     }
     
+    public Customer(Map<String, Object> c)
+    {
+        this.uid = (String) c.get("uid");
+        this.name = (String) c.get("name");
+        this.surname = (String) c.get("surname");
+        this.phone = (String) c.get("phone");
+        this.mail = (String) c.get("mail");
+    }
+    
+    public String displayProfile()
+    {
+        return String.format("%s %s\nPhone: %s\nMail: %s", name, surname, phone, mail);
+    }
+    
     public String getUid() {return uid;}
     
     public String getName() {return name;}
