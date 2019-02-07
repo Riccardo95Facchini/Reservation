@@ -79,10 +79,24 @@ public class CreateCustomerActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                if (!mail.isEmpty())
-                    mailText.setVisibility(View.GONE);
-                if (!phone.isEmpty())
-                    phoneText.setVisibility(View.GONE);
+                try
+                {
+                    if (!mail.isEmpty())
+                        mailText.setVisibility(View.GONE);
+                } catch (Exception e)
+                {
+                    mail = "";
+                }
+                
+                try
+                {
+                    if (!phone.isEmpty())
+                        phoneText.setVisibility(View.GONE);
+                } catch (Exception e)
+                {
+                    phone = "";
+                }
+                
             }
         });
         

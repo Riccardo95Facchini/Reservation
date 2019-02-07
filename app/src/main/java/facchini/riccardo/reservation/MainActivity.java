@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    
+        
         setTitle(R.string.loading);
         
         //Initialize Firebase Components
@@ -146,7 +146,6 @@ public class MainActivity extends AppCompatActivity
                 createCustomerIntent.putExtra("mail", user.getEmail());
                 createCustomerIntent.putExtra("phone", user.getPhoneNumber());
                 startActivity(createCustomerIntent);
-                //customers.document(uid).set(new Customer(uid, "Giuseppe", "Rossi", "012345678", "P@libero.it"));
             }
         });
     }
@@ -213,12 +212,14 @@ public class MainActivity extends AppCompatActivity
             //TODO open customer activity
             Toast.makeText(this, "CUSTOMER", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, CustomerActivity.class));
+            firebaseAuth.removeAuthStateListener(authStateListener);
             finish();
         } else if (isShop)
         {
             //TODO open shop activity
             Toast.makeText(this, "SHOP", Toast.LENGTH_SHORT).show();
-            
+    
+            firebaseAuth.removeAuthStateListener(authStateListener);
             finish();
         } else
         {

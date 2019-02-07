@@ -1,20 +1,28 @@
 package facchini.riccardo.reservation;
 
+import android.content.Intent;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class CustomerActivity extends AppCompatActivity
 {
-    
-    private BottomNavigationView bottomMenu;
+    private FirebaseAuth.AuthStateListener authStateListener;
     
     private byte backButton;
+    
+    private BottomNavigationView bottomMenu;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -27,6 +35,7 @@ public class CustomerActivity extends AppCompatActivity
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
         
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new CustomerHomeFragment()).commit();
+        setupFirebaseListener();
     }
     
     private BottomNavigationView.OnNavigationItemSelectedListener selectedListener = new BottomNavigationView.OnNavigationItemSelectedListener()
@@ -80,6 +89,79 @@ public class CustomerActivity extends AppCompatActivity
                     backButton = 0;
                 }
             }.start();
+        }
+    }
+    
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        if (authStateListener != null)
+        {
+            //On pause removes the listener for the authentication
+            FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
+        }
+    }
+    
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        //On resume adds again the listener for the authentication
+        FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+    }
+    
+    private void setupFirebaseListener()
+    {
+        authStateListener = new FirebaseAuth.AuthStateListener()
+        {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
+            {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                
+                if (user == null)
+                {
+                    Toast.makeText(CustomerActivity.this, "Logging out", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+            }
+        };
+    }
+    
+    
+    /**
+     * Shows the menu (3 dots) when touched
+     *
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+    
+    /**
+     * Action to perform when an option in the menu is selected
+     *
+     * @param item The selected option
+     * @return
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.sign_out_menu:
+                AuthUI.getInstance().signOut(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
