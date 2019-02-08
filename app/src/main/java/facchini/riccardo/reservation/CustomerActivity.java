@@ -123,7 +123,7 @@ public class CustomerActivity extends AppCompatActivity
                 if (user == null)
                 {
                     Toast.makeText(CustomerActivity.this, "Logging out", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                    Intent intent = new Intent(getBaseContext(), LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }

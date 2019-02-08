@@ -28,6 +28,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -113,7 +114,11 @@ public class CustomerSearchFragment extends Fragment
                 Intent intent = new Intent();
                 Bundle b = new Bundle();
                 b.putParcelable("Selected", selected);
+                Map<String, String> customer = new HashMap<>();
                 intent.putExtras(b);
+                intent.putExtra("uid", viewModel.getCurrentCustomer().getUid());
+                intent.putExtra("name", viewModel.getCurrentCustomer().getName());
+                intent.putExtra("surname", viewModel.getCurrentCustomer().getSurname());
                 intent.setClass(getContext(), CustomerSelectedShopActivity.class);
                 startActivity(intent);
             }

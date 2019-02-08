@@ -296,7 +296,7 @@ public class ShopTagHoursActivity extends AppCompatActivity
         for (String t : tags)
             checkTagExists(t);
         
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(this, LoginActivity.class));
     }
     
     /**

@@ -27,7 +27,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity
+public class LoginActivity extends AppCompatActivity
 {
     //Constants
     public static final int RC_SIGN_IN = 1;
@@ -81,9 +81,6 @@ public class MainActivity extends AppCompatActivity
         customers = db.collection("customers");
         shops = db.collection("shops");
         
-        //Initialize references to views
-        //TODO
-        
         //Initialize UI elements
         createCustomerButton = findViewById(R.id.createCustomerButton);
         createShopButton = findViewById(R.id.createShopButton);
@@ -129,7 +126,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Intent createShopIntent = new Intent(MainActivity.this, CreateShopActivity.class);
+                Intent createShopIntent = new Intent(LoginActivity.this, CreateShopActivity.class);
                 createShopIntent.putExtra("uid", uid);
                 createShopIntent.putExtra("mail", user.getEmail());
                 startActivity(createShopIntent);
@@ -141,7 +138,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Intent createCustomerIntent = new Intent(MainActivity.this, CreateCustomerActivity.class);
+                Intent createCustomerIntent = new Intent(LoginActivity.this, CreateCustomerActivity.class);
                 createCustomerIntent.putExtra("uid", uid);
                 createCustomerIntent.putExtra("mail", user.getEmail());
                 createCustomerIntent.putExtra("phone", user.getPhoneNumber());
@@ -172,7 +169,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Exception e)
             {
-                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -197,7 +194,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Exception e)
             {
-                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -3,9 +3,11 @@ package facchini.riccardo.reservation;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -15,15 +17,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +37,12 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
     FirebaseFirestore db;
     CollectionReference reservationsCollection;
     
-    private String userUid;
+    private Map<String, Object> customer;
     private Shop selectedShop;
     private ArrayAdapter<String> adapter;
     private Calendar selectedDate;
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     
     private TextView shopNameText, shopInfoText, shopHoursText;
     private Button selectDateButton;
@@ -52,11 +56,17 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
         
         db = FirebaseFirestore.getInstance();
         reservationsCollection = db.collection("reservations");
-        userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         
-        Bundle b = this.getIntent().getExtras();
+        Intent intent = getIntent();
+        Bundle b = intent.getExtras();
         if (b != null)
             selectedShop = b.getParcelable("Selected");
+        
+        customer = new HashMap<>();
+        customer.put("uid", intent.getStringExtra("uid"));
+        customer.put("name", intent.getStringExtra("name"));
+        customer.put("surname", intent.getStringExtra("surname"));
+        
         
         shopNameText = findViewById(R.id.shopNameText);
         shopInfoText = findViewById(R.id.shopInfoText);
@@ -101,7 +111,7 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
             public void onSuccess(DocumentSnapshot documentSnapshot)
             {
                 if (documentSnapshot.exists())
-                    createSpinnerAdapter((ArrayList<Map<String, String>>) documentSnapshot.get(sdf.format(selectedDate.getTime())));
+                    createSpinnerAdapter((ArrayList<Map<String, Object>>) documentSnapshot.get(dateFormat.format(selectedDate.getTime())));
                 else
                     createSpinnerAdapter(null);
             }
@@ -114,7 +124,7 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
      *
      * @param takenHours Already reserved hours
      */
-    private void createSpinnerAdapter(ArrayList<Map<String, String>> takenHours)
+    private void createSpinnerAdapter(ArrayList<Map<String, Object>> takenHours)
     {
         ArrayList<String> spinnerText = new ArrayList<>();
         String dayOfTheWeek = getDayString();
@@ -122,8 +132,8 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
         List<String> takenHoursList = new ArrayList<>();
         
         if (takenHours != null)
-            for (Map<String, String> map : takenHours)
-                takenHoursList.add(map.get(getString(R.string.timeLowercase)));
+            for (Map<String, Object> map : takenHours)
+                takenHoursList.add(timeFormat.format((Date) map.get(getString(R.string.timeLowercase))));
         
         try
         {
@@ -136,9 +146,9 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
                     h3 = hoursSelectedDay.get(2),
                     h4 = hoursSelectedDay.get(3);
             
-            if (!h1.toLowerCase().equals(getString(R.string.closedLowercase)))
+            if (!h1.equalsIgnoreCase(getString(R.string.closedLowercase)))
                 buildSpinnerArray(h1, h2, spinnerText);
-            if (!h3.toLowerCase().equals(getString(R.string.closedLowercase)))
+            if (!h3.equalsIgnoreCase(getString(R.string.closedLowercase)))
                 buildSpinnerArray(h3, h4, spinnerText);
             
             if (!takenHoursList.isEmpty() && !spinnerText.isEmpty())
@@ -178,40 +188,23 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
      */
     private void buildSpinnerArray(String start, String finish, ArrayList<String> spinnerText)
     {
-        String oClock = ":00", half = ":30";
-        while (!start.equals(finish))
+        Calendar calStart = Calendar.getInstance();
+        
+        try
         {
-            spinnerText.add(start);
+            calStart.setTime(timeFormat.parse(start));
             
-            if (start.endsWith(oClock))
-            {
-                start = (start.substring(0, start.indexOf(':'))).concat(half);
-                
-            } else if (start.endsWith(half))
-            {
-                start = (start.substring(0, start.indexOf(':'))).concat(oClock);
-                start = addHourToString(start);
-            }
+        } catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
+        
+        while (!(timeFormat.format(calStart.getTime()).equals(finish)))
+        {
+            spinnerText.add(timeFormat.format(calStart.getTime()));
+            calStart.add(Calendar.MINUTE, 30);
         }
     }
-    
-    /**
-     * Increments the hour after adding 30 minutes to a value at half hour
-     *
-     * @param toIncrement string to increment
-     * @return Incremented string
-     */
-    private String addHourToString(String toIncrement)
-    {
-        int hourValue = Integer.parseInt(toIncrement.substring(0, toIncrement.indexOf(':')));
-        hourValue++;
-        
-        if (hourValue < 10)
-            return "0".concat(Integer.toString(hourValue).concat(toIncrement.substring(toIncrement.indexOf(':'))));
-        else
-            return Integer.toString(hourValue).concat(toIncrement.substring(toIncrement.indexOf(':')));
-    }
-    
     
     /**
      * Converts day of the week int into string used by the system
@@ -282,18 +275,29 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
      */
     private void setDialogResult(String result)
     {
-        Map<String, String> updateShopRes = new HashMap<>();
-        updateShopRes.put(getString(R.string.userLowercase), userUid);
-        updateShopRes.put(getString(R.string.timeLowercase), result);
-        db.collection("reservations").document(selectedShop.getUid()).update(sdf.format(selectedDate.getTime()), FieldValue.arrayUnion(updateShopRes));
+        Date fullDate = new Date();
+        String date = dateFormat.format(selectedDate.getTime());
+        String toParse = date.concat(" ".concat(result));
+        try
+        {
+            fullDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(toParse);
+        } catch (ParseException e)
+        {
+            //TODO: handle exception
+            e.printStackTrace();
+        }
         
-        Map<String, String> updateCustomerRes = new HashMap<>();
-        updateCustomerRes.put("shop", selectedShop.getUid());
-        updateCustomerRes.put("date", sdf.format(selectedDate.getTime()));
-        updateCustomerRes.put(getString(R.string.timeLowercase), result);
+        Map<String, Object> data = customer;
+        data.put(getString(R.string.timeLowercase), fullDate);
+        db.collection("reservations").document(selectedShop.getUid()).update(dateFormat.format(selectedDate.getTime()), FieldValue.arrayUnion(data));
         
-        db.collection("customers").document(userUid).update("customerReservations", FieldValue.arrayUnion(updateCustomerRes));
+        data.clear();
+        data.put("shop", selectedShop.getUid());
+        data.put("date", fullDate);
+        
+        db.collection("customers").document((String) customer.get("uid")).update("customerReservations", FieldValue.arrayUnion(data));
         
         Toast.makeText(this, "Reservation completed", Toast.LENGTH_LONG).show();
+        
     }
 }

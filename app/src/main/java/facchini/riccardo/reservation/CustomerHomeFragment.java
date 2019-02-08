@@ -19,7 +19,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,7 +37,6 @@ public class CustomerHomeFragment extends Fragment
     private String userUid;
     private SharedViewModel viewModel;
     private List<Reservation> reservationList;
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private ArrayAdapter<String> adapter;
     private final Reservation dummy = new Reservation(null, null);
     
@@ -86,41 +84,33 @@ public class CustomerHomeFragment extends Fragment
                 if (documentSnapshot.exists())
                 {
                     viewModel.setCurrentCustomer(new Customer(documentSnapshot.getData()));
-                    extractNextReservations(((ArrayList<Map<String, String>>) documentSnapshot.get("customerReservations")));
+                    extractNextReservations(((ArrayList<Map<String, Object>>) documentSnapshot.get("customerReservations")));
                 }
             }
         });
     }
+    
     
     /**
      * Extracts and checks the future reservations of the user
      *
      * @param customerReservations
      */
-    private void extractNextReservations(final ArrayList<Map<String, String>> customerReservations)
+    private void extractNextReservations(final ArrayList<Map<String, Object>> customerReservations)
     {
         Date now = Calendar.getInstance().getTime();
-        Date res = null;
-        String time;
+        Date res;
         boolean noReservations = true;
-        for (Map<String, String> map : customerReservations)
+        
+        for (Map<String, Object> map : customerReservations)
         {
-            try
-            {
-                res = sdf.parse(map.get("date"));
-            } catch (ParseException pe)
-            {
-                
-            }
-            time = map.get("time");
-            res.setHours(Integer.parseInt(time.substring(0, time.indexOf(':'))));
-            res.setMinutes(Integer.parseInt(time.substring(time.indexOf(':') + 1)));
+            res = (Date) map.get("date");
             
             if (now.compareTo(res) < 0)
             {
                 noReservations = false;
                 final Date finalRes = res;
-                shopsCollection.document(map.get("shop")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+                shopsCollection.document((String) map.get("shop")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
                 {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot)

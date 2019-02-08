@@ -147,6 +147,6 @@ public class CreateCustomerActivity extends AppCompatActivity
                 phone, mail, new ArrayList<Map<String, String>>());
         customers.document(uid).set(newCustomer);
         
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(this, LoginActivity.class));
     }
 }

@@ -13,7 +13,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".CustomerSelectedShopActivity"></activity>
         <!-- Main/starting activity -->
-        <activity android:name=".MainActivity">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,11 +23,11 @@
         <activity
             android:name=".CreateCustomerActivity"
             android:label="@string/customerRegistration"
-            android:parentActivityName=".MainActivity" /> <!-- Create customer activity -->
+            android:parentActivityName=".LoginActivity" /> <!-- Create customer activity -->
         <activity
             android:name=".CreateShopActivity"
             android:label="@string/shopRegistration"
-            android:parentActivityName=".MainActivity" /> <!-- Add tags and hours activity -->
+            android:parentActivityName=".LoginActivity" /> <!-- Add tags and hours activity -->
         <activity
             android:name=".ShopTagHoursActivity"
             android:label="@string/tagsAndHours" /> <!-- Customer Activity -->
