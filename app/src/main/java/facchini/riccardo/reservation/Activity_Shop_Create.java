@@ -9,10 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-public class CreateShopActivity extends AppCompatActivity
+public class Activity_Shop_Create extends AppCompatActivity
 {
     private String uid;
     private String mail;
@@ -35,7 +32,7 @@ public class CreateShopActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_shop);
+        setContentView(R.layout.activity_shop_create);
         //Get intent and extra
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
@@ -221,7 +218,7 @@ public class CreateShopActivity extends AppCompatActivity
     
     private void continueToTags()
     {
-        Intent intent = new Intent(this, ShopTagHoursActivity.class);
+        Intent intent = new Intent(this, Activity_Shop_TagHours.class);
         intent.putExtra("uid", uid)
                 .putExtra("name", shopNameText.getText().toString().trim())
                 .putExtra("address1", address1Text.getText().toString().trim())

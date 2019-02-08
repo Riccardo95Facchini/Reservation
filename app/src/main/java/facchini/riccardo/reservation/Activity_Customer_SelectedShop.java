@@ -4,10 +4,10 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -16,11 +16,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CustomerSelectedShopActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener
+public class Activity_Customer_SelectedShop extends AppCompatActivity implements DatePickerDialog.OnDateSetListener
 {
     //Firestore
     FirebaseFirestore db;
@@ -63,7 +65,7 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
             selectedShop = b.getParcelable("Selected");
         
         customer = new HashMap<>();
-        customer.put("uid", intent.getStringExtra("uid"));
+        customer.put("customer", intent.getStringExtra("uid"));
         customer.put("name", intent.getStringExtra("name"));
         customer.put("surname", intent.getStringExtra("surname"));
         
@@ -83,7 +85,7 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
             @Override
             public void onClick(View v)
             {
-                DialogFragment datePicker = new DatePickerFragment();
+                DialogFragment datePicker = new Fragment_DatePicker();
                 datePicker.show(getSupportFragmentManager(), "DatePicker");
             }
         });
@@ -96,24 +98,39 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
         selectedDate.set(Calendar.YEAR, year);
         selectedDate.set(Calendar.MONTH, month);
         selectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        selectedDate.set(Calendar.AM_PM, 0);
+        selectedDate.set(Calendar.HOUR, 0);
+        selectedDate.set(Calendar.MINUTE, 0);
+        selectedDate.set(Calendar.SECOND, 0);
+        selectedDate.set(Calendar.MILLISECOND, 0);
         
         checkHoursDate();
     }
     
     /**
-     * Checks if in the given day there are already reservations and passes them to the method that creates the spinner
+     * Takes the selected day and does a query to check if there are already reservations on that day
      */
     private void checkHoursDate()
     {
-        reservationsCollection.document(selectedShop.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+        Calendar plusDay = Calendar.getInstance();
+        plusDay.setTime(selectedDate.getTime());
+        plusDay.add(Calendar.HOUR, 24);
+        reservationsCollection.whereEqualTo("shopUid", selectedShop.getUid())
+                .whereGreaterThan("time", selectedDate.getTime())
+                .whereLessThan("time", plusDay.getTime()).get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
         {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot)
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots)
             {
-                if (documentSnapshot.exists())
-                    createSpinnerAdapter((ArrayList<Map<String, Object>>) documentSnapshot.get(dateFormat.format(selectedDate.getTime())));
-                else
-                    createSpinnerAdapter(null);
+                createSpinnerAdapter(queryDocumentSnapshots);
+            }
+        }).addOnFailureListener(new OnFailureListener()
+        {
+            @Override
+            public void onFailure(@NonNull Exception e)
+            {
+                e.printStackTrace();
             }
         });
     }
@@ -122,18 +139,19 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
      * Creates the spinner adapter to select the reservation time based on opening hours and already reserved hours,
      * if no slots are available displays an alert to the user asking to select a different date.
      *
-     * @param takenHours Already reserved hours
+     * @param snap result of the query, contains all reservations for the selected day
      */
-    private void createSpinnerAdapter(ArrayList<Map<String, Object>> takenHours)
+    private void createSpinnerAdapter(QuerySnapshot snap)
     {
+        List<String> reservedHours = new ArrayList<>();
+        
+        for (QueryDocumentSnapshot doc : snap)
+            reservedHours.add(timeFormat.format(doc.getData().get("time")));
+        
+        
         ArrayList<String> spinnerText = new ArrayList<>();
         String dayOfTheWeek = getDayString();
         List<String> hoursSelectedDay;
-        List<String> takenHoursList = new ArrayList<>();
-        
-        if (takenHours != null)
-            for (Map<String, Object> map : takenHours)
-                takenHoursList.add(timeFormat.format((Date) map.get(getString(R.string.timeLowercase))));
         
         try
         {
@@ -151,12 +169,13 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
             if (!h3.equalsIgnoreCase(getString(R.string.closedLowercase)))
                 buildSpinnerArray(h3, h4, spinnerText);
             
-            if (!takenHoursList.isEmpty() && !spinnerText.isEmpty())
-                spinnerText.removeAll(takenHoursList); //Removes taken hours from the spinner list
+            if (!reservedHours.isEmpty() && !spinnerText.isEmpty())
+                spinnerText.removeAll(reservedHours); //Removes taken hours from the spinner list
             
         } catch (NullPointerException npe)
         {
             //Nothing needs to be done since spinnerText will still be empty
+            npe.printStackTrace();
         }
         
         if (spinnerText.isEmpty())
@@ -173,7 +192,7 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
                     }).show();
         } else
         {
-            adapter = new ArrayAdapter<>(CustomerSelectedShopActivity.this, android.R.layout.simple_spinner_item, spinnerText);
+            adapter = new ArrayAdapter<>(Activity_Customer_SelectedShop.this, android.R.layout.simple_spinner_item, spinnerText);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
             showSpinner(dayOfTheWeek);
         }
@@ -241,7 +260,7 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
      */
     private void showSpinner(final String day)
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(CustomerSelectedShopActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_Customer_SelectedShop.this);
         View view = getLayoutInflater().inflate(R.layout.alert_select_slot, null);
         builder.setTitle(day + " " + getString(R.string.availableHours));
         final Spinner spinner = view.findViewById(R.id.spinner);
@@ -261,7 +280,7 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
             public void onClick(DialogInterface dialog, int which)
             {
                 dialog.dismiss();
-                Toast.makeText(CustomerSelectedShopActivity.this, "No reservation selected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Activity_Customer_SelectedShop.this, "No reservation selected", Toast.LENGTH_SHORT).show();
             }
         });
         builder.setView(view);
@@ -286,16 +305,11 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
             e.printStackTrace();
         }
         
-        Map<String, Object> data = new HashMap<>(customer);
-        data.put(getString(R.string.timeLowercase), fullDate);
-        db.collection("reservations").document(selectedShop.getUid()).update(dateFormat.format(selectedDate.getTime()), FieldValue.arrayUnion(data));
+        String customerName = ((String) customer.get("name")).concat(" ").concat((String) customer.get("surname"));
         
-        data.clear();
-        data.put("shop", selectedShop.getUid());
-        data.put("date", fullDate);
+        ReservationShop reservationShop = new ReservationShop(selectedShop.getUid(), (String) customer.get("customer"), customerName, fullDate);
+        db.collection("reservations").add(reservationShop);
         
-        db.collection("customers").document((String) customer.get("uid")).update("customerReservations", FieldValue.arrayUnion(data));
-        
-        Toast.makeText(this, "Reservation completed", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "ReservationCustomer completed", Toast.LENGTH_LONG).show();
     }
 }

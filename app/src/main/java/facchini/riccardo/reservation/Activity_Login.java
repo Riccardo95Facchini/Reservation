@@ -27,7 +27,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.Arrays;
 
-public class LoginActivity extends AppCompatActivity
+public class Activity_Login extends AppCompatActivity
 {
     //Constants
     public static final int RC_SIGN_IN = 1;
@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
         
         setTitle(R.string.loading);
         
@@ -126,7 +126,7 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Intent createShopIntent = new Intent(LoginActivity.this, CreateShopActivity.class);
+                Intent createShopIntent = new Intent(Activity_Login.this, Activity_Shop_Create.class);
                 createShopIntent.putExtra("uid", uid);
                 createShopIntent.putExtra("mail", user.getEmail());
                 startActivity(createShopIntent);
@@ -138,7 +138,7 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Intent createCustomerIntent = new Intent(LoginActivity.this, CreateCustomerActivity.class);
+                Intent createCustomerIntent = new Intent(Activity_Login.this, Activity_Customer_Create.class);
                 createCustomerIntent.putExtra("uid", uid);
                 createCustomerIntent.putExtra("mail", user.getEmail());
                 createCustomerIntent.putExtra("phone", user.getPhoneNumber());
@@ -169,7 +169,7 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Exception e)
             {
-                Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(Activity_Login.this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -194,7 +194,7 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Exception e)
             {
-                Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(Activity_Login.this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -208,14 +208,14 @@ public class LoginActivity extends AppCompatActivity
         {
             //TODO open customer activity
             Toast.makeText(this, "CUSTOMER", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this, CustomerActivity.class));
+            startActivity(new Intent(this, Activity_Customer.class));
             firebaseAuth.removeAuthStateListener(authStateListener);
             finish();
         } else if (isShop)
         {
             //TODO open shop activity
             Toast.makeText(this, "SHOP", Toast.LENGTH_SHORT).show();
-    
+            startActivity(new Intent(this, Activity_Shop.class));
             firebaseAuth.removeAuthStateListener(authStateListener);
             finish();
         } else
@@ -330,7 +330,7 @@ public class LoginActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
+        inflater.inflate(R.menu.menu_logout, menu);
         return true;
     }
     

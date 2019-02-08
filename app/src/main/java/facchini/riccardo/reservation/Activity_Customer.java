@@ -5,6 +5,8 @@ import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,7 +18,7 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class CustomerActivity extends AppCompatActivity
+public class Activity_Customer extends AppCompatActivity
 {
     private FirebaseAuth.AuthStateListener authStateListener;
     
@@ -34,7 +36,7 @@ public class CustomerActivity extends AppCompatActivity
         bottomMenu = findViewById(R.id.bottomMenu);
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
         
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new CustomerHomeFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
         setupFirebaseListener();
     }
     
@@ -48,17 +50,17 @@ public class CustomerActivity extends AppCompatActivity
             switch (menuItem.getItemId())
             {
                 case R.id.bottomHome:
-                    selected = new CustomerHomeFragment();
+                    selected = new Fragment_Customer_Home();
                     break;
                 case R.id.bottomSearch:
-                    selected = new CustomerSearchFragment();
+                    selected = new Fragment_Customer_Search();
                     break;
                 case R.id.bottomProfile:
-                    selected = new CustomerProfileFragment();
+                    selected = new Fragment_Customer_Profile();
                     break;
             }
             
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selected).commit();
+            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, selected).commit();
             return true;
         }
     };
@@ -66,9 +68,7 @@ public class CustomerActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        if (getSupportFragmentManager().findFragmentByTag("ShopSelected") != null)
-            getSupportFragmentManager().popBackStackImmediate();
-        else if (backButton > 0)
+        if (backButton > 0)
             finish();
         else
         {
@@ -122,8 +122,8 @@ public class CustomerActivity extends AppCompatActivity
                 
                 if (user == null)
                 {
-                    Toast.makeText(CustomerActivity.this, "Logging out", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+                    Toast.makeText(Activity_Customer.this, "Logging out", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getBaseContext(), Activity_Login.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }
@@ -142,7 +142,7 @@ public class CustomerActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
+        inflater.inflate(R.menu.menu_logout, menu);
         return true;
     }
     

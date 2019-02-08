@@ -13,13 +13,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -28,17 +30,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class CustomerHomeFragment extends Fragment
+public class Fragment_Customer_Home extends Fragment
 {
     //Firestore
     private FirebaseFirestore db;
-    private CollectionReference customersCollection, shopsCollection;
+    private CollectionReference customersCollection, shopsCollection, reservationsCollection;
     
-    private String userUid;
+    private Calendar now;
+    private String customerUid;
     private SharedViewModel viewModel;
-    private List<Reservation> reservationList;
+    private List<ReservationCustomer> reservationCustomerList;
     private ArrayAdapter<String> adapter;
-    private final Reservation dummy = new Reservation(null, null);
+//    private final ReservationCustomer dummy = new ReservationCustomer(null, null);
     
     private ListView futureReservations;
     private TextView noReservationsText;
@@ -55,9 +58,12 @@ public class CustomerHomeFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         db = FirebaseFirestore.getInstance();
-        userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        customerUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         customersCollection = db.collection("customers");
         shopsCollection = db.collection("shops");
+        reservationsCollection = db.collection("reservations");
+        
+        now = Calendar.getInstance();
         
         futureReservations = view.findViewById(R.id.futureReservations);
         futureReservations.setVisibility(View.VISIBLE);
@@ -67,7 +73,7 @@ public class CustomerHomeFragment extends Fragment
         
         adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
         futureReservations.setAdapter(adapter);
-        reservationList = new ArrayList<>();
+        reservationCustomerList = new ArrayList<>();
     }
     
     @Override
@@ -76,61 +82,69 @@ public class CustomerHomeFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         
-        customersCollection.document(userUid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+        
+        customersCollection.document(customerUid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
         {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot)
             {
                 if (documentSnapshot.exists())
-                {
                     viewModel.setCurrentCustomer(new Customer(documentSnapshot.getData()));
-                    extractNextReservations(((ArrayList<Map<String, Object>>) documentSnapshot.get("customerReservations")));
-                }
             }
         });
+        
+        reservationsCollection.whereEqualTo("customerUid", customerUid).whereGreaterThan("time", now.getTime())
+                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
+        {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots)
+            {
+                extractNextReservations(queryDocumentSnapshots);
+            }
+        }).addOnFailureListener(new OnFailureListener()
+        {
+            @Override
+            public void onFailure(@NonNull Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+        
+        
     }
     
     
     /**
      * Extracts and checks the future reservations of the user
      *
-     * @param customerReservations
+     * @param snap
      */
-    private void extractNextReservations(final ArrayList<Map<String, Object>> customerReservations)
+    private void extractNextReservations(final QuerySnapshot snap)
     {
-        Date now = Calendar.getInstance().getTime();
-        Date res;
-        boolean noReservations = true;
-        
-        for (Map<String, Object> map : customerReservations)
+        if (snap.isEmpty())
         {
-            res = (Date) map.get("date");
-            
-            if (now.compareTo(res) < 0)
+            futureReservations.setVisibility(View.GONE);
+            noReservationsText.setVisibility(View.VISIBLE);
+            return;
+        }
+        
+        for (final QueryDocumentSnapshot doc : snap)
+        {
+            shopsCollection.document((String) doc.get("shopUid")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
             {
-                noReservations = false;
-                final Date finalRes = res;
-                shopsCollection.document((String) map.get("shop")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot)
                 {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot)
-                    {
-                        if (documentSnapshot.exists())
-                        {
-                            reservationList.add(new Reservation(documentSnapshot.toObject(Shop.class), finalRes));
-                            if (reservationList.size() == customerReservations.size())
-                                orderList();
-                        }
-                    }
-                });
-            } else
-                reservationList.add(dummy);
-            
-            if (noReservations && reservationList.size() == customerReservations.size())
-            {
-                futureReservations.setVisibility(View.GONE);
-                noReservationsText.setVisibility(View.VISIBLE);
-            }
+                    if (documentSnapshot.exists())
+                        reservationCustomerList.add(
+                                new ReservationCustomer(
+                                        documentSnapshot.toObject(Shop.class),
+                                        (Date) doc.get("time")));
+                    
+                    if (reservationCustomerList.size() == snap.size())
+                        orderList();
+                }
+            });
         }
     }
     
@@ -139,25 +153,22 @@ public class CustomerHomeFragment extends Fragment
      */
     private void orderList()
     {
-        while (reservationList.remove(dummy))
-        {
-        }
         
-        Collections.sort(reservationList, reservationComparator);
+        Collections.sort(reservationCustomerList, reservationComparator);
         
-        for (Reservation r : reservationList)
+        for (ReservationCustomer r : reservationCustomerList)
             adapter.add(r.getInfo());
     }
     
     /**
      * Defined comparator for reservations to order them
      */
-    public Comparator<Reservation> reservationComparator = new Comparator<Reservation>()
+    public Comparator<ReservationCustomer> reservationComparator = new Comparator<ReservationCustomer>()
     {
         @Override
-        public int compare(Reservation o1, Reservation o2)
+        public int compare(ReservationCustomer o1, ReservationCustomer o2)
         {
-            return o1.getWhen().compareTo(o2.getWhen());
+            return o1.getDate().compareTo(o2.getDate());
         }
     };
 }

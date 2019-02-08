@@ -15,7 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class CreateCustomerActivity extends AppCompatActivity
+public class Activity_Customer_Create extends AppCompatActivity
 {
     private String uid;
     private String mail;
@@ -39,7 +39,7 @@ public class CreateCustomerActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_customer);
+        setContentView(R.layout.activity_customer_create);
         
         //Get intent and extra
         Intent intent = getIntent();
@@ -143,10 +143,9 @@ public class CreateCustomerActivity extends AppCompatActivity
         customers = db.collection("customers");
         mail = mail.isEmpty() ? mailText.getText().toString() : mail;
         phone = phone.isEmpty() ? phoneText.getText().toString() : phone;
-        Customer newCustomer = new Customer(uid, firstNameText.getText().toString(), surnameText.getText().toString(),
-                phone, mail, new ArrayList<Map<String, String>>());
+        Customer newCustomer = new Customer(uid, firstNameText.getText().toString(), surnameText.getText().toString(), phone, mail);
         customers.document(uid).set(newCustomer);
         
-        startActivity(new Intent(this, LoginActivity.class));
+        startActivity(new Intent(this, Activity_Login.class));
     }
 }

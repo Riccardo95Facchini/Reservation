@@ -1,13 +1,11 @@
 package facchini.riccardo.reservation;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -29,11 +26,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
-public class CustomerSearchFragment extends Fragment
+public class Fragment_Customer_Search extends Fragment
 {
     
     private EditText searchText;
@@ -109,7 +104,7 @@ public class CustomerSearchFragment extends Fragment
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 Shop selected = foundShops.get(position);
-                viewModel.setSelectedShop(selected);
+                viewModel.setCurrentShop(selected);
                 getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
                 Intent intent = new Intent();
                 Bundle b = new Bundle();
@@ -119,7 +114,7 @@ public class CustomerSearchFragment extends Fragment
                 intent.putExtra("uid", viewModel.getCurrentCustomer().getUid());
                 intent.putExtra("name", viewModel.getCurrentCustomer().getName());
                 intent.putExtra("surname", viewModel.getCurrentCustomer().getSurname());
-                intent.setClass(getContext(), CustomerSelectedShopActivity.class);
+                intent.setClass(getContext(), Activity_Customer_SelectedShop.class);
                 startActivity(intent);
             }
         });

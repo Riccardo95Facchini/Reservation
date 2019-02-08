@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ShopTagHoursActivity extends AppCompatActivity
+public class Activity_Shop_TagHours extends AppCompatActivity
 {
     //Firestore
     private FirebaseFirestore db;
@@ -160,7 +160,7 @@ public class ShopTagHoursActivity extends AppCompatActivity
     
     private void dayButtonListenerSet(final String day)
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(ShopTagHoursActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_Shop_TagHours.this);
         View view = getLayoutInflater().inflate(R.layout.alert_opening_hours, null);
         builder.setTitle(day + " hours");
         final Spinner timeSpinner1 = view.findViewById(R.id.spinner);
@@ -183,7 +183,7 @@ public class ShopTagHoursActivity extends AppCompatActivity
                 int t4 = timeSpinner4.getSelectedItemPosition();
                 
                 if (!checkHours(t1, t2, t3, t4))
-                    Toast.makeText(ShopTagHoursActivity.this, "Wrong times selected, try again", Toast.LENGTH_LONG).show();
+                    Toast.makeText(Activity_Shop_TagHours.this, "Wrong times selected, try again", Toast.LENGTH_LONG).show();
                 else
                 {
                     
@@ -232,7 +232,7 @@ public class ShopTagHoursActivity extends AppCompatActivity
                 spinnerText.add(hours + half);
             }
         }
-        adapter = new ArrayAdapter<>(ShopTagHoursActivity.this, android.R.layout.simple_spinner_item, spinnerText);
+        adapter = new ArrayAdapter<>(Activity_Shop_TagHours.this, android.R.layout.simple_spinner_item, spinnerText);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
     }
     
@@ -296,7 +296,7 @@ public class ShopTagHoursActivity extends AppCompatActivity
         for (String t : tags)
             checkTagExists(t);
         
-        startActivity(new Intent(this, LoginActivity.class));
+        startActivity(new Intent(this, Activity_Login.class));
     }
     
     /**
@@ -322,7 +322,7 @@ public class ShopTagHoursActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Exception e)
             {
-                Toast.makeText(ShopTagHoursActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Activity_Shop_TagHours.this, "Something went wrong", Toast.LENGTH_SHORT).show();
             }
         });
     }

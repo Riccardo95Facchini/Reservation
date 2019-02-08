@@ -36,6 +36,20 @@ public class Shop implements Parcelable
         this.hours = new HashMap<>(hours);
     }
     
+    public Shop(Shop s)
+    {
+        this.uid = s.uid;
+        this.name = s.name;
+        this.mail = s.mail;
+        this.address1 = s.address1;
+        this.address2 = s.address2;
+        this.city = s.city;
+        this.zip = s.zip;
+        this.phone = s.phone;
+        this.tags = new ArrayList<>(s.tags);
+        this.hours = new HashMap<>(s.hours);
+    }
+    
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {
@@ -96,12 +110,12 @@ public class Shop implements Parcelable
         
         for (Map.Entry<String, List<String>> entry : hours.entrySet())
         {
-            if (!entry.getValue().get(0).toLowerCase().equals("closed") && !entry.getValue().get(2).toLowerCase().equals("closed"))
+            if (!entry.getValue().get(0).equalsIgnoreCase("closed") && !entry.getValue().get(2).toLowerCase().equals("closed"))
                 h.append(String.format("%s: \t %s-%s \t %s-%s\n", entry.getKey(),
                         entry.getValue().get(0), entry.getValue().get(1), entry.getValue().get(2), entry.getValue().get(3)));
-            else if (!entry.getValue().get(0).toLowerCase().equals("closed"))
+            else if (!entry.getValue().get(0).equalsIgnoreCase("closed"))
                 h.append(String.format("%s: \t %s-%s\n", entry.getKey(), entry.getValue().get(0), entry.getValue().get(1)));
-            else if (!entry.getValue().get(3).toLowerCase().equals("closed"))
+            else if (!entry.getValue().get(3).equalsIgnoreCase("closed"))
                 h.append(String.format("%s: \t %s-%s\n", entry.getKey(), entry.getValue().get(2), entry.getValue().get(3)));
         }
         return h.toString();
