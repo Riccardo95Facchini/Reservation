@@ -276,18 +276,17 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
     private void setDialogResult(String result)
     {
         Date fullDate = new Date();
-        String date = dateFormat.format(selectedDate.getTime());
-        String toParse = date.concat(" ".concat(result));
+        String date = dateFormat.format(selectedDate.getTime()).concat(" ".concat(result));
         try
         {
-            fullDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(toParse);
+            fullDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(date);
         } catch (ParseException e)
         {
             //TODO: handle exception
             e.printStackTrace();
         }
         
-        Map<String, Object> data = customer;
+        Map<String, Object> data = new HashMap<>(customer);
         data.put(getString(R.string.timeLowercase), fullDate);
         db.collection("reservations").document(selectedShop.getUid()).update(dateFormat.format(selectedDate.getTime()), FieldValue.arrayUnion(data));
         
@@ -298,6 +297,5 @@ public class CustomerSelectedShopActivity extends AppCompatActivity implements D
         db.collection("customers").document((String) customer.get("uid")).update("customerReservations", FieldValue.arrayUnion(data));
         
         Toast.makeText(this, "Reservation completed", Toast.LENGTH_LONG).show();
-        
     }
 }
