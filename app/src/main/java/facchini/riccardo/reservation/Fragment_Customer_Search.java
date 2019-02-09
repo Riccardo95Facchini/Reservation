@@ -1,11 +1,20 @@
 package facchini.riccardo.reservation;
 
+import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -24,8 +34,10 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Fragment_Customer_Search extends Fragment
@@ -37,6 +49,10 @@ public class Fragment_Customer_Search extends Fragment
     
     private SharedViewModel viewModel;
     private ArrayList<Shop> foundShops = new ArrayList<>();
+    
+    //Location
+    private Location userLocation;
+    private final Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
     
     //Firestore
     FirebaseFirestore db;
@@ -65,6 +81,40 @@ public class Fragment_Customer_Search extends Fragment
         searchText = view.findViewById(R.id.searchText);
         searchButton = view.findViewById(R.id.searchButton);
         foundShopsView = view.findViewById(R.id.foundShopsView);
+        
+        //Find current location
+        
+        try
+        {
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                
+                
+                Log.d("ECCEZIONE", "NO PERMISSION");
+            }
+            
+            
+            LocationManager lm = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+            userLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            
+            //TODO: remove before final commit, only for emulator
+            Address a = geocoder.getFromLocationName("Via prati 12 Piacenza 29121", 1).get(0);
+            userLocation.setLongitude(a.getLongitude());
+            userLocation.setLatitude(a.getLatitude());
+            
+            
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
         
         db = FirebaseFirestore.getInstance();
         tagsCollection = db.collection("tags");
@@ -134,10 +184,7 @@ public class Fragment_Customer_Search extends Fragment
             public void onSuccess(DocumentSnapshot documentSnapshot)
             {
                 if (documentSnapshot.exists())
-                {
-                    Map<String, Object> shopsFromTags = documentSnapshot.getData();
-                    displayShops(shopsFromTags);
-                }
+                    displayShops(documentSnapshot.getData());
             }
         });
     }
@@ -167,8 +214,31 @@ public class Fragment_Customer_Search extends Fragment
                     //Since it's asynchronous we don't know when it's the last one and we have to check
                     if (foundShops.size() == shopsFromTags.size())
                     {
+                        Address address = null;
+                        Location l = new Location("Shop Location");
                         for (Shop s : foundShops)
-                            adapter.add(s.getInfo());
+                        {
+                            
+                            try
+                            {
+                                address = geocoder.getFromLocationName(s.getFullAddress(), 1).get(0);
+                                
+                                
+                                l.setLatitude(address.getLatitude());
+                                l.setLongitude(address.getLongitude());
+                            } catch (IOException e)
+                            {
+                                e.printStackTrace();
+                            }
+                            
+                            try
+                            {
+                                adapter.add(s.getInfo().concat(String.format("\nDistance: %s", userLocation.distanceTo(l))));
+                            } catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
             });

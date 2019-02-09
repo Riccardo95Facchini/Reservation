@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -125,24 +126,36 @@ public class Fragment_Customer_Home extends Fragment
             noReservationsText.setVisibility(View.VISIBLE);
             return;
         }
-        
-        for (final QueryDocumentSnapshot doc : snap)
+    
+        try
         {
-            shopsCollection.document((String) doc.get("shopUid")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+            for (final QueryDocumentSnapshot doc : snap)
             {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot)
+                shopsCollection.document((String) doc.get("shopUid")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
                 {
-                    if (documentSnapshot.exists())
-                        reservationCustomerHomeList.add(
-                                new Reservation_Customer_Home(
-                                        documentSnapshot.toObject(Shop.class),
-                                        (Date) doc.get("time")));
-                    
-                    if (reservationCustomerHomeList.size() == snap.size())
-                        orderList();
-                }
-            });
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot)
+                    {
+                        try
+                        {
+                            if (documentSnapshot.exists())
+                                reservationCustomerHomeList.add(
+                                        new Reservation_Customer_Home(
+                                                documentSnapshot.toObject(Shop.class),
+                                                ((Timestamp) doc.get("time")).toDate()));
+        
+                            if (reservationCustomerHomeList.size() == snap.size())
+                                orderList();
+                        } catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
     

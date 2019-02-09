@@ -113,6 +113,11 @@ public class Shop implements Parcelable
     
     }
     
+    public String getFullAddress()
+    {
+        return String.format("%s %s %s %s", address1, address2, city, zip);
+    }
+    
     public String getInfo()
     {
         return String.format("%s\nCity: %s \tAddress: %s %s", name, city, address1, address2);
