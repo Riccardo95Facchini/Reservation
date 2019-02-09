@@ -4,14 +4,14 @@ package facchini.riccardo.reservation;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ReservationCustomer
+public class Reservation_Customer_Home
 {
     private Shop shop;
     private Date date;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     
-    public ReservationCustomer(Shop shop, Date when)
+    public Reservation_Customer_Home(Shop shop, Date when)
     {
         this.shop = shop;
         this.date = when;

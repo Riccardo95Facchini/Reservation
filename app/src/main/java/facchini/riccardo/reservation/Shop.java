@@ -118,6 +118,11 @@ public class Shop implements Parcelable
         return String.format("%s\nCity: %s \tAddress: %s %s", name, city, address1, address2);
     }
     
+    public String displayProfile()
+    {
+        return getInfo().concat("\n\nHours:\n").concat(getHoursFormat());
+    }
+    
     public String getHoursFormat()
     {
         StringBuilder h = new StringBuilder();

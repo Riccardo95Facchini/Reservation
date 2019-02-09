@@ -30,7 +30,7 @@ public class Fragment_Shop_Profile extends Fragment
     {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
-        profileInfoText.setText(viewModel.getCurrentCustomer().displayProfile());
+        profileInfoText.setText(viewModel.getCurrentShop().displayProfile());
     }
     
     @Override
