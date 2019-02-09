@@ -78,10 +78,7 @@ public class Activity_Customer extends AppCompatActivity
             new CountDownTimer(2000, 1000)
             {
                 @Override
-                public void onTick(long millisUntilFinished)
-                {
-                
-                }
+                public void onTick(long millisUntilFinished) {}
                 
                 @Override
                 public void onFinish()

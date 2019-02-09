@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class Fragment_Customer_Home extends Fragment
 {
@@ -39,9 +38,8 @@ public class Fragment_Customer_Home extends Fragment
     private Calendar now;
     private String customerUid;
     private SharedViewModel viewModel;
-    private List<ReservationCustomer> reservationCustomerList;
+    private List<Reservation_Customer_Home> reservationCustomerHomeList;
     private ArrayAdapter<String> adapter;
-//    private final ReservationCustomer dummy = new ReservationCustomer(null, null);
     
     private ListView futureReservations;
     private TextView noReservationsText;
@@ -73,7 +71,7 @@ public class Fragment_Customer_Home extends Fragment
         
         adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
         futureReservations.setAdapter(adapter);
-        reservationCustomerList = new ArrayList<>();
+        reservationCustomerHomeList = new ArrayList<>();
     }
     
     @Override
@@ -136,12 +134,12 @@ public class Fragment_Customer_Home extends Fragment
                 public void onSuccess(DocumentSnapshot documentSnapshot)
                 {
                     if (documentSnapshot.exists())
-                        reservationCustomerList.add(
-                                new ReservationCustomer(
+                        reservationCustomerHomeList.add(
+                                new Reservation_Customer_Home(
                                         documentSnapshot.toObject(Shop.class),
                                         (Date) doc.get("time")));
                     
-                    if (reservationCustomerList.size() == snap.size())
+                    if (reservationCustomerHomeList.size() == snap.size())
                         orderList();
                 }
             });
@@ -154,19 +152,19 @@ public class Fragment_Customer_Home extends Fragment
     private void orderList()
     {
         
-        Collections.sort(reservationCustomerList, reservationComparator);
+        Collections.sort(reservationCustomerHomeList, reservationComparator);
         
-        for (ReservationCustomer r : reservationCustomerList)
+        for (Reservation_Customer_Home r : reservationCustomerHomeList)
             adapter.add(r.getInfo());
     }
     
     /**
      * Defined comparator for reservations to order them
      */
-    public Comparator<ReservationCustomer> reservationComparator = new Comparator<ReservationCustomer>()
+    public Comparator<Reservation_Customer_Home> reservationComparator = new Comparator<Reservation_Customer_Home>()
     {
         @Override
-        public int compare(ReservationCustomer o1, ReservationCustomer o2)
+        public int compare(Reservation_Customer_Home o1, Reservation_Customer_Home o2)
         {
             return o1.getDate().compareTo(o2.getDate());
         }

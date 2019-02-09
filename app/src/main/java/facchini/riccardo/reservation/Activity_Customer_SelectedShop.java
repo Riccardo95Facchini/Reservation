@@ -19,7 +19,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -307,9 +306,9 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         
         String customerName = ((String) customer.get("name")).concat(" ").concat((String) customer.get("surname"));
         
-        ReservationShop reservationShop = new ReservationShop(selectedShop.getUid(), (String) customer.get("customer"), customerName, fullDate);
-        db.collection("reservations").add(reservationShop);
+        ReservationDatabase reservationDatabase = new ReservationDatabase(selectedShop.getUid(), (String) customer.get("customer"), customerName, fullDate);
+        db.collection("reservations").add(reservationDatabase);
         
-        Toast.makeText(this, "ReservationCustomer completed", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Reservation_Customer_Home completed", Toast.LENGTH_LONG).show();
     }
 }

@@ -50,6 +50,20 @@ public class Shop implements Parcelable
         this.hours = new HashMap<>(s.hours);
     }
     
+    public Shop(Map<String, Object> m)
+    {
+        this.uid = (String) m.get("uid");
+        this.name = (String) m.get("name");
+        this.mail = (String) m.get("mail");
+        this.address1 = (String) m.get("address1");
+        this.address2 = (String) m.get("address2");
+        this.city = (String) m.get("city");
+        this.zip = (String) m.get("zip");
+        this.phone = (String) m.get("phone");
+        this.tags = new ArrayList<>((ArrayList<String>) m.get("tags"));
+        this.hours = new HashMap<>((HashMap<String, List<String>>) m.get("hours"));
+    }
+    
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {

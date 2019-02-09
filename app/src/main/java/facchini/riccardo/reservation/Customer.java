@@ -1,6 +1,5 @@
 package facchini.riccardo.reservation;
 
-import java.util.List;
 import java.util.Map;
 
 public class Customer
@@ -30,10 +29,18 @@ public class Customer
         this.mail = (String) c.get("mail");
     }
     
+    public Customer() {}
+    
     public String displayProfile()
     {
         return String.format("%s %s\nPhone: %s\nMail: %s", name, surname, phone, mail);
     }
+    
+    public String getInfo()
+    {
+        return String.format("Name: %s %s\nPhone: %s\nMail: %s", name, surname, phone.isEmpty() ? "N/A" : phone, mail.isEmpty() ? "N/A" : mail);
+    }
+    
     
     public String getUid() {return uid;}
     
