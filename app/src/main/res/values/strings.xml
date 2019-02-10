@@ -56,4 +56,5 @@
     <string name="timeDB" translatable="false">time</string>
     <string name="userLowercase" translatable="false">user</string>
     <string name="noReservations">No pending reservations forund</string>
+    <string name="noShopsFound">No shops found</string>
 </resources>

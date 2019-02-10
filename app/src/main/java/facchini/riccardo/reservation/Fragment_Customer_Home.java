@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,9 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 public class Fragment_Customer_Home extends Fragment
 {
@@ -44,6 +43,7 @@ public class Fragment_Customer_Home extends Fragment
     
     private ListView futureReservations;
     private TextView noReservationsText;
+    private ProgressBar progressBar;
     
     @Nullable
     @Override
@@ -69,6 +69,9 @@ public class Fragment_Customer_Home extends Fragment
         
         noReservationsText = view.findViewById(R.id.noReservations);
         noReservationsText.setVisibility(View.GONE);
+        
+        progressBar = view.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
         
         adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
         futureReservations.setAdapter(adapter);
@@ -120,13 +123,15 @@ public class Fragment_Customer_Home extends Fragment
      */
     private void extractNextReservations(final QuerySnapshot snap)
     {
+        progressBar.setVisibility(View.VISIBLE);
         if (snap.isEmpty())
         {
             futureReservations.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
             noReservationsText.setVisibility(View.VISIBLE);
             return;
         }
-    
+        
         try
         {
             for (final QueryDocumentSnapshot doc : snap)
@@ -143,7 +148,7 @@ public class Fragment_Customer_Home extends Fragment
                                         new Reservation_Customer_Home(
                                                 documentSnapshot.toObject(Shop.class),
                                                 ((Timestamp) doc.get("time")).toDate()));
-        
+                            
                             if (reservationCustomerHomeList.size() == snap.size())
                                 orderList();
                         } catch (Exception e)
@@ -169,6 +174,8 @@ public class Fragment_Customer_Home extends Fragment
         
         for (Reservation_Customer_Home r : reservationCustomerHomeList)
             adapter.add(r.getInfo());
+        
+        progressBar.setVisibility(View.GONE);
     }
     
     /**

@@ -35,6 +35,7 @@ public class Activity_Customer extends AppCompatActivity
     private FirebaseAuth.AuthStateListener authStateListener;
     
     private byte backButton;
+    private int currentMenu = R.id.bottomHome;
     
     private BottomNavigationView bottomMenu;
     
@@ -60,10 +61,10 @@ public class Activity_Customer extends AppCompatActivity
     {
 //        if (isServicesOK())
 //        {
-            if (isMapsEnabled())
-            {
-                return true;
-            }
+        if (isMapsEnabled())
+        {
+            return true;
+        }
 //        }
         return false;
     }
@@ -120,7 +121,7 @@ public class Activity_Customer extends AppCompatActivity
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
-    
+
 //    public boolean isServicesOK()
 //    {
 //        Log.d(TAG, "isServicesOK: checking google services version");
@@ -189,20 +190,27 @@ public class Activity_Customer extends AppCompatActivity
     
     private BottomNavigationView.OnNavigationItemSelectedListener selectedListener = new BottomNavigationView.OnNavigationItemSelectedListener()
     {
+        
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
         {
             Fragment selected = null;
             
+            if (currentMenu == menuItem.getItemId())
+                return false;
+            
             switch (menuItem.getItemId())
             {
                 case R.id.bottomHome:
+                    currentMenu = R.id.bottomHome;
                     selected = new Fragment_Customer_Home();
                     break;
                 case R.id.bottomSearch:
+                    currentMenu = R.id.bottomSearch;
                     selected = new Fragment_Customer_Search();
                     break;
                 case R.id.bottomProfile:
+                    currentMenu = R.id.bottomProfile;
                     selected = new Fragment_Customer_Profile();
                     break;
             }
@@ -254,13 +262,12 @@ public class Activity_Customer extends AppCompatActivity
         //On resume adds again the listener for the authentication
         FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
         
-        if(checkMapServices())
+        if (checkMapServices())
         {
-            if(mLocationPermissionGranted)
+            if (mLocationPermissionGranted)
             {
                 getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
-            }
-            else
+            } else
                 getLocationPermission();
         }
     }
