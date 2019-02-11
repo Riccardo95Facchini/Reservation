@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -37,6 +38,8 @@ public class Activity_Shop_TagHours extends AppCompatActivity
     private Button sendButton, mondayButton, tuesdayButton, wednesdayButton, thursdayButton, fridayButton, saturdayButton, sundayButton;
     //EditText
     private EditText tagsText;
+    //TextViews
+    private Map<String, TextView> hoursTexts;
     
     private ArrayList<String> tags;
     private Map<String, List<String>> hours;
@@ -95,6 +98,32 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         fridayButton = findViewById(R.id.fridayButton);
         saturdayButton = findViewById(R.id.saturdayButton);
         sundayButton = findViewById(R.id.sundayButton);
+
+//        TextView textMon = findViewById(R.id.textMon);
+//        TextView textTue = findViewById(R.id.textTue);
+//        TextView textWed = findViewById(R.id.textWed);
+//        TextView textThu = findViewById(R.id.textThu);
+//        TextView textFri = findViewById(R.id.textFri);
+//        TextView textSat = findViewById(R.id.textSat);
+//        TextView textSun = findViewById(R.id.textSun);
+//
+//        hoursTexts.put(getString(R.string.mondayText), textMon);
+//        hoursTexts.put(getString(R.string.tuesdayText), textTue);
+//        hoursTexts.put(getString(R.string.wednesdayText), textWed);
+//        hoursTexts.put(getString(R.string.thursdayText), textThu);
+//        hoursTexts.put(getString(R.string.fridayText), textFri);
+//        hoursTexts.put(getString(R.string.saturdayText), textSat);
+//        hoursTexts.put(getString(R.string.sundayText), textSun);
+        
+        hoursTexts = new HashMap<>();
+        
+        hoursTexts.put(getString(R.string.mondayText), (TextView) findViewById(R.id.textMon));
+        hoursTexts.put(getString(R.string.tuesdayText), (TextView) findViewById(R.id.textTue));
+        hoursTexts.put(getString(R.string.wednesdayText), (TextView) findViewById(R.id.textWed));
+        hoursTexts.put(getString(R.string.thursdayText), (TextView) findViewById(R.id.textThu));
+        hoursTexts.put(getString(R.string.fridayText), (TextView) findViewById(R.id.textFri));
+        hoursTexts.put(getString(R.string.saturdayText), (TextView) findViewById(R.id.textSat));
+        hoursTexts.put(getString(R.string.sundayText), (TextView) findViewById(R.id.textSun));
         
         tagsText = findViewById(R.id.tagsText);
         
@@ -194,6 +223,7 @@ public class Activity_Shop_TagHours extends AppCompatActivity
                     ret.add(timeSpinner4.getSelectedItem().toString());
                     
                     hours.put(day, ret);
+                    hoursTexts.get(day).setText(String.format("%s-%s \t %s-%s", ret.get(0), ret.get(1), ret.get(2), ret.get(3)));
                 }
                 dialog.dismiss();
             }

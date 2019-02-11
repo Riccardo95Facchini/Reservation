@@ -97,20 +97,6 @@ public class Fragment_Customer_Search extends Fragment
         geocoder = new Geocoder(getActivity(), Locale.getDefault());
         myLocation = getLastKnownLocation();
         
-        /*
-        //TODO: remove before final commit, only for emulator
-        Address a = null;
-        try
-        {
-            a = geocoder.getFromLocationName("Via prati 12 Piacenza 29121", 1).get(0);
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        myLocation.setLongitude(a.getLongitude());
-        myLocation.setLatitude(a.getLatitude());
-        */
-        
         db = FirebaseFirestore.getInstance();
         tagsCollection = db.collection("tags");
         shopsCollection = db.collection("shops");
@@ -172,6 +158,9 @@ public class Fragment_Customer_Search extends Fragment
      */
     private void searchTag(String text)
     {
+        text = text.replaceAll("[^a-zA-Z\\s]", "")
+                .replaceAll("\\s+", " ").toLowerCase().trim();
+        
         progressBar.setVisibility(View.VISIBLE);
         foundShops.clear();
         

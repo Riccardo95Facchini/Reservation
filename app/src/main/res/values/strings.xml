@@ -57,4 +57,11 @@
     <string name="userLowercase" translatable="false">user</string>
     <string name="noReservations">No pending reservations forund</string>
     <string name="noShopsFound">No shops found</string>
+    <string name="mon">MON</string>
+    <string name="sun">SUN</string>
+    <string name="sat">SAT</string>
+    <string name="fri">FRI</string>
+    <string name="thu">THU</string>
+    <string name="wed">WED</string>
+    <string name="tue">TUE</string>
 </resources>

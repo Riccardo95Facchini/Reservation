@@ -44,10 +44,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginEnd="8dp"
                 android:text="@string/sendButtonText"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sundayButton" />
 
@@ -82,22 +83,43 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:text="@string/mondayText"
-                app:layout_constraintEnd_toStartOf="@+id/tuesdayButton"
+                android:text="@string/mon"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/hoursText" />
+
+            <TextView
+                android:id="@+id/textMon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/closedLowercase"
+                android:textAlignment="center"
+                app:layout_constraintBaseline_toBaselineOf="@+id/mondayButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/mondayButton" />
 
             <Button
                 android:id="@+id/tuesdayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/tue"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mondayButton" />
+
+            <TextView
+                android:id="@+id/textTue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/tuesdayText"
+                android:text="@string/closedLowercase"
+                android:textAlignment="center"
+                app:layout_constraintBaseline_toBaselineOf="@+id/tuesdayButton"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/mondayButton"
-                app:layout_constraintTop_toTopOf="@+id/mondayButton" />
+                app:layout_constraintStart_toEndOf="@+id/tuesdayButton" />
 
             <Button
                 android:id="@+id/wednesdayButton"
@@ -105,22 +127,43 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:text="@string/wednesdayText"
-                app:layout_constraintEnd_toStartOf="@+id/thursdayButton"
+                android:text="@string/wed"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mondayButton" />
+                app:layout_constraintTop_toBottomOf="@+id/tuesdayButton" />
+
+            <TextView
+                android:id="@+id/textWed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/closedLowercase"
+                android:textAlignment="center"
+                app:layout_constraintBaseline_toBaselineOf="@+id/wednesdayButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/wednesdayButton" />
 
             <Button
                 android:id="@+id/thursdayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/thu"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/wednesdayButton" />
+
+            <TextView
+                android:id="@+id/textThu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/thursdayText"
+                android:text="@string/closedLowercase"
+                android:textAlignment="center"
+                app:layout_constraintBaseline_toBaselineOf="@+id/thursdayButton"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/wednesdayButton"
-                app:layout_constraintTop_toTopOf="@+id/wednesdayButton" />
+                app:layout_constraintStart_toEndOf="@+id/thursdayButton" />
 
             <Button
                 android:id="@+id/fridayButton"
@@ -128,33 +171,65 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:text="@string/fridayText"
-                app:layout_constraintEnd_toStartOf="@+id/saturdayButton"
+                android:text="@string/fri"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/wednesdayButton" />
+                app:layout_constraintTop_toBottomOf="@+id/thursdayButton" />
+
+            <TextView
+                android:id="@+id/textFri"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/closedLowercase"
+                android:textAlignment="center"
+                app:layout_constraintBaseline_toBaselineOf="@+id/fridayButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/fridayButton" />
 
             <Button
                 android:id="@+id/saturdayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/sat"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fridayButton" />
+
+            <TextView
+                android:id="@+id/textSat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/saturdayText"
-                app:layout_constraintEnd_toStartOf="@+id/sundayButton"
-                app:layout_constraintStart_toEndOf="@+id/fridayButton"
-                app:layout_constraintTop_toTopOf="@+id/fridayButton" />
+                android:text="@string/closedLowercase"
+                android:textAlignment="center"
+                app:layout_constraintBaseline_toBaselineOf="@+id/saturdayButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/saturdayButton" />
 
             <Button
                 android:id="@+id/sundayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/sun"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/saturdayButton" />
+
+            <TextView
+                android:id="@+id/textSun"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/sundayText"
+                android:text="@string/closedLowercase"
+                android:textAlignment="center"
+                app:layout_constraintBaseline_toBaselineOf="@+id/sundayButton"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/saturdayButton"
-                app:layout_constraintTop_toTopOf="@+id/fridayButton" />
+                app:layout_constraintStart_toEndOf="@+id/sundayButton" />
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
