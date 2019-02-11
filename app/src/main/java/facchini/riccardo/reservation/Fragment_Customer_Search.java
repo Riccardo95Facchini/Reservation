@@ -2,18 +2,19 @@ package facchini.riccardo.reservation;
 
 import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -38,13 +42,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import static android.content.Context.LOCATION_SERVICE;
 
 public class Fragment_Customer_Search extends Fragment
 {
@@ -58,9 +58,12 @@ public class Fragment_Customer_Search extends Fragment
     private ArrayList<Shop> foundShops = new ArrayList<>();
     
     //Location
-    private LocationManager mLocationManager;
+    private FusedLocationProviderClient client;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
     private Location myLocation;
     private Geocoder geocoder;
+    private boolean locationCalled = false;
     
     //Firestore
     FirebaseFirestore db;
@@ -92,10 +95,6 @@ public class Fragment_Customer_Search extends Fragment
         
         progressBar = view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
-        
-        //Find current location
-        geocoder = new Geocoder(getActivity(), Locale.getDefault());
-        myLocation = getLastKnownLocation();
         
         db = FirebaseFirestore.getInstance();
         tagsCollection = db.collection("tags");
@@ -151,6 +150,51 @@ public class Fragment_Customer_Search extends Fragment
         });
     }
     
+    private void getLocation()
+    {
+        locationCalled = true;
+        //Find current location
+        geocoder = new Geocoder(getActivity(), Locale.getDefault());
+        //myLocation = new Location("myLocation");
+        /* Location system #1*/
+        //myLocation = getLastKnownLocation();
+        try
+        {
+            /*Location #3*/
+            client = LocationServices.getFusedLocationProviderClient(getActivity());
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                return;
+            client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>()
+            {
+                @Override
+                public void onSuccess(Location location)
+                {
+                    myLocation = location;
+                }
+            }).addOnFailureListener(new OnFailureListener()
+            {
+                @Override
+                public void onFailure(@NonNull Exception e)
+                {
+                    e.printStackTrace();
+                }
+            });
+            
+            /*Location system #2*/
+//            locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+//            LocationListener locationListener = new MyLocationListener();
+//            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+//            {
+//                return;
+//            }
+//            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 10, locationListener);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    
     /**
      * Searches if the text in the search box corresponds to a tag in the system
      *
@@ -158,6 +202,9 @@ public class Fragment_Customer_Search extends Fragment
      */
     private void searchTag(String text)
     {
+        if (!locationCalled)
+            getLocation();
+        
         text = text.replaceAll("[^a-zA-Z\\s]", "")
                 .replaceAll("\\s+", " ").toLowerCase().trim();
         
@@ -206,7 +253,6 @@ public class Fragment_Customer_Search extends Fragment
                     //Since it's asynchronous we don't know when it's the last one and we have to check
                     if (foundShops.size() == shopsFromTags.size())
                     {
-                        
                         Address address = null;
                         Location shopLoc = new Location("Shop Location");
                         
@@ -262,42 +308,59 @@ public class Fragment_Customer_Search extends Fragment
         }
     };
     
-    /**
-     * Returns the last known location and works on physical phone too
-     *
-     * @return last known location
-     */
-    private Location getLastKnownLocation()
+    /*Location Systems #1 and #2*/
+    // Location system #1
+//    private Location getLastKnownLocation()
+//    {
+//        locationManager = (LocationManager) getActivity().getApplicationContext().getSystemService(LOCATION_SERVICE);
+//        List<String> providers = locationManager.getProviders(true);
+//        Location bestLocation = null;
+//        for (String provider : providers)
+//        {
+//
+//            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+//            {
+//                return null;
+//            }
+//            Location l = locationManager.getLastKnownLocation(provider);
+//
+//            if (l == null)
+//            {
+//                continue;
+//            }
+//            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy())
+//            {
+//                // Found best last known location: %s", l);
+//                bestLocation = l;
+//            }
+//        }
+//        return bestLocation;
+//    }
+    
+    
+    //Listener for system #2 of location
+    private class MyLocationListener implements LocationListener
     {
-        mLocationManager = (LocationManager) getActivity().getApplicationContext().getSystemService(LOCATION_SERVICE);
-        List<String> providers = mLocationManager.getProviders(true);
-        Location bestLocation = null;
-        for (String provider : providers)
+        @Override
+        public void onLocationChanged(Location loc)
         {
-            
-            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            try
             {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return null;
-            }
-            Location l = mLocationManager.getLastKnownLocation(provider);
-            
-            if (l == null)
+                myLocation.setLongitude(loc.getLongitude());
+                myLocation.setLatitude(loc.getLatitude());
+            } catch (Exception e)
             {
-                continue;
-            }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy())
-            {
-                // Found best last known location: %s", l);
-                bestLocation = l;
+                e.printStackTrace();
             }
         }
-        return bestLocation;
+        
+        @Override
+        public void onProviderDisabled(String provider) {}
+        
+        @Override
+        public void onProviderEnabled(String provider) {}
+        
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
     }
 }

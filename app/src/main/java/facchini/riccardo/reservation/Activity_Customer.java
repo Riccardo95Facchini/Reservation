@@ -1,9 +1,12 @@
 package facchini.riccardo.reservation;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -229,7 +232,6 @@ public class Activity_Customer extends AppCompatActivity
             }
         };
     }
-    
     
     /**
      * Shows the menu (3 dots) when touched
