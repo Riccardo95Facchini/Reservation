@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,9 +42,6 @@ public class Activity_Login extends AppCompatActivity
     private FirebaseFirestore db;
     private CollectionReference customers;
     private CollectionReference shops;
-    //Storage
-    private FirebaseStorage firebaseStorage;
-    private StorageReference storageReference;
     
     //Strings
     private String uid;
@@ -54,12 +52,12 @@ public class Activity_Login extends AppCompatActivity
     
     //UI
     //Buttons
-    private Button createCustomerButton;
-    private Button createShopButton;
+    private ImageButton createCustomerButton;
+    private ImageButton createShopButton;
     //Progress bar
     private ProgressBar startupProgressBar;
     //Text view
-    private TextView startupText;
+    private TextView startupText, selectTypeText;
     
     
     @Override
@@ -76,8 +74,6 @@ public class Activity_Login extends AppCompatActivity
         db = FirebaseFirestore.getInstance();
         
         //Initialize Firebase references
-        //databaseReference = firebaseDatabase.getReference().child("messages"); //Takes only the messages child
-        //storageReference = firebaseStorage.getReference().child("chat_photos");
         customers = db.collection("customers");
         shops = db.collection("shops");
         
@@ -86,6 +82,7 @@ public class Activity_Login extends AppCompatActivity
         createShopButton = findViewById(R.id.createShopButton);
         startupProgressBar = findViewById(R.id.startupProgressBar);
         startupText = findViewById(R.id.startupText);
+        selectTypeText = findViewById(R.id.selectTypeText);
         
         //Firebase Authentication
         authStateListener = new FirebaseAuth.AuthStateListener()
@@ -206,15 +203,11 @@ public class Activity_Login extends AppCompatActivity
     {
         if (isCustomer)
         {
-            //TODO open customer activity
-            Toast.makeText(this, "CUSTOMER", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, Activity_Customer.class));
             firebaseAuth.removeAuthStateListener(authStateListener);
             finish();
         } else if (isShop)
         {
-            //TODO open shop activity
-            Toast.makeText(this, "SHOP", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, Activity_Shop.class));
             firebaseAuth.removeAuthStateListener(authStateListener);
             finish();
@@ -222,7 +215,6 @@ public class Activity_Login extends AppCompatActivity
         {
             //Stay here and make the user create a either a shop or a customer account
             disableProgressEnableButtons();
-            Toast.makeText(this, "NOTHING", Toast.LENGTH_SHORT).show();
             setTitle(R.string.registrations);
         }
     }
@@ -239,6 +231,7 @@ public class Activity_Login extends AppCompatActivity
             {
                 createCustomerButton.setVisibility(View.VISIBLE);
                 createShopButton.setVisibility(View.VISIBLE);
+                selectTypeText.setVisibility(View.VISIBLE);
                 startupProgressBar.setVisibility(View.GONE);
                 startupText.setVisibility(View.GONE);
             }

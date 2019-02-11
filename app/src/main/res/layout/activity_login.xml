@@ -7,34 +7,43 @@
     android:layout_height="match_parent"
     tools:context=".Activity_Login">
 
-    <Button
-        android:id="@+id/createCustomerButton"
+    <TextView
+        android:id="@+id/selectTypeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/createCustomer"
+        android:text="@string/welcome_are_you_a_customer_or_a_shop_owner"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/createShopButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:id="@+id/createCustomerButton"
+        android:layout_width="0dp"
+        android:layout_height="341dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:background="@drawable/customer_cartoon"
+        android:text="@string/createCustomer"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/createShopButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/selectTypeText" />
+
+    <ImageButton
+        android:id="@+id/createShopButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/shop_cartoon"
         android:text="@string/createShop"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/createCustomerButton"
         app:layout_constraintStart_toStartOf="@+id/createCustomerButton"
-        app:layout_constraintTop_toBottomOf="@+id/createCustomerButton"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/createCustomerButton" />
 
     <ProgressBar
         android:id="@+id/startupProgressBar"

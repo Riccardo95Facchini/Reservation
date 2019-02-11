@@ -98,22 +98,6 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         fridayButton = findViewById(R.id.fridayButton);
         saturdayButton = findViewById(R.id.saturdayButton);
         sundayButton = findViewById(R.id.sundayButton);
-
-//        TextView textMon = findViewById(R.id.textMon);
-//        TextView textTue = findViewById(R.id.textTue);
-//        TextView textWed = findViewById(R.id.textWed);
-//        TextView textThu = findViewById(R.id.textThu);
-//        TextView textFri = findViewById(R.id.textFri);
-//        TextView textSat = findViewById(R.id.textSat);
-//        TextView textSun = findViewById(R.id.textSun);
-//
-//        hoursTexts.put(getString(R.string.mondayText), textMon);
-//        hoursTexts.put(getString(R.string.tuesdayText), textTue);
-//        hoursTexts.put(getString(R.string.wednesdayText), textWed);
-//        hoursTexts.put(getString(R.string.thursdayText), textThu);
-//        hoursTexts.put(getString(R.string.fridayText), textFri);
-//        hoursTexts.put(getString(R.string.saturdayText), textSat);
-//        hoursTexts.put(getString(R.string.sundayText), textSun);
         
         hoursTexts = new HashMap<>();
         
