@@ -46,6 +46,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/colorPrimary"
                 android:text="@string/sendButtonText"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
@@ -83,6 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:backgroundTint="@color/colorOptionalButton"
                 android:text="@string/mon"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/hoursText" />
@@ -103,11 +105,10 @@
                 android:id="@+id/tuesdayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
+                android:backgroundTint="@color/colorOptionalButton"
                 android:text="@string/tue"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mondayButton" />
+                tools:layout_editor_absoluteX="8dp"
+                tools:layout_editor_absoluteY="312dp" />
 
             <TextView
                 android:id="@+id/textTue"
@@ -127,6 +128,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:backgroundTint="@color/colorOptionalButton"
                 android:text="@string/wed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tuesdayButton" />
@@ -149,6 +151,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:backgroundTint="@color/colorOptionalButton"
                 android:text="@string/thu"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/wednesdayButton" />
@@ -171,6 +174,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:backgroundTint="@color/colorOptionalButton"
                 android:text="@string/fri"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/thursdayButton" />
@@ -193,6 +197,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:backgroundTint="@color/colorOptionalButton"
                 android:text="@string/sat"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/fridayButton" />
@@ -215,6 +220,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:backgroundTint="@color/colorOptionalButton"
                 android:text="@string/sun"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/saturdayButton" />
