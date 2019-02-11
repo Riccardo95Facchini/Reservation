@@ -54,19 +54,8 @@ public class Activity_Customer extends AppCompatActivity
         bottomMenu = findViewById(R.id.bottomMenu);
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
         
+        getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
         setupFirebaseListener();
-    }
-    
-    private boolean checkMapServices()
-    {
-//        if (isServicesOK())
-//        {
-        if (isMapsEnabled())
-        {
-            return true;
-        }
-//        }
-        return false;
     }
     
     /**
@@ -103,53 +92,24 @@ public class Activity_Customer extends AppCompatActivity
     
     private void getLocationPermission()
     {
+        if (mLocationPermissionGranted)
+            return;
+        
         /*
          * Request location permission, so that we can get the location of the
          * device. The result of the permission request is handled by a callback,
          * onRequestPermissionsResult.
          */
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED)
-        {
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             mLocationPermissionGranted = true;
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
-        } else
-        {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+        else
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
     }
-
-//    public boolean isServicesOK()
-//    {
-//        Log.d(TAG, "isServicesOK: checking google services version");
-//
-//        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
-//
-//        if (available == ConnectionResult.SUCCESS)
-//        {
-//            //everything is fine and the user can make map requests
-//            Log.d(TAG, "isServicesOK: Google Play Services is working");
-//            return true;
-//        } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available))
-//        {
-//            //an error occured but we can resolve it
-//            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
-//            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(this, available, ERROR_DIALOG_REQUEST);
-//            dialog.show();
-//        } else
-//        {
-//            Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
-//        }
-//        return false;
-//    }
     
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
-                                           @NonNull int[] grantResults)
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults)
     {
         mLocationPermissionGranted = false;
         switch (requestCode)
@@ -157,11 +117,8 @@ public class Activity_Customer extends AppCompatActivity
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
             {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     mLocationPermissionGranted = true;
-                }
             }
         }
     }
@@ -170,21 +127,13 @@ public class Activity_Customer extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult: called.");
         switch (requestCode)
         {
             case PERMISSIONS_REQUEST_ENABLE_GPS:
             {
-                if (mLocationPermissionGranted)
-                {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
-                } else
-                {
-                    getLocationPermission();
-                }
+                getLocationPermission();
             }
         }
-        
     }
     
     
@@ -207,6 +156,8 @@ public class Activity_Customer extends AppCompatActivity
                     break;
                 case R.id.bottomSearch:
                     currentMenu = R.id.bottomSearch;
+                    isMapsEnabled();
+                    getLocationPermission();
                     selected = new Fragment_Customer_Search();
                     break;
                 case R.id.bottomProfile:
@@ -262,13 +213,9 @@ public class Activity_Customer extends AppCompatActivity
         //On resume adds again the listener for the authentication
         FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
         
-        if (checkMapServices())
+        if (currentMenu == R.id.bottomSearch && isMapsEnabled())
         {
-            if (mLocationPermissionGranted)
-            {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
-            } else
-                getLocationPermission();
+            getLocationPermission();
         }
     }
     
