@@ -42,7 +42,7 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
         
         holder.textViewShop.setText(shop.getName());
         holder.textViewAddress.setText(shop.getFullAddress());
-        holder.textViewWhen.setText(res.getWhen());
+        holder.textViewWhen.setText(res.getDateFormatted());
     }
     
     @Override

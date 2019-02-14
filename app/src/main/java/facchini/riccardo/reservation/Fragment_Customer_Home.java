@@ -172,8 +172,8 @@ public class Fragment_Customer_Home extends Fragment implements RecyclerViewClic
                             if (documentSnapshot.exists())
                                 resList.add(
                                         new Reservation_Customer_Home(
-                                                documentSnapshot.toObject(Shop.class),
-                                                ((Timestamp) doc.get("time")).toDate()));
+                                                ((Timestamp) doc.get("time")).toDate(),
+                                                documentSnapshot.toObject(Shop.class)));
                             
                             if (resList.size() == snap.size())
                                 orderList();

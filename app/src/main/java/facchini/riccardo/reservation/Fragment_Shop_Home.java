@@ -137,8 +137,8 @@ public class Fragment_Shop_Home extends Fragment
                     if (documentSnapshot.exists())
                         reservationShopHomeList.add(
                                 new Reservation_Shop_Home(
-                                        documentSnapshot.toObject(Customer.class),
-                                        (Date) doc.get("time")));
+                                        (Date) doc.get("time"),
+                                        documentSnapshot.toObject(Customer.class)));
                     
                     if (reservationShopHomeList.size() == snap.size())
                         orderList();
@@ -154,8 +154,8 @@ public class Fragment_Shop_Home extends Fragment
     {
         Collections.sort(reservationShopHomeList, reservationComparator);
         
-        for (Reservation_Shop_Home r : reservationShopHomeList)
-            adapter.add(r.getInfo());
+        //for (Reservation_Shop_Home r : reservationShopHomeList)
+            //adapter.add(r.getInfo());
     }
     
     /**
