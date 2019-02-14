@@ -13,4 +13,9 @@ public class Reservation_Shop_Home extends Reservation
     }
     
     public Customer getCustomer() {return customer;}
+    
+    public String getInfo()
+    {
+        return String.format("%s    at: %s\n%s", date.toString(), date.toString(), customer.getInfo());
+    }
 }

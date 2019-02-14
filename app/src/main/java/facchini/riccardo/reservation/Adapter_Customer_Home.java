@@ -30,7 +30,7 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
     public Reservation_Customer_ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.card_customer_layout, null);
+        View view = inflater.inflate(R.layout.card_customer_home, null);
         return new Reservation_Customer_ViewHolder(view);
     }
     
@@ -60,7 +60,7 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
         {
             super(itemView);
             
-            textViewShop = itemView.findViewById(R.id.textViewShop);
+            textViewShop = itemView.findViewById(R.id.textViewCustomer);
             textViewAddress = itemView.findViewById(R.id.textViewAddress);
             textViewWhen = itemView.findViewById(R.id.textViewWhen);
         }

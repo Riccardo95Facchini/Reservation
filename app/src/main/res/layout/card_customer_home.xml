@@ -25,7 +25,7 @@
             android:padding="8dp">
 
             <TextView
-                android:id="@+id/textViewShop"
+                android:id="@+id/textViewCustomer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
@@ -40,7 +40,7 @@
                 android:id="@+id/textViewAddress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/textViewShop"
+                android:layout_below="@id/textViewCustomer"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="5dp"
                 android:text="Via Roma 72 Piacenza"

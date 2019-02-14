@@ -13,5 +13,4 @@ public class Reservation_Customer_Home extends Reservation
     }
     
     public Shop getShop() {return shop;}
-    
 }
