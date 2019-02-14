@@ -1,15 +1,17 @@
 package facchini.riccardo.reservation;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -27,9 +29,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class Fragment_Customer_Home extends Fragment
+public class Fragment_Customer_Home extends Fragment implements RecyclerViewClickListener
 {
     //Firestore
     private FirebaseFirestore db;
@@ -38,10 +42,13 @@ public class Fragment_Customer_Home extends Fragment
     private Calendar now;
     private String customerUid;
     private SharedViewModel viewModel;
-    private List<Reservation_Customer_Home> reservationCustomerHomeList;
-    private ArrayAdapter<String> adapter;
+    private List<Reservation_Customer_Home> resList;
+    //private ArrayAdapter<String> adapter;
     
-    private ListView futureReservations;
+    private RecyclerView recyclerView;
+    private Adapter_Customer_Home adapterCustomerHome;
+    
+    //private ListView futureReservations;
     private TextView noReservationsText;
     private ProgressBar progressBar;
     
@@ -64,18 +71,36 @@ public class Fragment_Customer_Home extends Fragment
         
         now = Calendar.getInstance();
         
-        futureReservations = view.findViewById(R.id.futureReservations);
-        futureReservations.setVisibility(View.VISIBLE);
+        try
+        {
+            recyclerView = view.findViewById(R.id.futureReservations);
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            
+            resList = new ArrayList<>();
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+//        futureReservations = view.findViewById(R.id.futureReservations);
+//        futureReservations.setVisibility(View.VISIBLE);
         
         noReservationsText = view.findViewById(R.id.noReservations);
         noReservationsText.setVisibility(View.GONE);
         
         progressBar = view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
-        
-        adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-        futureReservations.setAdapter(adapter);
-        reservationCustomerHomeList = new ArrayList<>();
+
+//        adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+//        futureReservations.setAdapter(adapter);
+        resList = new ArrayList<>();
+    }
+    
+    @Override
+    public void recyclerViewListClicked(View v, int position)
+    {
+        //TODO: what to do when a reservation is clicked
     }
     
     @Override
@@ -126,7 +151,8 @@ public class Fragment_Customer_Home extends Fragment
         progressBar.setVisibility(View.VISIBLE);
         if (snap.isEmpty())
         {
-            futureReservations.setVisibility(View.GONE);
+            //futureReservations.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             noReservationsText.setVisibility(View.VISIBLE);
             return;
@@ -144,12 +170,12 @@ public class Fragment_Customer_Home extends Fragment
                         try
                         {
                             if (documentSnapshot.exists())
-                                reservationCustomerHomeList.add(
+                                resList.add(
                                         new Reservation_Customer_Home(
                                                 documentSnapshot.toObject(Shop.class),
                                                 ((Timestamp) doc.get("time")).toDate()));
                             
-                            if (reservationCustomerHomeList.size() == snap.size())
+                            if (resList.size() == snap.size())
                                 orderList();
                         } catch (Exception e)
                         {
@@ -170,10 +196,19 @@ public class Fragment_Customer_Home extends Fragment
     private void orderList()
     {
         
-        Collections.sort(reservationCustomerHomeList, reservationComparator);
+        Collections.sort(resList, reservationComparator);
         
-        for (Reservation_Customer_Home r : reservationCustomerHomeList)
-            adapter.add(r.getInfo());
+        try
+        {
+            adapterCustomerHome = new Adapter_Customer_Home(getContext(), resList, this);
+            recyclerView.setAdapter(adapterCustomerHome);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+//        for (Reservation_Customer_Home r : resList)
+//            adapter.add(r.getInfo());
         
         progressBar.setVisibility(View.GONE);
     }
