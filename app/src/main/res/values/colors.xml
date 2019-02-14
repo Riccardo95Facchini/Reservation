@@ -9,6 +9,6 @@
     <color name="colorPrimaryDark">#2E6B98</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorOptionalButton">#808080</color>
-    <color name="colorBackground">#D0D0D0</color>
+    <color name="colorBackground">#F0F0F0</color>
 
-    </resources>
+</resources>
