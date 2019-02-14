@@ -3,7 +3,6 @@ package facchini.riccardo.reservation;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +18,12 @@ public class Shop implements Parcelable
     private String city;
     private String zip;
     private String phone;
+    private double latitude;
+    private double longitude;
     private ArrayList<String> tags;
     private Map<String, List<String>> hours;
     
-    public Shop(String uid, String name, String mail, String address1, String address2, String city, String zip, String phone, ArrayList<String> tags, Map<String, List<String>> hours)
+    public Shop(String uid, String name, String mail, String address1, String address2, String city, String zip, String phone, double latitude, double longitude, ArrayList<String> tags, Map<String, List<String>> hours)
     {
         this.uid = uid;
         this.name = name;
@@ -32,6 +33,8 @@ public class Shop implements Parcelable
         this.city = city;
         this.zip = zip;
         this.phone = phone;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.tags = new ArrayList<>(tags);
         this.hours = new HashMap<>(hours);
     }
@@ -46,6 +49,8 @@ public class Shop implements Parcelable
         this.city = s.city;
         this.zip = s.zip;
         this.phone = s.phone;
+        this.latitude = s.latitude;
+        this.longitude = s.longitude;
         this.tags = new ArrayList<>(s.tags);
         this.hours = new HashMap<>(s.hours);
     }
@@ -60,6 +65,8 @@ public class Shop implements Parcelable
         this.city = (String) m.get("city");
         this.zip = (String) m.get("zip");
         this.phone = (String) m.get("phone");
+        this.latitude = (double) m.get("latitude");
+        this.longitude = (double) m.get("longitude");
         this.tags = new ArrayList<>((ArrayList<String>) m.get("tags"));
         this.hours = new HashMap<>((HashMap<String, List<String>>) m.get("hours"));
     }
@@ -75,6 +82,8 @@ public class Shop implements Parcelable
         dest.writeString(city);
         dest.writeString(zip);
         dest.writeString(phone);
+        dest.writeDouble(latitude);
+        dest.writeDouble(longitude);
         dest.writeList(new ArrayList<>(tags));
         dest.writeMap(new HashMap<>(hours));
     }
@@ -89,6 +98,8 @@ public class Shop implements Parcelable
         this.city = in.readString();
         this.zip = in.readString();
         this.phone = in.readString();
+        this.latitude = in.readDouble();
+        this.longitude = in.readDouble();
         this.tags = in.readArrayList(Shop.class.getClassLoader());
         this.hours = in.readHashMap(Shop.class.getClassLoader());
     }
@@ -164,6 +175,10 @@ public class Shop implements Parcelable
     public ArrayList<String> getTags() {return new ArrayList<String>(tags);}
     
     public Map<String, List<String>> getHours() {return new HashMap<>(hours);}
+    
+    public double getLatitude() {return latitude;}
+    
+    public double getLongitude() {return longitude;}
     
     @Override
     public int describeContents()

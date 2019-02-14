@@ -3,6 +3,7 @@ package facchini.riccardo.reservation;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Geocoder;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,10 +21,12 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class Activity_Shop_TagHours extends AppCompatActivity
@@ -31,7 +34,6 @@ public class Activity_Shop_TagHours extends AppCompatActivity
     //Firestore
     private FirebaseFirestore db;
     private CollectionReference shopsReference;
-    private CollectionReference tagsReference;
     
     //UI
     //Buttons
@@ -45,6 +47,7 @@ public class Activity_Shop_TagHours extends AppCompatActivity
     private Map<String, List<String>> hours;
     
     private String uid, mail, phone, name, address1, address2, city, zip;
+    private double latitude, longitude;
     
     private ArrayAdapter<String> adapter;
     
@@ -272,6 +275,8 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         address2 = intent.getStringExtra("address2");
         city = intent.getStringExtra("city");
         zip = intent.getStringExtra("zip");
+        latitude = intent.getDoubleExtra("latitude", 0);
+        longitude = intent.getDoubleExtra("longitude", 0);
     }
     
     /**
@@ -303,62 +308,11 @@ public class Activity_Shop_TagHours extends AppCompatActivity
     {
         db = FirebaseFirestore.getInstance();
         shopsReference = db.collection("shops");
-        Shop newShop = new Shop(uid, name, mail, address1, address2, city, zip, phone, tags, hours);
+        Shop newShop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude, longitude, tags, hours);
         shopsReference.document(uid).set(newShop);
-        tagsReference = db.collection("tags");
         createDocumentReservation();
-        for (String t : tags)
-            checkTagExists(t);
         
         startActivity(new Intent(this, Activity_Login.class));
-    }
-    
-    /**
-     * Checks if the tag already exists in the database,
-     * it's used to decide whether to update an existing document in the database or insert a new one
-     *
-     * @param t Name of the document/tag
-     */
-    private void checkTagExists(final String t)
-    {
-        tagsReference.document(t).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
-        {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot)
-            {
-                if (documentSnapshot.exists())
-                    updateDocumentTag(t);
-                else
-                    createDocumentTag(t);
-            }
-        }).addOnFailureListener(new OnFailureListener()
-        {
-            @Override
-            public void onFailure(@NonNull Exception e)
-            {
-                Toast.makeText(Activity_Shop_TagHours.this, "Something went wrong", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-    
-    /**
-     * Creates a document for a new tag in the database,
-     * also places a useless field inside of it because Firestore doesn't allow for empty documents
-     *
-     * @param t Name of the document/tag
-     */
-    private void createDocumentTag(final String t)
-    {
-        Map<String, Object> docData = new HashMap<>();
-        docData.put("created", "");
-        tagsReference.document(t).set(docData).addOnSuccessListener(new OnSuccessListener<Void>()
-        {
-            @Override
-            public void onSuccess(Void aVoid)
-            {
-                updateDocumentTag(t);
-            }
-        });
     }
     
     /**
@@ -375,16 +329,6 @@ public class Activity_Shop_TagHours extends AppCompatActivity
             {
             }
         });
-    }
-    
-    /**
-     * Updates an existing document
-     *
-     * @param t Name of the document/tag
-     */
-    private void updateDocumentTag(String t)
-    {
-        tagsReference.document(t).update(uid, uid);
     }
     
     /**

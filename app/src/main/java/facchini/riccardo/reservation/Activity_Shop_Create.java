@@ -1,6 +1,8 @@
 package facchini.riccardo.reservation;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -8,11 +10,16 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.util.Locale;
 
 public class Activity_Shop_Create extends AppCompatActivity
 {
     private String uid;
     private String mail;
+    private Address address;
     
     
     //UI
@@ -207,6 +214,31 @@ public class Activity_Shop_Create extends AppCompatActivity
      */
     private boolean isFormFull()
     {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        String fulladdress = String.format("%s %s %s %s",
+                address1Text.getText().toString().trim(),
+                address2Text.getText().toString().trim(),
+                cityText.getText().toString().trim(),
+                zipText.getText().toString().trim());
+    
+        address = null;
+        
+        try
+        {
+            address = geocoder.getFromLocationName(fulladdress, 1).get(0);
+        } catch (IOException e)
+        {
+            Toast.makeText(this, getString(R.string.wrongAddress), Toast.LENGTH_SHORT).show();
+            return false;
+        } finally
+        {
+            if (address == null)
+            {
+                Toast.makeText(this, getString(R.string.wrongAddress), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        
         return shopNameText.getText().toString().length() > 0 &&
                 address1Text.getText().toString().length() > 0 &&
                 address2Text.getText().toString().length() > 0 &&
@@ -226,7 +258,9 @@ public class Activity_Shop_Create extends AppCompatActivity
                 .putExtra("city", cityText.getText().toString().trim())
                 .putExtra("zip", zipText.getText().toString().trim())
                 .putExtra("phone", phoneText.getText().toString().trim())
-                .putExtra("mail", mailText.getText().toString().trim());
+                .putExtra("mail", mailText.getText().toString().trim())
+                .putExtra("latitude", address.getLatitude())
+                .putExtra("longitude", address.getLongitude());
         startActivity(intent);
     }
 }

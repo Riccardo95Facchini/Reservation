@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,8 +30,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -43,8 +47,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class Fragment_Customer_Search extends Fragment
 {
@@ -55,7 +62,8 @@ public class Fragment_Customer_Search extends Fragment
     private ProgressBar progressBar;
     
     private SharedViewModel viewModel;
-    private ArrayList<Shop> foundShops = new ArrayList<>();
+    //private ArrayList<Shop> foundShops = new ArrayList<>();
+    private ArrayList<SearchResult> foundShops = new ArrayList<>();
     
     //Location
     private FusedLocationProviderClient client;
@@ -64,6 +72,9 @@ public class Fragment_Customer_Search extends Fragment
     private Location myLocation;
     private Geocoder geocoder;
     private boolean locationCalled = false;
+    private int distance = 2000;
+    
+    private double deltaLng, deltaLat;
     
     //Firestore
     FirebaseFirestore db;
@@ -133,7 +144,7 @@ public class Fragment_Customer_Search extends Fragment
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                Shop selected = foundShops.get(position);
+                Shop selected = foundShops.get(position).getShopFound();
                 viewModel.setCurrentShop(selected);
                 getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
                 Intent intent = new Intent();
@@ -148,6 +159,9 @@ public class Fragment_Customer_Search extends Fragment
                 startActivity(intent);
             }
         });
+        
+        if (!locationCalled)
+            getLocation();
     }
     
     private void getLocation()
@@ -202,94 +216,186 @@ public class Fragment_Customer_Search extends Fragment
      */
     private void searchTag(String text)
     {
-        if (!locationCalled)
-            getLocation();
+        try
+        {
+            text = text.replaceAll("[^a-zA-Z\\s]", "")
+                    .replaceAll("\\s+", " ").toLowerCase().trim();
+            
+            progressBar.setVisibility(View.VISIBLE);
+            foundShops.clear();
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+//        tagsCollection.document(text).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+//        {
+//            @Override
+//            public void onSuccess(DocumentSnapshot documentSnapshot)
+//            {
+//                if (documentSnapshot.exists())
+//                    displayShops(documentSnapshot.getData());
+//                else
+//                {
+//                    progressBar.setVisibility(View.GONE);
+//                    Toast.makeText(getContext(), getString(R.string.noShopsFound), Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
         
-        text = text.replaceAll("[^a-zA-Z\\s]", "")
-                .replaceAll("\\s+", " ").toLowerCase().trim();
+        getDeltas(distance);
         
-        progressBar.setVisibility(View.VISIBLE);
-        foundShops.clear();
         
-        tagsCollection.document(text).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+        double d1 = myLocation.getLatitude() - deltaLat,
+                d2 = myLocation.getLatitude() + deltaLat,
+                d3 = myLocation.getLongitude() - deltaLng,
+                d4 = myLocation.getLongitude() + deltaLng;
+        
+        
+        Task taskLat = shopsCollection.whereArrayContains("tags", text)
+                .whereGreaterThanOrEqualTo("latitude", d1)
+                .whereLessThanOrEqualTo("latitude", d2)
+                .get();
+        
+        Task taskLng = shopsCollection.whereArrayContains("tags", text)
+                .whereGreaterThanOrEqualTo("longitude", d3)
+                .whereLessThanOrEqualTo("longitude", d4)
+                .get();
+        
+        Task<List<QuerySnapshot>> allTasks = Tasks.whenAllSuccess(taskLat, taskLng);
+        allTasks.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>()
         {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot)
+            public void onSuccess(List<QuerySnapshot> querySnapshots)
             {
-                if (documentSnapshot.exists())
-                    displayShops(documentSnapshot.getData());
-                else
+                try
                 {
-                    progressBar.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), getString(R.string.noShopsFound), Toast.LENGTH_SHORT).show();
+                    Set<String> queryShops = new HashSet<>();
+                    Location shopLocation = new Location("ShopLocation");
+                    
+                    int i = 0;
+                    for (QuerySnapshot snapshot : querySnapshots)
+                    {
+                        for (QueryDocumentSnapshot doc : snapshot)
+                        {
+                            String uid = (String) doc.getData().get("uid");
+                            
+                            if (i == 0)
+                            {
+                                queryShops.add(uid);
+                            } else if (queryShops.contains(uid))
+                            {
+                                Shop shop = new Shop(doc.getData());
+                                
+                                shopLocation.setLatitude(shop.getLatitude());
+                                shopLocation.setLongitude(shop.getLongitude());
+                                float dist = myLocation.distanceTo(shopLocation);
+                                
+                                if (dist <= distance)
+                                    foundShops.add(new SearchResult(shop, dist));
+                            }
+                        }
+                        i++;
+                    }
+                    
+                    queryShops.clear();
+                    
+                    if (foundShops.isEmpty())
+                    {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), getString(R.string.noShopsFound), Toast.LENGTH_SHORT).show();
+                    } else
+                    {
+                        orderList(foundShops);
+                        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+                        foundShopsView.setAdapter(adapter);
+                        
+                        for (SearchResult fs : foundShops)
+                            adapter.add(fs.getShopFound().getInfo().concat(String.format("\nDistance: %s", fs.getFormatDistance())));
+                        
+                        progressBar.setVisibility(View.GONE);
+                        
+                    }
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
                 }
             }
         });
     }
-    
-    /**
-     * If the tag exists pull all the info of the shops that have that tag and displays them in the listview
-     *
-     * @param shopsFromTags Map<uid, uid>, basically the entire document with the given tag
-     */
-    private void displayShops(final Map<String, Object> shopsFromTags)
-    {
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-        foundShopsView.setAdapter(adapter);
-        
-        for (Map.Entry<String, Object> entry : shopsFromTags.entrySet())
-        {
-            shopsQuery = shopsCollection.whereEqualTo("uid", entry.getValue());
-            
-            
-            shopsQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
-            {
-                @Override
-                public void onSuccess(QuerySnapshot queryDocumentSnapshots)
-                {
-                    for (QueryDocumentSnapshot snap : queryDocumentSnapshots)
-                        foundShops.add(snap.toObject(Shop.class)); //Add shop to the list of found ones
-                    
-                    //Since it's asynchronous we don't know when it's the last one and we have to check
-                    if (foundShops.size() == shopsFromTags.size())
-                    {
-                        Address address = null;
-                        Location shopLoc = new Location("Shop Location");
-                        
-                        ArrayList<SearchResult> searchResults = new ArrayList<>();
-                        
-                        for (Shop s : foundShops)
-                        {
-                            try
-                            {
-                                //TODO: OPTIMIZE THIS PART
-                                address = geocoder.getFromLocationName(s.getFullAddress(), 1).get(0);
-                                shopLoc.setLatitude(address.getLatitude());
-                                shopLoc.setLongitude(address.getLongitude());
-                            } catch (IOException e)
-                            {
-                                e.printStackTrace();
-                            }
-                            
-                            try
-                            {
-                                searchResults.add(new SearchResult(s, myLocation.distanceTo(shopLoc)));
-                            } catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                        orderList(searchResults);
-                        
-                        for (SearchResult sr : searchResults)
-                            adapter.add(sr.getShopFound().getInfo().concat(String.format("\nDistance: %s", sr.getFormatDistance())));
-                        
-                        progressBar.setVisibility(View.GONE);
-                    }
-                }
-            });
-        }
-    }
+
+//    /**
+//     * If the tag exists pull all the info of the shops that have that tag and displays them in the listview
+//     *
+//     * @param shopsFromTags Map<uid, uid>, basically the entire document with the given tag
+//     */
+//    private void displayShops(final Map<String, Object> shopsFromTags)
+//    {
+//        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+//        foundShopsView.setAdapter(adapter);
+//
+//        for (Map.Entry<String, Object> entry : shopsFromTags.entrySet())
+//        {
+//            shopsQuery = shopsCollection.whereEqualTo("uid", entry.getValue());
+//
+//
+//            shopsQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
+//            {
+//                @Override
+//                public void onSuccess(QuerySnapshot queryDocumentSnapshots)
+//                {
+//                    for (QueryDocumentSnapshot snap : queryDocumentSnapshots)
+//                        foundShops.add(snap.toObject(Shop.class)); //Add shop to the list of found ones
+//
+//                    //Since it's asynchronous we don't know when it's the last one and we have to check
+//                    if (foundShops.size() == shopsFromTags.size())
+//                    {
+//                        Address address = null;
+//                        Location shopLoc = new Location("Shop Location");
+//
+//                        ArrayList<SearchResult> searchResults = new ArrayList<>();
+//
+//                        for (Shop s : foundShops)
+//                        {
+//                            try
+//                            {
+//                                //TODO: OPTIMIZE THIS PART
+//                                address = geocoder.getFromLocationName(s.getFullAddress(), 1).get(0);
+//                                shopLoc.setLatitude(address.getLatitude());
+//                                shopLoc.setLongitude(address.getLongitude());
+//
+//                                try
+//                                {
+//                                    db.collection("test").add(shopLoc);
+//                                } catch (Exception e)
+//                                {
+//                                    e.printStackTrace();
+//                                }
+//
+//                            } catch (IOException e)
+//                            {
+//                                e.printStackTrace();
+//                            }
+//
+//                            try
+//                            {
+//                                searchResults.add(new SearchResult(s, myLocation.distanceTo(shopLoc)));
+//                            } catch (Exception e)
+//                            {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                        orderList(searchResults);
+//
+//                        for (SearchResult sr : searchResults)
+//                            adapter.add(sr.getShopFound().getInfo().concat(String.format("\nDistance: %s", sr.getFormatDistance())));
+//
+//                        progressBar.setVisibility(View.GONE);
+//                    }
+//                }
+//            });
+//        }
+//    }
     
     private void orderList(ArrayList<SearchResult> searchResults)
     {
@@ -337,30 +443,51 @@ public class Fragment_Customer_Search extends Fragment
 //        return bestLocation;
 //    }
     
-    
-    //Listener for system #2 of location
-    private class MyLocationListener implements LocationListener
+    private void getDeltas(int dist)
     {
-        @Override
-        public void onLocationChanged(Location loc)
+        try
         {
-            try
+            if (myLocation == null)
             {
-                myLocation.setLongitude(loc.getLongitude());
-                myLocation.setLatitude(loc.getLatitude());
-            } catch (Exception e)
+                getLocation();
+                getDeltas(dist);
+            } else
             {
-                e.printStackTrace();
+                
+                final double earthRadius = 6371000; //meters
+                
+                deltaLat = (dist / earthRadius) * (180 / Math.PI);
+                deltaLng = Math.toDegrees((dist / (earthRadius * Math.cos(Math.toRadians(myLocation.getLatitude())))));
             }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
         }
-        
-        @Override
-        public void onProviderDisabled(String provider) {}
-        
-        @Override
-        public void onProviderEnabled(String provider) {}
-        
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
     }
+    
+    /*Listener for system #2 of location*/
+//    private class MyLocationListener implements LocationListener
+//    {
+//        @Override
+//        public void onLocationChanged(Location loc)
+//        {
+//            try
+//            {
+//                myLocation.setLongitude(loc.getLongitude());
+//                myLocation.setLatitude(loc.getLatitude());
+//            } catch (Exception e)
+//            {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        @Override
+//        public void onProviderDisabled(String provider) {}
+//
+//        @Override
+//        public void onProviderEnabled(String provider) {}
+//
+//        @Override
+//        public void onStatusChanged(String provider, int status, Bundle extras) {}
+//    }
 }

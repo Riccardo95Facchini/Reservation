@@ -43,12 +43,10 @@ public class Fragment_Customer_Home extends Fragment implements RecyclerViewClic
     private String customerUid;
     private SharedViewModel viewModel;
     private List<Reservation_Customer_Home> resList;
-    //private ArrayAdapter<String> adapter;
     
     private RecyclerView recyclerView;
     private Adapter_Customer_Home adapterCustomerHome;
     
-    //private ListView futureReservations;
     private TextView noReservationsText;
     private ProgressBar progressBar;
     
@@ -71,17 +69,11 @@ public class Fragment_Customer_Home extends Fragment implements RecyclerViewClic
         
         now = Calendar.getInstance();
         
-        try
-        {
-            recyclerView = view.findViewById(R.id.futureReservations);
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            
-            resList = new ArrayList<>();
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        recyclerView = view.findViewById(R.id.futureReservations);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        
+        resList = new ArrayList<>();
 
 //        futureReservations = view.findViewById(R.id.futureReservations);
 //        futureReservations.setVisibility(View.VISIBLE);
@@ -151,7 +143,6 @@ public class Fragment_Customer_Home extends Fragment implements RecyclerViewClic
         progressBar.setVisibility(View.VISIBLE);
         if (snap.isEmpty())
         {
-            //futureReservations.setVisibility(View.GONE);
             recyclerView.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             noReservationsText.setVisibility(View.VISIBLE);
@@ -198,17 +189,8 @@ public class Fragment_Customer_Home extends Fragment implements RecyclerViewClic
         
         Collections.sort(resList, reservationComparator);
         
-        try
-        {
-            adapterCustomerHome = new Adapter_Customer_Home(getContext(), resList, this);
-            recyclerView.setAdapter(adapterCustomerHome);
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-//        for (Reservation_Customer_Home r : resList)
-//            adapter.add(r.getInfo());
+        adapterCustomerHome = new Adapter_Customer_Home(getContext(), resList, this);
+        recyclerView.setAdapter(adapterCustomerHome);
         
         progressBar.setVisibility(View.GONE);
     }
