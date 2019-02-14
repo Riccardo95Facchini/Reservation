@@ -10,5 +10,6 @@
     <color name="colorAccent">#D81B60</color>
     <color name="colorOptionalButton">#808080</color>
     <color name="colorBackground">#F0F0F0</color>
+    <color name="colorCard">#81c2f4</color>
 
 </resources>
