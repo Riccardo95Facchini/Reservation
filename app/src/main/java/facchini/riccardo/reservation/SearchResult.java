@@ -17,7 +17,7 @@ public class SearchResult
     
     public String getFormatDistance()
     {
-        return distance > 1000f ? String.format("%.2f Km", distance / 1000) : String.format("%.2f m", distance);
+        return distance > 1000f ? String.format("Distance: %.2f Km", distance / 1000) : String.format("Distance %.2f m", distance);
     }
     
     public int compareTo(SearchResult sr2)

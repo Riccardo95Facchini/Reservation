@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -27,10 +26,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
-public class Fragment_Shop_Home extends Fragment implements RecyclerViewClickListener
+public class Fragment_Shop_Home extends Fragment
 {
     //Firestore
     private FirebaseFirestore db;
@@ -113,13 +111,6 @@ public class Fragment_Shop_Home extends Fragment implements RecyclerViewClickLis
         });
     }
     
-    @Override
-    public void recyclerViewListClicked(View v, int position)
-    {
-        //TODO: what to do when a reservation is clicked
-    }
-    
-    
     /**
      * Extracts and checks the future reservations of the user
      *
@@ -159,9 +150,8 @@ public class Fragment_Shop_Home extends Fragment implements RecyclerViewClickLis
     private void orderList()
     {
         Collections.sort(resList, reservationComparator);
-        adapterShopHome = new Adapter_Shop_Home(getContext(), resList, this);
+        adapterShopHome = new Adapter_Shop_Home(getContext(), resList);
         recyclerView.setAdapter(adapterShopHome);
-        
     }
     
     /**

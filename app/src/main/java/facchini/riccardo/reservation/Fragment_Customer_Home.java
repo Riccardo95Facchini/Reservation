@@ -1,7 +1,6 @@
 package facchini.riccardo.reservation;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -29,11 +27,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class Fragment_Customer_Home extends Fragment implements RecyclerViewClickListener
+public class Fragment_Customer_Home extends Fragment
 {
     //Firestore
     private FirebaseFirestore db;
@@ -74,25 +70,14 @@ public class Fragment_Customer_Home extends Fragment implements RecyclerViewClic
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         
         resList = new ArrayList<>();
-
-//        futureReservations = view.findViewById(R.id.futureReservations);
-//        futureReservations.setVisibility(View.VISIBLE);
         
         noReservationsText = view.findViewById(R.id.noReservations);
         noReservationsText.setVisibility(View.GONE);
         
         progressBar = view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
-
-//        adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-//        futureReservations.setAdapter(adapter);
+        
         resList = new ArrayList<>();
-    }
-    
-    @Override
-    public void recyclerViewListClicked(View v, int position)
-    {
-        //TODO: what to do when a reservation is clicked
     }
     
     @Override
@@ -128,8 +113,6 @@ public class Fragment_Customer_Home extends Fragment implements RecyclerViewClic
                 e.printStackTrace();
             }
         });
-        
-        
     }
     
     
@@ -149,35 +132,29 @@ public class Fragment_Customer_Home extends Fragment implements RecyclerViewClic
             return;
         }
         
-        try
+        for (final QueryDocumentSnapshot doc : snap)
         {
-            for (final QueryDocumentSnapshot doc : snap)
+            shopsCollection.document((String) doc.get("shopUid")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
             {
-                shopsCollection.document((String) doc.get("shopUid")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot)
                 {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot)
+                    try
                     {
-                        try
-                        {
-                            if (documentSnapshot.exists())
-                                resList.add(
-                                        new Reservation_Customer_Home(
-                                                ((Timestamp) doc.get("time")).toDate(),
-                                                documentSnapshot.toObject(Shop.class)));
-                            
-                            if (resList.size() == snap.size())
-                                orderList();
-                        } catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
+                        if (documentSnapshot.exists())
+                            resList.add(
+                                    new Reservation_Customer_Home(
+                                            ((Timestamp) doc.get("time")).toDate(),
+                                            documentSnapshot.toObject(Shop.class)));
+                        
+                        if (resList.size() == snap.size())
+                            orderList();
+                    } catch (Exception e)
+                    {
+                        e.printStackTrace();
                     }
-                });
-            }
-        } catch (Exception e)
-        {
-            e.printStackTrace();
+                }
+            });
         }
     }
     
@@ -186,10 +163,9 @@ public class Fragment_Customer_Home extends Fragment implements RecyclerViewClic
      */
     private void orderList()
     {
-        
         Collections.sort(resList, reservationComparator);
         
-        adapterCustomerHome = new Adapter_Customer_Home(getContext(), resList, this);
+        adapterCustomerHome = new Adapter_Customer_Home(getContext(), resList);
         recyclerView.setAdapter(adapterCustomerHome);
         
         progressBar.setVisibility(View.GONE);

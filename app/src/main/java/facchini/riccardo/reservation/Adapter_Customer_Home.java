@@ -15,14 +15,14 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
     
     private Context context;
     private List<Reservation_Customer_Home> reservationCustomerHomeList;
-    private static RecyclerViewClickListener itemListener;
+    //private static OnItemClickListener itemListener;
     
     
-    public Adapter_Customer_Home(Context context, List<Reservation_Customer_Home> reservationCustomerHomeList, RecyclerViewClickListener itemListener)
+    public Adapter_Customer_Home(Context context, List<Reservation_Customer_Home> reservationCustomerHomeList)
     {
         this.context = context;
         this.reservationCustomerHomeList = reservationCustomerHomeList;
-        this.itemListener = itemListener;
+        //this.itemListener = itemListener;
     }
     
     @NonNull
@@ -51,10 +51,9 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
         return reservationCustomerHomeList.size();
     }
     
-    class Reservation_Customer_ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
+    class Reservation_Customer_ViewHolder extends RecyclerView.ViewHolder
     {
         TextView textViewShop, textViewAddress, textViewWhen;
-        
         
         public Reservation_Customer_ViewHolder(@NonNull View itemView)
         {
@@ -63,12 +62,6 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
             textViewShop = itemView.findViewById(R.id.textViewCustomer);
             textViewAddress = itemView.findViewById(R.id.textViewAddress);
             textViewWhen = itemView.findViewById(R.id.textViewWhen);
-        }
-        
-        @Override
-        public void onClick(View v)
-        {
-            itemListener.recyclerViewListClicked(v, this.getLayoutPosition());
         }
     }
 }

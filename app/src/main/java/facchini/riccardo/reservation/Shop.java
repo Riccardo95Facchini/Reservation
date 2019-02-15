@@ -145,11 +145,13 @@ public class Shop implements Parcelable
         
         for (Map.Entry<String, List<String>> entry : hours.entrySet())
         {
-            if (!entry.getValue().get(0).equalsIgnoreCase("closed") && !entry.getValue().get(2).toLowerCase().equals("closed"))
+            if (!entry.getValue().get(0).equalsIgnoreCase("closed") && !entry.getValue().get(2).equalsIgnoreCase("closed"))
                 h.append(String.format("%s: \t %s-%s \t %s-%s\n", entry.getKey(),
                         entry.getValue().get(0), entry.getValue().get(1), entry.getValue().get(2), entry.getValue().get(3)));
+            
             else if (!entry.getValue().get(0).equalsIgnoreCase("closed"))
                 h.append(String.format("%s: \t %s-%s\n", entry.getKey(), entry.getValue().get(0), entry.getValue().get(1)));
+            
             else if (!entry.getValue().get(3).equalsIgnoreCase("closed"))
                 h.append(String.format("%s: \t %s-%s\n", entry.getKey(), entry.getValue().get(2), entry.getValue().get(3)));
         }

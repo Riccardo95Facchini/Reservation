@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -118,13 +119,13 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
                 .whereGreaterThan("time", selectedDate.getTime())
                 .whereLessThan("time", plusDay.getTime()).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
-        {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots)
-            {
-                createSpinnerAdapter(queryDocumentSnapshots);
-            }
-        }).addOnFailureListener(new OnFailureListener()
+                {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots)
+                    {
+                        createSpinnerAdapter(queryDocumentSnapshots);
+                    }
+                }).addOnFailureListener(new OnFailureListener()
         {
             @Override
             public void onFailure(@NonNull Exception e)
@@ -142,11 +143,11 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
      */
     private void createSpinnerAdapter(QuerySnapshot snap)
     {
+        
         List<String> reservedHours = new ArrayList<>();
         
         for (QueryDocumentSnapshot doc : snap)
-            reservedHours.add(timeFormat.format(doc.getData().get("time")));
-        
+            reservedHours.add(timeFormat.format(((Timestamp) doc.get("time")).toDate()));
         
         ArrayList<String> spinnerText = new ArrayList<>();
         String dayOfTheWeek = getDayString();
@@ -154,8 +155,8 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         
         try
         {
-            /*Needed for testing, some shops don't have hours registered for a closed day, resulting in a NPE.
-             If a shop is registered with the system "closed" tags are generated automatically. */
+                /*Needed for testing, some shops don't have hours registered for a closed day, resulting in a NPE.
+                 If a shop is registered with the system "closed" tags are generated automatically. */
             hoursSelectedDay = new ArrayList<>(selectedShop.getHours().get(dayOfTheWeek));
             
             String h1 = hoursSelectedDay.get(0),
@@ -309,6 +310,6 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         ReservationDatabase reservationDatabase = new ReservationDatabase(selectedShop.getUid(), (String) customer.get("customer"), customerName, fullDate);
         db.collection("reservations").add(reservationDatabase);
         
-        Toast.makeText(this, "Reservation_Customer_Home completed", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.reservationCompleted), Toast.LENGTH_LONG).show();
     }
 }

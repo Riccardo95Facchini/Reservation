@@ -5,9 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
 import android.location.Criteria;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,16 +14,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -33,41 +30,35 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
-public class Fragment_Customer_Search extends Fragment
+public class Fragment_Customer_Search extends Fragment implements OnItemClickListener
 {
     
     private EditText searchText;
     private ImageButton searchButton;
-    private ListView foundShopsView;
+    private RecyclerView foundShopsView;
     private ProgressBar progressBar;
     private SeekBar distanceSeekBar;
     private TextView distanceText;
     
     private SharedViewModel viewModel;
     private ArrayList<SearchResult> foundShops = new ArrayList<>();
+    private Adapter_Customer_Search adapter;
     
     //Location
     private FusedLocationProviderClient client;
@@ -104,7 +95,10 @@ public class Fragment_Customer_Search extends Fragment
     {
         searchText = view.findViewById(R.id.searchText);
         searchButton = view.findViewById(R.id.searchButton);
+        
         foundShopsView = view.findViewById(R.id.foundShopsView);
+        foundShopsView.setHasFixedSize(true);
+        foundShopsView.setLayoutManager(new LinearLayoutManager(getContext()));
         
         distanceSeekBar = view.findViewById(R.id.distanceSeekBar);
         distanceText = view.findViewById(R.id.distanceText);
@@ -161,29 +155,25 @@ public class Fragment_Customer_Search extends Fragment
             }
         });
         
-        foundShopsView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
-                Shop selected = foundShops.get(position).getShopFound();
-                viewModel.setCurrentShop(selected);
-                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
-                Intent intent = new Intent();
-                Bundle b = new Bundle();
-                b.putParcelable("Selected", selected);
-                Map<String, String> customer = new HashMap<>();
-                intent.putExtras(b);
-                intent.putExtra("uid", viewModel.getCurrentCustomer().getUid());
-                intent.putExtra("name", viewModel.getCurrentCustomer().getName());
-                intent.putExtra("surname", viewModel.getCurrentCustomer().getSurname());
-                intent.setClass(getContext(), Activity_Customer_SelectedShop.class);
-                startActivity(intent);
-            }
-        });
-        
         if (!locationCalled)
             getLocation();
+    }
+    
+    @Override
+    public void onItemClick(int position)
+    {
+        Shop selected = foundShops.get(position).getShopFound();
+        viewModel.setCurrentShop(selected);
+        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
+        Intent intent = new Intent();
+        Bundle b = new Bundle();
+        b.putParcelable("Selected", selected);
+        intent.putExtras(b);
+        intent.putExtra("uid", viewModel.getCurrentCustomer().getUid());
+        intent.putExtra("name", viewModel.getCurrentCustomer().getName());
+        intent.putExtra("surname", viewModel.getCurrentCustomer().getSurname());
+        intent.setClass(getContext(), Activity_Customer_SelectedShop.class);
+        startActivity(intent);
     }
     
     private void getLocation()
@@ -211,40 +201,35 @@ public class Fragment_Customer_Search extends Fragment
             public void onProviderDisabled(String provider) {}
         };
         
-        try
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            return;
+        
+        /*Location manager system from https://developer.android.com/guide/topics/location/strategies#java
+         * Requires both from network and gps provider*/
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        
+        //Also try to get the last known location
+        myLocation = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), false));
+        
+        /*Other method using FusedLocationProvider*/
+        client = LocationServices.getFusedLocationProviderClient(getActivity());
+        client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>()
         {
-            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                return;
-            
-            /*Location manager system from https://developer.android.com/guide/topics/location/strategies#java
-             * Requires both from network and gps provider*/
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            
-            //Also try to get the last known location
-            myLocation = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), false));
-            
-            /*Other method using FusedLocationProvider*/
-            client = LocationServices.getFusedLocationProviderClient(getActivity());
-            client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>()
+            @Override
+            public void onSuccess(Location location)
             {
-                @Override
-                public void onSuccess(Location location)
-                {
-                    myLocation = location;
-                }
-            }).addOnFailureListener(new OnFailureListener()
-            {
-                @Override
-                public void onFailure(@NonNull Exception e)
-                {
-                    e.printStackTrace();
-                }
-            });
-        } catch (Exception e)
+                myLocation = location;
+                locationManager.removeUpdates(locationListener);
+            }
+        }).addOnFailureListener(new OnFailureListener()
         {
-            e.printStackTrace();
-        }
+            @Override
+            public void onFailure(@NonNull Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
     }
     
     
@@ -285,60 +270,55 @@ public class Fragment_Customer_Search extends Fragment
             @Override
             public void onSuccess(List<QuerySnapshot> querySnapshots)
             {
-                try
+                Set<String> queryShops = new HashSet<>();
+                Location shopLocation = new Location("ShopLocation");
+                
+                int i = 0;
+                for (QuerySnapshot snapshot : querySnapshots)
                 {
-                    Set<String> queryShops = new HashSet<>();
-                    Location shopLocation = new Location("ShopLocation");
-                    
-                    int i = 0;
-                    for (QuerySnapshot snapshot : querySnapshots)
+                    for (QueryDocumentSnapshot doc : snapshot)
                     {
-                        for (QueryDocumentSnapshot doc : snapshot)
+                        String uid = (String) doc.getData().get("uid");
+                        
+                        if (i == 0)
                         {
-                            String uid = (String) doc.getData().get("uid");
+                            queryShops.add(uid);
+                        } else if (queryShops.contains(uid))
+                        {
+                            Shop shop = new Shop(doc.getData());
                             
-                            if (i == 0)
-                            {
-                                queryShops.add(uid);
-                            } else if (queryShops.contains(uid))
-                            {
-                                Shop shop = new Shop(doc.getData());
-                                
-                                shopLocation.setLatitude(shop.getLatitude());
-                                shopLocation.setLongitude(shop.getLongitude());
-                                float dist = myLocation.distanceTo(shopLocation);
-                                
-                                if (dist <= (distance * 1000))
-                                    foundShops.add(new SearchResult(shop, dist));
-                            }
+                            shopLocation.setLatitude(shop.getLatitude());
+                            shopLocation.setLongitude(shop.getLongitude());
+                            float dist = myLocation.distanceTo(shopLocation);
+                            
+                            if (dist <= (distance * 1000))
+                                foundShops.add(new SearchResult(shop, dist));
                         }
-                        i++;
                     }
-                    
-                    queryShops.clear();
-                    
-                    if (foundShops.isEmpty())
-                    {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), getString(R.string.noShopsFound), Toast.LENGTH_SHORT).show();
-                    } else
-                    {
-                        Collections.sort(foundShops, searchResultComparator);
-                        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-                        foundShopsView.setAdapter(adapter);
-                        
-                        for (SearchResult fs : foundShops)
-                            adapter.add(fs.getShopFound().getInfo().concat(String.format("\nDistance: %s", fs.getFormatDistance())));
-                        
-                        progressBar.setVisibility(View.GONE);
-                        
-                    }
-                } catch (Exception e)
+                    i++;
+                }
+                
+                queryShops.clear();
+                
+                if (foundShops.isEmpty())
                 {
-                    e.printStackTrace();
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), getString(R.string.noShopsFound), Toast.LENGTH_SHORT).show();
+                } else
+                {
+                    setAdapter();
+                    progressBar.setVisibility(View.GONE);
                 }
             }
         });
+    }
+    
+    private void setAdapter()
+    {
+        Collections.sort(foundShops, searchResultComparator);
+        adapter = new Adapter_Customer_Search(getContext(), foundShops);
+        adapter.setOnItemClickListener(this);
+        foundShopsView.setAdapter(adapter);
     }
     
     /**
@@ -359,23 +339,16 @@ public class Fragment_Customer_Search extends Fragment
     private void getDeltas()
     {
         int dist = 1000 * distance;
-        try
+        if (myLocation == null)
         {
-            if (myLocation == null)
-            {
-                Log.d("ECCEZIONE", "no location");
-            } else
-            {
-                Log.d("ECCEZIONE", String.format("lat: %s\nlng: %s", myLocation.getLatitude(), myLocation.getLongitude()));
-                locationManager.removeUpdates(locationListener); //Stop listening for locations
-                final double earthRadius = 6371000; //meters
-                
-                deltaLat = (dist / earthRadius) * (180 / Math.PI);
-                deltaLng = Math.toDegrees((dist / (earthRadius * Math.cos(Math.toRadians(myLocation.getLatitude())))));
-            }
-        } catch (Exception e)
+            Log.d("ECCEZIONE", "no location");
+        } else
         {
-            e.printStackTrace();
+            locationManager.removeUpdates(locationListener); //Stop listening for locations
+            final double earthRadius = 6371000; //meters
+            
+            deltaLat = (dist / earthRadius) * (180 / Math.PI);
+            deltaLng = Math.toDegrees((dist / (earthRadius * Math.cos(Math.toRadians(myLocation.getLatitude())))));
         }
     }
 }
