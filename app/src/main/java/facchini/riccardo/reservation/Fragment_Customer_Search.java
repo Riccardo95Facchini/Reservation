@@ -225,7 +225,6 @@ public class Fragment_Customer_Search extends Fragment
             myLocation = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), false));
             
             /*Other method using FusedLocationProvider*/
-            geocoder = new Geocoder(getActivity(), Locale.getDefault());
             client = LocationServices.getFusedLocationProviderClient(getActivity());
             client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>()
             {
@@ -250,7 +249,7 @@ public class Fragment_Customer_Search extends Fragment
     
     
     /**
-     * Searches if the text in the search box corresponds to a tag in the system
+     * Searches if shops with the given tag exist and displays them to the user
      *
      * @param text Tag to search
      */
@@ -324,7 +323,7 @@ public class Fragment_Customer_Search extends Fragment
                         Toast.makeText(getContext(), getString(R.string.noShopsFound), Toast.LENGTH_SHORT).show();
                     } else
                     {
-                        orderList(foundShops);
+                        Collections.sort(foundShops, searchResultComparator);
                         final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
                         foundShopsView.setAdapter(adapter);
                         
@@ -342,11 +341,6 @@ public class Fragment_Customer_Search extends Fragment
         });
     }
     
-    private void orderList(ArrayList<SearchResult> searchResults)
-    {
-        Collections.sort(searchResults, searchResultComparator);
-    }
-    
     /**
      * Defined comparator for reservations to order them
      */
@@ -359,6 +353,9 @@ public class Fragment_Customer_Search extends Fragment
         }
     };
     
+    /**
+     * Sets deltas to find minimum/maximum values of latitude/longitude for the query
+     */
     private void getDeltas()
     {
         int dist = 1000 * distance;
