@@ -1,12 +1,15 @@
 package facchini.riccardo.reservation;
 
+import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +32,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class Fragment_Customer_Home extends Fragment
+public class Fragment_Customer_Home extends Fragment implements OnItemClickListener
 {
     //Firestore
     private FirebaseFirestore db;
@@ -68,8 +71,6 @@ public class Fragment_Customer_Home extends Fragment
         recyclerView = view.findViewById(R.id.futureReservations);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        
-        resList = new ArrayList<>();
         
         noReservationsText = view.findViewById(R.id.noReservations);
         noReservationsText.setVisibility(View.GONE);
@@ -139,20 +140,13 @@ public class Fragment_Customer_Home extends Fragment
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot)
                 {
-                    try
-                    {
-                        if (documentSnapshot.exists())
-                            resList.add(
-                                    new Reservation_Customer_Home(
-                                            ((Timestamp) doc.get("time")).toDate(),
-                                            documentSnapshot.toObject(Shop.class)));
-                        
-                        if (resList.size() == snap.size())
-                            orderList();
-                    } catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
+                    if (documentSnapshot.exists())
+                        resList.add(
+                                new Reservation_Customer_Home(((Timestamp) doc.get("time")).toDate(),
+                                        documentSnapshot.toObject(Shop.class), doc.getId()));
+                    
+                    if (resList.size() == snap.size())
+                        orderList();
                 }
             });
         }
@@ -167,6 +161,7 @@ public class Fragment_Customer_Home extends Fragment
         
         adapterCustomerHome = new Adapter_Customer_Home(getContext(), resList);
         recyclerView.setAdapter(adapterCustomerHome);
+        adapterCustomerHome.setOnItemClickListener(this);
         
         progressBar.setVisibility(View.GONE);
     }
@@ -182,4 +177,30 @@ public class Fragment_Customer_Home extends Fragment
             return o1.getDate().compareTo(o2.getDate());
         }
     };
+    
+    @Override
+    public void onItemClick(final int position)
+    {
+        Reservation_Customer_Home res = resList.get(position);
+        new AlertDialog.Builder(getContext()).setCancelable(true)
+                .setTitle(getString(R.string.areYouSure))
+                .setMessage(getString(R.string.deleteReservationFor).concat(res.getShop().getName()).concat(getString(R.string.atWithTwoSpaces)).concat(res.getDateFormatted()))
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        reservationsCollection.document(resList.get(position).getResUid()).delete();
+                        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null)
+                                .replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
+                    }
+                }).setNegativeButton("No", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                //Do nothing
+            }
+        }).show();
+    }
 }

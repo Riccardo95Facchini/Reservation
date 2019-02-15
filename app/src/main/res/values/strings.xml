@@ -68,4 +68,7 @@
     <string name="wrongAddress">Can\'t find location, please check address</string>
     <string name="searchDistance">Search distance:</string>
     <string name="reservationCompleted">Reservation completed</string>
+    <string name="areYouSure">Are you sure?</string>
+    <string name="atWithTwoSpaces">at</string>
+    <string name="deleteReservationFor">Delete reservation for</string>
 </resources>

@@ -15,14 +15,18 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
     
     private Context context;
     private List<Reservation_Customer_Home> reservationCustomerHomeList;
-    //private static OnItemClickListener itemListener;
+    private OnItemClickListener itemListener;
     
     
     public Adapter_Customer_Home(Context context, List<Reservation_Customer_Home> reservationCustomerHomeList)
     {
         this.context = context;
         this.reservationCustomerHomeList = reservationCustomerHomeList;
-        //this.itemListener = itemListener;
+    }
+    
+    public void setOnItemClickListener(OnItemClickListener itemListener)
+    {
+        this.itemListener = itemListener;
     }
     
     @NonNull
@@ -31,7 +35,7 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
     {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.card_customer_home, null);
-        return new Reservation_Customer_ViewHolder(view);
+        return new Reservation_Customer_ViewHolder(view, itemListener);
     }
     
     @Override
@@ -55,13 +59,28 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
     {
         TextView textViewShop, textViewAddress, textViewWhen;
         
-        public Reservation_Customer_ViewHolder(@NonNull View itemView)
+        public Reservation_Customer_ViewHolder(@NonNull View itemView, final OnItemClickListener itemClickListener)
         {
             super(itemView);
             
             textViewShop = itemView.findViewById(R.id.textViewCustomer);
             textViewAddress = itemView.findViewById(R.id.textViewAddress);
             textViewWhen = itemView.findViewById(R.id.textViewWhen);
+            
+            itemView.setOnLongClickListener(new View.OnLongClickListener()
+            {
+                @Override
+                public boolean onLongClick(View v)
+                {
+                    if (itemClickListener != null)
+                    {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION)
+                            itemListener.onItemClick(position);
+                    }
+                    return true;
+                }
+            });
         }
     }
 }
