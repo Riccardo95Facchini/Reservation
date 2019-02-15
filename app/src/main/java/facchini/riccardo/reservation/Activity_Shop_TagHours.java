@@ -293,9 +293,11 @@ public class Activity_Shop_TagHours extends AppCompatActivity
                 .replaceAll("\\s+", " ")
                 .toLowerCase().trim();
         
+        
         if (!parsedString.isEmpty())
         {
             tags = new ArrayList<>(Arrays.asList(parsedString.split("\\s", 0)));
+            tags.add(name.toLowerCase().trim());
             return true;
         } else
             return false;
