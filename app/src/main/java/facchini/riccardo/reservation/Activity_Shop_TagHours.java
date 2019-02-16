@@ -102,8 +102,8 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         
         hoursTexts.put("Monday", (TextView) findViewById(R.id.textMon));
         hoursTexts.put("Tuesday", (TextView) findViewById(R.id.textTue));
-        hoursTexts.put("Thursday", (TextView) findViewById(R.id.textWed));
-        hoursTexts.put("Wednesday", (TextView) findViewById(R.id.textThu));
+        hoursTexts.put("Wednesday", (TextView) findViewById(R.id.textWed));
+        hoursTexts.put("Thursday", (TextView) findViewById(R.id.textThu));
         hoursTexts.put("Friday", (TextView) findViewById(R.id.textFri));
         hoursTexts.put("Saturday", (TextView) findViewById(R.id.textSat));
         hoursTexts.put("Sunday", (TextView) findViewById(R.id.textSun));
@@ -288,9 +288,9 @@ public class Activity_Shop_TagHours extends AppCompatActivity
     private void getIntentAndExtras(Intent intent)
     {
         Bundle b = intent.getExtras();
-        if (b != null)
+        currentShop = b.getParcelable("CurrentShop");
+        if (currentShop != null)
         {
-            currentShop = b.getParcelable("CurrentShop");
             setTitle(R.string.edit);
             editing = true;
         } else

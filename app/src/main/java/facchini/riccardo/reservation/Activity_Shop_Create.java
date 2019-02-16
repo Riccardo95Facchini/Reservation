@@ -43,9 +43,9 @@ public class Activity_Shop_Create extends AppCompatActivity
         //Get intent and extra
         Intent intent = getIntent();
         Bundle b = intent.getExtras();
-        if (b != null)
+        currentShop = b.getParcelable("CurrentShop");
+        if (currentShop != null)
         {
-            currentShop = b.getParcelable("CurrentShop");
             setTitle(R.string.edit);
             editing = true;
             uid = currentShop.getUid();
@@ -58,7 +58,7 @@ public class Activity_Shop_Create extends AppCompatActivity
         setUI();
         handleTextsOnCreate();
         
-        if(editing)
+        if (editing)
             continueButton.setEnabled(true);
     }
     
