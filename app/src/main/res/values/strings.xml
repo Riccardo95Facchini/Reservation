@@ -69,8 +69,8 @@
     <string name="searchDistance">Search distance:</string>
     <string name="reservationCompleted">Reservation completed</string>
     <string name="areYouSure">Are you sure?</string>
-    <string name="atWithTwoSpaces">at</string>
-    <string name="deleteReservationFor">Delete reservation for</string>
+    <string name="onWithTabs">\t on \t</string>
+    <string name="deleteReservationFor">Delete reservation for \n</string>
     <string name="edit">Edit</string>
     <string name="edit_opening_hours">Edit opening hours</string>
     <string name="edit_your_tags">Edit your tags</string>

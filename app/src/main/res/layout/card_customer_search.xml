@@ -51,7 +51,7 @@
                 android:id="@+id/textViewPhoneMail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/textViewDistance"
+                android:layout_below="@+id/textViewAddress"
                 android:layout_alignStart="@+id/textViewCustomer"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="5dp"

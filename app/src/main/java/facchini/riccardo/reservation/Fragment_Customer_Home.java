@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -184,7 +183,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
         Reservation_Customer_Home res = resList.get(position);
         new AlertDialog.Builder(getContext()).setCancelable(true)
                 .setTitle(getString(R.string.areYouSure))
-                .setMessage(getString(R.string.deleteReservationFor).concat(res.getShop().getName()).concat(getString(R.string.atWithTwoSpaces)).concat(res.getDateFormatted()))
+                .setMessage(getString(R.string.deleteReservationFor).concat(res.getShop().getName()).concat(getString(R.string.onWithTabs)).concat(res.getDateFormatted()))
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener()
                 {
                     @Override

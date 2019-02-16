@@ -196,7 +196,7 @@ public class Activity_Shop_TagHours extends AppCompatActivity
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(Activity_Shop_TagHours.this);
         View view = getLayoutInflater().inflate(R.layout.alert_opening_hours, null);
-        builder.setTitle(day + " hours");
+        builder.setTitle(day + " hours").setCancelable(false);
         final Spinner timeSpinner1 = view.findViewById(R.id.spinner);
         final Spinner timeSpinner2 = view.findViewById(R.id.timeSpinner2);
         final Spinner timeSpinner3 = view.findViewById(R.id.timeSpinner3);
@@ -345,8 +345,7 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         if (!editing)
         {
             shop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude, longitude, tags, hours);
-            shopsReference.document().set(shop);
-            createDocumentReservation();
+            shopsReference.document(uid).set(shop);
             startActivity(new Intent(this, Activity_Login.class));
         } else
         {
@@ -357,22 +356,6 @@ public class Activity_Shop_TagHours extends AppCompatActivity
             shopsReference.document(uid).set(shop);
             startActivity(new Intent(this, Activity_Shop.class));
         }
-    }
-    
-    /**
-     * Creates the empty document to hold future reservations
-     */
-    private void createDocumentReservation()
-    {
-        Map<String, Object> docData = new HashMap<>();
-        docData.put("created", "");
-        db.collection("reservations").document(uid).set(docData).addOnSuccessListener(new OnSuccessListener<Void>()
-        {
-            @Override
-            public void onSuccess(Void aVoid)
-            {
-            }
-        });
     }
     
     /**
