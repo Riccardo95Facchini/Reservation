@@ -1,11 +1,14 @@
 package facchini.riccardo.reservation;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.List;
@@ -58,6 +61,7 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
     class Reservation_Customer_ViewHolder extends RecyclerView.ViewHolder
     {
         TextView textViewShop, textViewAddress, textViewWhen;
+        ImageButton infoButton;
         
         public Reservation_Customer_ViewHolder(@NonNull View itemView, final OnItemClickListener itemClickListener)
         {
@@ -66,6 +70,28 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
             textViewShop = itemView.findViewById(R.id.textViewCustomer);
             textViewAddress = itemView.findViewById(R.id.textViewAddress);
             textViewWhen = itemView.findViewById(R.id.textViewWhen);
+            infoButton = itemView.findViewById(R.id.infoButton);
+            
+            infoButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Shop shop = reservationCustomerHomeList.get(getAdapterPosition()).getShop();
+                    
+                    new AlertDialog.Builder(context).setCancelable(true)
+                            .setTitle(context.getString(R.string.reservationShopDetails))
+                            .setMessage(shop.displayProfile())
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    //Do nothing
+                                }
+                            }).show();
+                }
+            });
             
             itemView.setOnLongClickListener(new View.OnLongClickListener()
             {

@@ -116,7 +116,7 @@ public class Activity_Shop_TagHours extends AppCompatActivity
             
             try
             {
-                tags =currentShop.getTags();
+                tags = currentShop.getTags();
                 tags.remove(currentShop.getName().replaceAll("[^a-zA-Z\\s]", " ")
                         .replaceAll("\\s+", " ").toLowerCase().trim());
                 tags.remove(currentShop.getName().toLowerCase().trim());

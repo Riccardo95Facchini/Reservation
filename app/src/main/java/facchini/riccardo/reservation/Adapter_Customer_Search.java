@@ -47,6 +47,7 @@ public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Custom
         holder.textViewAddress.setText(shop.displayFullAddress());
         holder.textViewDistance.setText(res.getFormatDistance());
         holder.textViewTimes.setText(shop.displayHoursFormat());
+        holder.textViewPhoneMail.setText(String.format("Phone: %s \t Mail: %s", shop.getPhone(), shop.getMail()));
     }
     
     @Override
@@ -57,7 +58,7 @@ public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Custom
     
     class Shops_ViewHolder extends RecyclerView.ViewHolder
     {
-        TextView textViewName, textViewDistance, textViewAddress, textViewTimes;
+        TextView textViewName, textViewDistance, textViewAddress, textViewTimes, textViewPhoneMail;
         
         public Shops_ViewHolder(@NonNull View itemView, final OnItemClickListener itemClickListener)
         {
@@ -67,6 +68,7 @@ public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Custom
             textViewAddress = itemView.findViewById(R.id.textViewAddress);
             textViewDistance = itemView.findViewById(R.id.textViewDistance);
             textViewTimes = itemView.findViewById(R.id.textViewTimes);
+            textViewPhoneMail = itemView.findViewById(R.id.textViewPhoneMail);
             
             itemView.setOnClickListener(new View.OnClickListener()
             {

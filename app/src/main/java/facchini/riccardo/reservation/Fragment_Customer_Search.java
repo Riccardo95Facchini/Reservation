@@ -1,8 +1,10 @@
 package facchini.riccardo.reservation;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
@@ -248,69 +250,72 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
         
         getDeltas();
         
-        double minLat = myLocation.getLatitude() - deltaLat,
-                maxLat = myLocation.getLatitude() + deltaLat,
-                minLng = myLocation.getLongitude() - deltaLng,
-                maxLng = myLocation.getLongitude() + deltaLng;
-        
-        
-        Task taskLat = shopsCollection.whereArrayContains("tags", text)
-                .whereGreaterThanOrEqualTo("latitude", minLat)
-                .whereLessThanOrEqualTo("latitude", maxLat)
-                .get();
-        
-        Task taskLng = shopsCollection.whereArrayContains("tags", text)
-                .whereGreaterThanOrEqualTo("longitude", minLng)
-                .whereLessThanOrEqualTo("longitude", maxLng)
-                .get();
-        
-        Task<List<QuerySnapshot>> allTasks = Tasks.whenAllSuccess(taskLat, taskLng);
-        allTasks.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>()
+        if (myLocation != null)
         {
-            @Override
-            public void onSuccess(List<QuerySnapshot> querySnapshots)
+            double minLat = myLocation.getLatitude() - deltaLat,
+                    maxLat = myLocation.getLatitude() + deltaLat,
+                    minLng = myLocation.getLongitude() - deltaLng,
+                    maxLng = myLocation.getLongitude() + deltaLng;
+            
+            
+            Task taskLat = shopsCollection.whereArrayContains("tags", text)
+                    .whereGreaterThanOrEqualTo("latitude", minLat)
+                    .whereLessThanOrEqualTo("latitude", maxLat)
+                    .get();
+            
+            Task taskLng = shopsCollection.whereArrayContains("tags", text)
+                    .whereGreaterThanOrEqualTo("longitude", minLng)
+                    .whereLessThanOrEqualTo("longitude", maxLng)
+                    .get();
+            
+            Task<List<QuerySnapshot>> allTasks = Tasks.whenAllSuccess(taskLat, taskLng);
+            allTasks.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>()
             {
-                Set<String> queryShops = new HashSet<>();
-                Location shopLocation = new Location("ShopLocation");
-                
-                int i = 0;
-                for (QuerySnapshot snapshot : querySnapshots)
+                @Override
+                public void onSuccess(List<QuerySnapshot> querySnapshots)
                 {
-                    for (QueryDocumentSnapshot doc : snapshot)
+                    Set<String> queryShops = new HashSet<>();
+                    Location shopLocation = new Location("ShopLocation");
+                    
+                    int i = 0;
+                    for (QuerySnapshot snapshot : querySnapshots)
                     {
-                        String uid = (String) doc.getData().get("uid");
-                        
-                        if (i == 0)
+                        for (QueryDocumentSnapshot doc : snapshot)
                         {
-                            queryShops.add(uid);
-                        } else if (queryShops.contains(uid))
-                        {
-                            Shop shop = new Shop(doc.getData());
+                            String uid = (String) doc.getData().get("uid");
                             
-                            shopLocation.setLatitude(shop.getLatitude());
-                            shopLocation.setLongitude(shop.getLongitude());
-                            float dist = myLocation.distanceTo(shopLocation);
-                            
-                            if (dist <= (distance * 1000))
-                                foundShops.add(new SearchResult(shop, dist));
+                            if (i == 0)
+                            {
+                                queryShops.add(uid);
+                            } else if (queryShops.contains(uid))
+                            {
+                                Shop shop = new Shop(doc.getData());
+                                
+                                shopLocation.setLatitude(shop.getLatitude());
+                                shopLocation.setLongitude(shop.getLongitude());
+                                float dist = myLocation.distanceTo(shopLocation);
+                                
+                                if (dist <= (distance * 1000))
+                                    foundShops.add(new SearchResult(shop, dist));
+                            }
                         }
+                        i++;
                     }
-                    i++;
+                    
+                    queryShops.clear();
+                    
+                    if (foundShops.isEmpty())
+                    {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), getString(R.string.noShopsFound), Toast.LENGTH_SHORT).show();
+                    } else
+                    {
+                        setAdapter();
+                        progressBar.setVisibility(View.GONE);
+                    }
                 }
-                
-                queryShops.clear();
-                
-                if (foundShops.isEmpty())
-                {
-                    progressBar.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), getString(R.string.noShopsFound), Toast.LENGTH_SHORT).show();
-                } else
-                {
-                    setAdapter();
-                    progressBar.setVisibility(View.GONE);
-                }
-            }
-        });
+            });
+        }
     }
     
     private void setAdapter()
@@ -341,7 +346,20 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
         int dist = 1000 * distance;
         if (myLocation == null)
         {
-            Log.d("ECCEZIONE", "no location");
+            new AlertDialog.Builder(getContext()).setCancelable(false)
+                    .setTitle(getString(R.string.lcoationProblem))
+                    .setMessage(getString(R.string.noGPSLocationError))
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null)
+                                    .replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
+                        }
+                    }).show();
+            
+            
         } else
         {
             locationManager.removeUpdates(locationListener); //Stop listening for locations

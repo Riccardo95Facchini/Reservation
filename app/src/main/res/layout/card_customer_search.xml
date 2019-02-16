@@ -48,6 +48,17 @@
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Small" />
 
             <TextView
+                android:id="@+id/textViewPhoneMail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewDistance"
+                android:layout_alignStart="@+id/textViewCustomer"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="5dp"
+                android:text="Phone: 0523154687   Mail: test@test.test"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Small" />
+
+            <TextView
                 android:id="@+id/textViewDistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -62,10 +73,10 @@
                 android:id="@+id/textViewTimes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/textViewAddress"
+                android:layout_below="@+id/textViewPhoneMail"
                 android:layout_alignStart="@+id/textViewCustomer"
                 android:layout_marginStart="0dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="5dp"
                 android:text="Mon: 7:30-12:30"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Small" />
 

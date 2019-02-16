@@ -131,7 +131,7 @@ public class Shop implements Parcelable
     
     public String displayInfo()
     {
-        return String.format("%s\nCity: %s \tAddress: %s %s", name, city, address1, address2);
+        return String.format("%s\n\n%s\n\nPhone: %s\nMail: %s", name, displayFullAddress(), phone, mail);
     }
     
     public String displayProfile()
