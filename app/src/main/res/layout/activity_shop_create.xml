@@ -25,7 +25,7 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/textTop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -51,7 +51,7 @@
                 android:inputType="textPersonName"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView" />
+                app:layout_constraintTop_toBottomOf="@+id/textTop" />
 
             <EditText
                 android:id="@+id/address1Text"
@@ -73,14 +73,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="24dp"
-                android:layout_marginEnd="8dp"
                 android:ems="10"
                 android:hint="@string/address2Text"
                 android:inputType="textPostalAddress"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/address1Text" />
+                app:layout_constraintTop_toBottomOf="@+id/address1Text"
+                app:layout_constraintWidth_percent="0.5" />
 
             <EditText
                 android:id="@+id/phoneText"
@@ -95,7 +93,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/zipText" />
+                app:layout_constraintTop_toBottomOf="@+id/cityText" />
 
             <EditText
                 android:id="@+id/mailText"
@@ -116,15 +114,13 @@
                 android:id="@+id/zipText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="16dp"
                 android:ems="10"
                 android:hint="@string/zipText"
                 android:inputType="number"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cityText" />
+                app:layout_constraintTop_toTopOf="@+id/address2Text"
+                app:layout_constraintWidth_percent="0.3"/>
 
             <EditText
                 android:id="@+id/cityText"
@@ -137,6 +133,7 @@
                 android:hint="@string/cityHint"
                 android:inputType="text"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/address2Text" />
 

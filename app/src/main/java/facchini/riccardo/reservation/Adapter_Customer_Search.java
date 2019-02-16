@@ -3,7 +3,6 @@ package facchini.riccardo.reservation;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,9 +44,9 @@ public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Custom
         Shop shop = res.getShopFound();
         
         holder.textViewName.setText(shop.getName());
-        holder.textViewAddress.setText(shop.getFullAddress());
+        holder.textViewAddress.setText(shop.displayFullAddress());
         holder.textViewDistance.setText(res.getFormatDistance());
-        holder.textViewTimes.setText(shop.getHoursFormat());
+        holder.textViewTimes.setText(shop.displayHoursFormat());
     }
     
     @Override

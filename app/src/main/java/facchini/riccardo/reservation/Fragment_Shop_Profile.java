@@ -1,6 +1,7 @@
 package facchini.riccardo.reservation;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class Fragment_Shop_Profile extends Fragment
@@ -16,6 +18,7 @@ public class Fragment_Shop_Profile extends Fragment
     private SharedViewModel viewModel;
     
     private TextView profileInfoText;
+    private Button buttonEdit;
     
     @Nullable
     @Override
@@ -37,5 +40,22 @@ public class Fragment_Shop_Profile extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         profileInfoText = view.findViewById(R.id.profileInfoText);
+        buttonEdit = view.findViewById(R.id.buttonEdit);
+        
+        buttonEdit.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Shop currentShop = viewModel.getCurrentShop();
+                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
+                Intent intent = new Intent();
+                Bundle b = new Bundle();
+                b.putParcelable("CurrentShop", currentShop);
+                intent.putExtras(b);
+                intent.setClass(getContext(), Activity_Shop_Create.class);
+                startActivity(intent);
+            }
+        });
     }
 }

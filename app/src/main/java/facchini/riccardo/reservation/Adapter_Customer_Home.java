@@ -45,7 +45,7 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
         Shop shop = res.getShop();
         
         holder.textViewShop.setText(shop.getName());
-        holder.textViewAddress.setText(shop.getFullAddress());
+        holder.textViewAddress.setText(shop.displayFullAddress());
         holder.textViewWhen.setText(res.getDateFormatted());
     }
     

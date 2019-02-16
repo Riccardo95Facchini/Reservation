@@ -78,7 +78,7 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         shopNameText.setText(selectedShop.getName());
         shopInfoText.setText(String.format("City: %s \tAddress: %s %s", selectedShop.getCity(),
                 selectedShop.getAddress1(), selectedShop.getAddress2()));
-        shopHoursText.setText(selectedShop.getHoursFormat());
+        shopHoursText.setText(selectedShop.displayHoursFormat());
         
         selectDateButton.setOnClickListener(new View.OnClickListener()
         {

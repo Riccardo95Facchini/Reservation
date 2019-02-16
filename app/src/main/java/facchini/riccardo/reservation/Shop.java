@@ -124,22 +124,22 @@ public class Shop implements Parcelable
     
     }
     
-    public String getFullAddress()
+    public String displayFullAddress()
     {
         return String.format("%s %s %s %s", address1, address2, city, zip);
     }
     
-    public String getInfo()
+    public String displayInfo()
     {
         return String.format("%s\nCity: %s \tAddress: %s %s", name, city, address1, address2);
     }
     
     public String displayProfile()
     {
-        return getInfo().concat("\n\nHours:\n").concat(getHoursFormat());
+        return displayInfo().concat("\n\nHours:\n").concat(displayHoursFormat());
     }
     
-    public String getHoursFormat()
+    public String displayHoursFormat()
     {
         StringBuilder h = new StringBuilder();
         
@@ -156,6 +156,21 @@ public class Shop implements Parcelable
                 h.append(String.format("%s: \t %s-%s\n", entry.getKey(), entry.getValue().get(2), entry.getValue().get(3)));
         }
         return h.toString();
+    }
+    
+    public String displayHoursDay(String day)
+    {
+        String ret;
+        
+        try
+        {
+            ret = String.format("%s-%s \t %s-%s", hours.get(day).get(0), hours.get(day).get(1), hours.get(day).get(2), hours.get(day).get(3));
+        } catch (Exception e)
+        {
+            ret = "Closed-Closed \t Closed-Closed";
+        }
+        
+        return ret;
     }
     
     public String getPhone() {return phone;}

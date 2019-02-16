@@ -3,8 +3,6 @@ package facchini.riccardo.reservation;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Geocoder;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -15,18 +13,18 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class Activity_Shop_TagHours extends AppCompatActivity
@@ -46,6 +44,8 @@ public class Activity_Shop_TagHours extends AppCompatActivity
     private ArrayList<String> tags;
     private Map<String, List<String>> hours;
     
+    private Shop currentShop = null;
+    private boolean editing = false;
     private String uid, mail, phone, name, address1, address2, city, zip;
     private double latitude, longitude;
     
@@ -57,10 +57,16 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop_tag_hours);
         
-        hours = new HashMap<>();
-        hoursInit();
-        
         getIntentAndExtras(getIntent());
+        
+        if (!editing)
+        {
+            hours = new HashMap<>();
+            hoursInit();
+        } else
+        {
+            hours = currentShop.getHours();
+        }
         
         getUI();
         
@@ -70,19 +76,9 @@ public class Activity_Shop_TagHours extends AppCompatActivity
             public void onClick(View v)
             {
                 if (storeTags())
-                {
                     sendData();
-                } else
-                {
-                    runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            tagsText.setHint(getString(R.string.noTagWarning));
-                        }
-                    });
-                }
+                else
+                    Toast.makeText(Activity_Shop_TagHours.this, getString(R.string.noTagWarning), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -104,15 +100,36 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         
         hoursTexts = new HashMap<>();
         
-        hoursTexts.put(getString(R.string.mondayText), (TextView) findViewById(R.id.textMon));
-        hoursTexts.put(getString(R.string.tuesdayText), (TextView) findViewById(R.id.textTue));
-        hoursTexts.put(getString(R.string.wednesdayText), (TextView) findViewById(R.id.textWed));
-        hoursTexts.put(getString(R.string.thursdayText), (TextView) findViewById(R.id.textThu));
-        hoursTexts.put(getString(R.string.fridayText), (TextView) findViewById(R.id.textFri));
-        hoursTexts.put(getString(R.string.saturdayText), (TextView) findViewById(R.id.textSat));
-        hoursTexts.put(getString(R.string.sundayText), (TextView) findViewById(R.id.textSun));
+        hoursTexts.put("Monday", (TextView) findViewById(R.id.textMon));
+        hoursTexts.put("Tuesday", (TextView) findViewById(R.id.textTue));
+        hoursTexts.put("Thursday", (TextView) findViewById(R.id.textWed));
+        hoursTexts.put("Wednesday", (TextView) findViewById(R.id.textThu));
+        hoursTexts.put("Friday", (TextView) findViewById(R.id.textFri));
+        hoursTexts.put("Saturday", (TextView) findViewById(R.id.textSat));
+        hoursTexts.put("Sunday", (TextView) findViewById(R.id.textSun));
         
         tagsText = findViewById(R.id.tagsText);
+        
+        if (editing)
+        {
+            setHoursTexts();
+            
+            try
+            {
+                tags =currentShop.getTags();
+                tags.remove(currentShop.getName().replaceAll("[^a-zA-Z\\s]", " ")
+                        .replaceAll("\\s+", " ").toLowerCase().trim());
+                tags.remove(currentShop.getName().toLowerCase().trim());
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            
+            for (String t : tags)
+            {
+                tagsText.append(t.concat(" "));
+            }
+        }
         
         createSpinnerAdapter();
         
@@ -121,57 +138,58 @@ public class Activity_Shop_TagHours extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                dayButtonListenerSet(getString(R.string.mondayText));
+                dayButtonListenerSet("Monday");
             }
         });
         tuesdayButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
-            {
-                dayButtonListenerSet(getString(R.string.tuesdayText));
-            }
+            { dayButtonListenerSet("Tuesday"); }
         });
         thursdayButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View v)
-            {
-                dayButtonListenerSet(getString(R.string.thursdayText));
-            }
+            public void onClick(View v) {dayButtonListenerSet("Thursday");}
         });
         wednesdayButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
-            {
-                dayButtonListenerSet(getString(R.string.wednesdayText));
-            }
+            { dayButtonListenerSet("Wednesday"); }
         });
         fridayButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                dayButtonListenerSet(getString(R.string.fridayText));
+                dayButtonListenerSet("Friday");
             }
         });
         saturdayButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View v)
-            {
-                dayButtonListenerSet(getString(R.string.saturdayText));
-            }
+            public void onClick(View v) { dayButtonListenerSet("Saturday"); }
         });
         sundayButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                dayButtonListenerSet(getString(R.string.sundayText));
+                dayButtonListenerSet("Sunday");
             }
         });
+    }
+    
+    private void setHoursTexts()
+    {
+        hoursTexts.get("Monday").setText(currentShop.displayHoursDay("Monday"));
+        hoursTexts.get("Tuesday").setText(currentShop.displayHoursDay("Tuesday"));
+        hoursTexts.get("Thursday").setText(currentShop.displayHoursDay("Thursday"));
+        hoursTexts.get("Wednesday").setText(currentShop.displayHoursDay("Wednesday"));
+        hoursTexts.get("Friday").setText(currentShop.displayHoursDay("Friday"));
+        hoursTexts.get("Saturday").setText(currentShop.displayHoursDay("Saturday"));
+        hoursTexts.get("Sunday").setText(currentShop.displayHoursDay("Sunday"));
     }
     
     private void dayButtonListenerSet(final String day)
@@ -202,7 +220,6 @@ public class Activity_Shop_TagHours extends AppCompatActivity
                     Toast.makeText(Activity_Shop_TagHours.this, "Wrong times selected, try again", Toast.LENGTH_LONG).show();
                 else
                 {
-                    
                     ArrayList ret = new ArrayList<String>();
                     ret.add(timeSpinner1.getSelectedItem().toString());
                     ret.add(timeSpinner2.getSelectedItem().toString());
@@ -231,24 +248,27 @@ public class Activity_Shop_TagHours extends AppCompatActivity
      */
     private void createSpinnerAdapter()
     {
+        final String start = "00:00", finish = "23:30";
+        final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        Calendar calendar = Calendar.getInstance();
+        
+        try
+        {
+            calendar.setTime(timeFormat.parse(start));
+        } catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
+        
         ArrayList<String> spinnerText = new ArrayList<>();
         spinnerText.add("Closed");
         
-        final String oClock = ":00";
-        final String half = ":30";
-        
-        for (int hours = 0; hours < 24; hours++)
+        while (!(timeFormat.format(calendar.getTime()).equals(finish)))
         {
-            if (hours < 10)
-            {
-                spinnerText.add("0" + hours + oClock);
-                spinnerText.add("0" + hours + half);
-            } else
-            {
-                spinnerText.add(hours + oClock);
-                spinnerText.add(hours + half);
-            }
+            spinnerText.add(timeFormat.format(calendar.getTime()));
+            calendar.add(Calendar.MINUTE, 30);
         }
+        
         adapter = new ArrayAdapter<>(Activity_Shop_TagHours.this, android.R.layout.simple_spinner_item, spinnerText);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
     }
@@ -267,16 +287,25 @@ public class Activity_Shop_TagHours extends AppCompatActivity
     
     private void getIntentAndExtras(Intent intent)
     {
-        uid = intent.getStringExtra("uid");
-        mail = intent.getStringExtra("mail");
-        phone = intent.getStringExtra("phone");
-        name = intent.getStringExtra("name");
-        address1 = intent.getStringExtra("address1");
-        address2 = intent.getStringExtra("address2");
-        city = intent.getStringExtra("city");
-        zip = intent.getStringExtra("zip");
-        latitude = intent.getDoubleExtra("latitude", 0);
-        longitude = intent.getDoubleExtra("longitude", 0);
+        Bundle b = intent.getExtras();
+        if (b != null)
+        {
+            currentShop = b.getParcelable("CurrentShop");
+            setTitle(R.string.edit);
+            editing = true;
+        } else
+        {
+            uid = intent.getStringExtra("uid");
+            mail = intent.getStringExtra("mail");
+            phone = intent.getStringExtra("phone");
+            name = intent.getStringExtra("name");
+            address1 = intent.getStringExtra("address1");
+            address2 = intent.getStringExtra("address2");
+            city = intent.getStringExtra("city");
+            zip = intent.getStringExtra("zip");
+            latitude = intent.getDoubleExtra("latitude", 0);
+            longitude = intent.getDoubleExtra("longitude", 0);
+        }
     }
     
     /**
@@ -287,17 +316,19 @@ public class Activity_Shop_TagHours extends AppCompatActivity
      */
     private boolean storeTags()
     {
+        if (editing)
+            name = currentShop.getName();
         
-        String parsedString = (tagsText.getText().toString().concat(name))
-                .replaceAll("[^a-zA-Z\\s]", "")
+        String parsedString = (tagsText.getText().toString().concat(" " + name))
+                .replaceAll("[^a-zA-Z\\s]", " ")
                 .replaceAll("\\s+", " ")
                 .toLowerCase().trim();
         
-        
         if (!parsedString.isEmpty())
         {
-            tags = new ArrayList<>(Arrays.asList(parsedString.split("\\s", 0)));
-            tags.add(name.toLowerCase().trim());
+            HashSet<String> set = new HashSet<>(Arrays.asList(parsedString.split("\\s", 0)));
+            set.add(name.toLowerCase().trim());
+            tags = new ArrayList<>(set);
             return true;
         } else
             return false;
@@ -310,11 +341,22 @@ public class Activity_Shop_TagHours extends AppCompatActivity
     {
         db = FirebaseFirestore.getInstance();
         shopsReference = db.collection("shops");
-        Shop newShop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude, longitude, tags, hours);
-        shopsReference.document(uid).set(newShop);
-        createDocumentReservation();
-        
-        startActivity(new Intent(this, Activity_Login.class));
+        final Shop shop;
+        if (!editing)
+        {
+            shop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude, longitude, tags, hours);
+            shopsReference.document().set(shop);
+            createDocumentReservation();
+            startActivity(new Intent(this, Activity_Login.class));
+        } else
+        {
+            uid = currentShop.getUid();
+            shop = new Shop(uid, currentShop.getName(), currentShop.getMail(), currentShop.getAddress1(), currentShop.getAddress2(),
+                    currentShop.getCity(), currentShop.getZip(), currentShop.getPhone(), currentShop.getLatitude(), currentShop.getLongitude(), tags, hours);
+            
+            shopsReference.document(uid).set(shop);
+            startActivity(new Intent(this, Activity_Shop.class));
+        }
     }
     
     /**

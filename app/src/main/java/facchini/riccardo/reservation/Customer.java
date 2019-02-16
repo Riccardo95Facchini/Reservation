@@ -36,7 +36,7 @@ public class Customer
         return String.format("%s %s\nPhone: %s\nMail: %s", name, surname, phone, mail);
     }
     
-    public String getInfo()
+    public String displayInfo()
     {
         return String.format("Name: %s %s\nPhone: %s\nMail: %s", name, surname, phone.isEmpty() ? "N/A" : phone, mail.isEmpty() ? "N/A" : mail);
     }

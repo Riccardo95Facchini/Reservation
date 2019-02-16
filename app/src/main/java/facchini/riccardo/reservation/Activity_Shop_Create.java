@@ -7,9 +7,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -17,22 +19,19 @@ import java.util.Locale;
 
 public class Activity_Shop_Create extends AppCompatActivity
 {
-    private String uid;
-    private String mail;
+    private String uid = "";
+    private String mail = "";
     private Address address;
     
+    private boolean editing = false;
+    private Shop currentShop = null;
     
     //UI
     //Buttons
     private Button continueButton;
-    //Text view
-    private EditText shopNameText;
-    private EditText address1Text;
-    private EditText address2Text;
-    private EditText cityText;
-    private EditText zipText;
-    private EditText phoneText;
-    private EditText mailText;
+    //Text
+    private TextView textTop;
+    private EditText shopNameText, address1Text, address2Text, cityText, zipText, phoneText, mailText;
     
     
     @Override
@@ -40,13 +39,36 @@ public class Activity_Shop_Create extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop_create);
+        
         //Get intent and extra
         Intent intent = getIntent();
-        uid = intent.getStringExtra("uid");
-        mail = intent.getStringExtra("mail");
+        Bundle b = intent.getExtras();
+        if (b != null)
+        {
+            currentShop = b.getParcelable("CurrentShop");
+            setTitle(R.string.edit);
+            editing = true;
+            uid = currentShop.getUid();
+        } else
+        {
+            uid = intent.getStringExtra("uid");
+            mail = intent.getStringExtra("mail");
+        }
         
+        setUI();
+        handleTextsOnCreate();
+        
+        if(editing)
+            continueButton.setEnabled(true);
+    }
+    
+    /**
+     * Sets the UI elements of this activity
+     */
+    private void setUI()
+    {
         //Initialize UI elements
-        continueButton = findViewById(R.id.continueButton);
+        textTop = findViewById(R.id.textTop);
         shopNameText = findViewById(R.id.shopNameText);
         address1Text = findViewById(R.id.address1Text);
         address2Text = findViewById(R.id.address2Text);
@@ -55,19 +77,33 @@ public class Activity_Shop_Create extends AppCompatActivity
         phoneText = findViewById(R.id.phoneText);
         mailText = findViewById(R.id.mailText);
         
+        if (!mail.isEmpty())
+            mailText.setText(mail);
         
+        if (editing)
+        {
+            textTop.setText(getString(R.string.changeFieldsEditShop));
+            shopNameText.setText(currentShop.getName());
+            address1Text.setText(currentShop.getAddress1());
+            address2Text.setText(currentShop.getAddress2());
+            cityText.setText(currentShop.getCity());
+            zipText.setText(currentShop.getZip());
+            phoneText.setText(currentShop.getPhone());
+            mailText.setText(currentShop.getMail());
+        }
+        
+        continueButton = findViewById(R.id.continueButton);
         continueButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                continueToTags();
+                if (checkAddress())
+                    continueToTags();
             }
         });
         
         continueButton.setEnabled(false);
-        
-        handleTextsOnCreate();
     }
     
     /**
@@ -75,15 +111,18 @@ public class Activity_Shop_Create extends AppCompatActivity
      */
     private void handleTextsOnCreate()
     {
-        runOnUiThread(new Runnable()
+        if (!editing)
         {
-            @Override
-            public void run()
+            runOnUiThread(new Runnable()
             {
-                if (!mail.isEmpty())
-                    mailText.setText(mail);
-            }
-        });
+                @Override
+                public void run()
+                {
+                    if (!mail.isEmpty())
+                        mailText.setText(mail);
+                }
+            });
+        }
         
         shopNameText.addTextChangedListener(new TextWatcher()
         {
@@ -208,37 +247,12 @@ public class Activity_Shop_Create extends AppCompatActivity
     }
     
     /**
-     * Checks if the entire for has been filled
+     * Checks if the entire form has been filled
      *
      * @return true if all fields have at least one char, false otherwise
      */
     private boolean isFormFull()
     {
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        String fulladdress = String.format("%s %s %s %s",
-                address1Text.getText().toString().trim(),
-                address2Text.getText().toString().trim(),
-                cityText.getText().toString().trim(),
-                zipText.getText().toString().trim());
-    
-        address = null;
-        
-        try
-        {
-            address = geocoder.getFromLocationName(fulladdress, 1).get(0);
-        } catch (IOException e)
-        {
-            Toast.makeText(this, getString(R.string.wrongAddress), Toast.LENGTH_SHORT).show();
-            return false;
-        } finally
-        {
-            if (address == null)
-            {
-                Toast.makeText(this, getString(R.string.wrongAddress), Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }
-        
         return shopNameText.getText().toString().length() > 0 &&
                 address1Text.getText().toString().length() > 0 &&
                 address2Text.getText().toString().length() > 0 &&
@@ -251,16 +265,71 @@ public class Activity_Shop_Create extends AppCompatActivity
     private void continueToTags()
     {
         Intent intent = new Intent(this, Activity_Shop_TagHours.class);
-        intent.putExtra("uid", uid)
-                .putExtra("name", shopNameText.getText().toString().trim())
-                .putExtra("address1", address1Text.getText().toString().trim())
-                .putExtra("address2", address2Text.getText().toString().trim())
-                .putExtra("city", cityText.getText().toString().trim())
-                .putExtra("zip", zipText.getText().toString().trim())
-                .putExtra("phone", phoneText.getText().toString().trim())
-                .putExtra("mail", mailText.getText().toString().trim())
-                .putExtra("latitude", address.getLatitude())
-                .putExtra("longitude", address.getLongitude());
+        
+        String name = shopNameText.getText().toString().trim();
+        String mail = mailText.getText().toString().trim();
+        String address1 = address1Text.getText().toString().trim();
+        String address2 = address2Text.getText().toString().trim();
+        String city = cityText.getText().toString().trim();
+        String zip = zipText.getText().toString().trim();
+        String phone = phoneText.getText().toString().trim();
+        double latitude = address.getLatitude();
+        double longitude = address.getLongitude();
+        
+        if (!editing)
+        {
+            intent.putExtra("uid", uid)
+                    .putExtra("name", name)
+                    .putExtra("address1", address1)
+                    .putExtra("address2", address2)
+                    .putExtra("city", city)
+                    .putExtra("zip", zip)
+                    .putExtra("phone", phone)
+                    .putExtra("mail", mail)
+                    .putExtra("latitude", latitude)
+                    .putExtra("longitude", longitude);
+        } else
+        {
+            Bundle b = new Bundle();
+            Shop shop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude, longitude, currentShop.getTags(), currentShop.getHours());
+            b.putParcelable("CurrentShop", shop);
+            intent.putExtras(b);
+            intent.setClass(this, Activity_Shop_TagHours.class);
+        }
         startActivity(intent);
+    }
+    
+    /**
+     * Checks if the inserted address is valid, makes toast to warn the user to fix it if wrong
+     *
+     * @return true if valid, false otherwise
+     */
+    private boolean checkAddress()
+    {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        String fullAddress = String.format("%s %s %s %s",
+                address1Text.getText().toString().trim(),
+                address2Text.getText().toString().trim(),
+                cityText.getText().toString().trim(),
+                zipText.getText().toString().trim());
+        
+        address = null;
+        
+        try
+        {
+            address = geocoder.getFromLocationName(fullAddress, 1).get(0);
+        } catch (IOException e)
+        {
+            Toast.makeText(this, getString(R.string.wrongAddress), Toast.LENGTH_SHORT).show();
+            return false;
+        } finally
+        {
+            if (address == null)
+            {
+                Toast.makeText(this, getString(R.string.wrongAddress), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        return true;
     }
 }

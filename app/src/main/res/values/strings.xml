@@ -14,7 +14,7 @@
     <string name="shopRegistration">Shop registration</string>
     <string name="shopNameHint">Shop Name</string>
     <string name="address1Text">Street Address</string>
-    <string name="address2Text">Street Address Line 2</string>
+    <string name="address2Text">Address Line 2</string>
     <string name="continueButton">Continue</string>
     <string name="cityHint">City</string>
     <string name="zipText">ZIP code</string>
@@ -71,4 +71,9 @@
     <string name="areYouSure">Are you sure?</string>
     <string name="atWithTwoSpaces">at</string>
     <string name="deleteReservationFor">Delete reservation for</string>
+    <string name="edit">Edit</string>
+    <string name="edit_opening_hours">Edit opening hours</string>
+    <string name="edit_your_tags">Edit your tags</string>
+    <string name="finish">finish</string>
+    <string name="changeFieldsEditShop">Change the fields you wish to modify</string>
 </resources>

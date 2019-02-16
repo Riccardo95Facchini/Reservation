@@ -240,7 +240,7 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
      */
     private void searchTag(String text)
     {
-        text = text.replaceAll("[^a-zA-Z\\s]", "")
+        text = text.replaceAll("[^a-zA-Z\\s]", " ")
                 .replaceAll("\\s+", " ").toLowerCase().trim();
         
         progressBar.setVisibility(View.VISIBLE);
