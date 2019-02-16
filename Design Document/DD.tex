@@ -1,0 +1,65 @@
+\input{commandsFile}
+
+\begin{document}
+%Custom title page
+\begin{titlepage}
+\centering
+\includegraphics[scale=0.75]{Img/PolimiLogo}
+\par\vspace{6cm}
+{\textcolor{Blue}{\textbf{{\Huge Reservation}}}}
+\par\vspace{1cm}
+{\textcolor{Blue}{\textbf{{\Large Design and Implementation of Mobile Applications course \\ Professor Luciano Baresi}}}}
+\par\vspace{3cm}
+{\Large\scshape{Written by Riccardo Facchini \\Mat: 899190}}
+\par\vfill
+{\large 2018-2019}
+\end{titlepage}
+%Deliverable specific information----------------------------------
+\clearpage
+\section*{Deliverable specific information}
+\addcontentsline{toc}{section}{Deliverable specific information}
+\begin{tabular}{ll}
+\hline
+\textbf{Deliverable:} & Design Document\\
+\textbf{Title:} & Design Document \\
+\textbf{Authors:} & Riccardo Facchini \\
+\textbf{Version:} & 1.0 \\ 
+\textbf{Last revision:} & \today \\
+\textbf{Download page:} & \url{https://github.com/Riccardo95Facchini/Reservation.git} \\
+\textbf{Copyright:} & Copyright © 2019, Riccardo Facchini – All rights reserved \\
+\hline
+\end{tabular}
+\setcounter{page}{1}
+
+%Table of contents------------------------------------------------------
+\clearpage
+\tableofcontents
+\addcontentsline{toc}{section}{Table of Contents}
+\clearpage
+\listoffigures
+\addcontentsline{toc}{section}{List of Figures}
+%INTRODUCTION---------------------------------------------------
+\clearpage
+{\color{Blue}{\section{Introduction}}}
+\label{sect:Introduction}
+\input{Files/Introduction}
+%Architectural Design---------------------------------------------------
+\clearpage
+{\color{Blue}{\section{Architectural Design}}}
+\label{sect:ArchitecturalDesign}
+\input{Files/ArchitecturalDesign}
+%User Interface-----------------------------------------------------------------
+\clearpage
+{\color{Blue}{\section{User Interface Design}}}
+\label{sect:UserInterfaceDesign}
+\input{Files/UserInterface}
+%Implementation, Integration and Test Plan--------------------------------------
+\clearpage
+{\color{Blue}{\section{Implementation and Integration}}}
+\label{sect:ImplementationIntegration}
+\input{Files/ImplementationIntegrationTestPlan}
+%Effort Spent------------------------------------
+{\color{Blue}{\section{Appendix}}}
+\label{sect:Appendix}
+\input{Files/Appendix}
+\end{document}

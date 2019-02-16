@@ -1,0 +1,14 @@
+\subsection{Introduction}
+In this section is present the documentation regarding the implementation order of the different components of the system and their integration with one another.
+\subsection{Entry Criteria}
+What follows is an illustration of the requisites that need to be fulfilled before the Integration phase can start.
+\paragraph*{Design Document:\\} This document and the initial mockups must be finished before starting with the development, it must be noted how it has to be updated after the development is finished in order to integrate it with what changed during development as the DD is not fixed and is subject to changes if needed.
+\paragraph*{Documentation:\\} Each method and class must be fully documented using JavaDoc in order to assure that the code is easily understandable, making it easier to extend and maintain even by different people that may end up working on the system in the future.\\
+Names of classes, methods and variables must be chosen with the intent of communicating the reason of their existence and not be confusing or too similar to one another, also they should follow the standard Java naming conventions.\\
+Also names should use a cascade system such as: Activity\_TypeOfUser\_Screen\_Details.
+\subsection{Elements to be Integrated}
+\begin{enumerate}
+\item \emph{Database}: Both DB and DBMS are handled by the Firebase API, in particular Firestore, meaning that until a proper release is planned the free to use testing plan is more than enough.\\
+\item \emph{Client}: Composed by the \emph{mobile application} it holds the logic of the system and the presentation system.\\
+The integration should focus on making sure that the communication doesn't imply high waiting time and that the graphical interface behaves as it should regarding the received data.
+\end{enumerate}
