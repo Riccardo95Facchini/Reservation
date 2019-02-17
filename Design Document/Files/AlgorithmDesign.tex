@@ -1,9 +1,21 @@
 \subsection{Introduction}
-In this section, it will be described with pseudocode the main algorithms of the system.
+In this section, it will be described the main algorithms of the system, which is the search of a shop in the area.
 
-\subsubsection{Path Calculation}
-It should be noted that since the system relies on the APIs of \emph{Google Maps} to actually calculate the path, the \textbf{Path Calculator} component only needs to select the vehicles that the user will have to use (given the his/her preferences, owned vehicles, the weather conditions and the eventuality of strikes), this means that (as already stated) it acts more like a \emph{Query Builder} and then selects the best path if more than one is returned.
-\lstinputlisting[language=pseudocode]{Files/PathCalculation.txt}
+\subsubsection{Distance Calculation}
+Since the GPS system is heavy on battery consumption, it's not always reliable (especially when just turned on) and the user may want to search in a different location than where he/she is right now, when the customer wants to start a search a dialog shown in \autoref{fig:addressSearch} asking for the address is shown, then the only needed values of \textbf{latitude} and the \textbf{longitude} are extracted.\\
+Given the maximum \textbf{distance} the user wants the search to be done, the deltas for both the latitude and the longitude can be computed as follows:\\
+\begin{center}
+$ deltaLat = (distance/earthRadius) * (180 * Math.PI) $\\
+$ deltaLng = Math.toDegrees((dist / (earthRadius * Math.cos(Math.toRadians(currentLat))))) $
+\end{center}
 
-\subsubsection{Appointment Checking}
-\lstinputlisting[language=pseudocode]{Files/AppointmentChecking.txt}
+\subsubsection{Queries}
+Due to a limitation of Firestore, queries are made by searching for shops with the given tag, the latitude inside the min and max values (found respectively by subtracting and adding to the current latitude the value of deltaLat) and then a third parameter called \textit{intLongitude} is used, corresponding to the longitude truncated.\\
+This has to be done since Firestore doesn't allow for queries with different search parameters except for equals, so instead of doing two queries (one for latitude and one for longitude) and then merging the common values, one query is done limiting the search to only one longitude and then the values retrieved are checked locally if they are inside the range. In the edge cases where the search spans over more than one longitude integer value, then more than one query will be made with the different values set, each query will return a different set than the others obviously so it must only be checked if the shops are in the correct range and no control between queries result has to be done.\\
+Here is the example of the first (and usually only) query:\\
+\begin{center}
+\textit{shopsCollection.whereArrayContains("tags", searchedText)\\
+.whereGreaterThanOrEqualTo("latitude", minLat)\\
+.whereLessThanOrEqualTo("latitude", maxLat)\\
+.whereEqualTo("intLongitude", minIntLng).get();}
+\end{center}
