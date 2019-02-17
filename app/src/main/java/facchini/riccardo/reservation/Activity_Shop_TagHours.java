@@ -344,14 +344,16 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         final Shop shop;
         if (!editing)
         {
-            shop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude, longitude, tags, hours);
+            int intLongitude = (int) longitude;
+            shop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude, longitude, intLongitude, tags, hours);
             shopsReference.document(uid).set(shop);
             startActivity(new Intent(this, Activity_Login.class));
         } else
         {
             uid = currentShop.getUid();
-            shop = new Shop(uid, currentShop.getName(), currentShop.getMail(), currentShop.getAddress1(), currentShop.getAddress2(),
-                    currentShop.getCity(), currentShop.getZip(), currentShop.getPhone(), currentShop.getLatitude(), currentShop.getLongitude(), tags, hours);
+            shop = new Shop(uid, currentShop.getName(), currentShop.getMail(), currentShop.getAddress1(),
+                    currentShop.getAddress2(), currentShop.getCity(), currentShop.getZip(), currentShop.getPhone(),
+                    currentShop.getLatitude(), currentShop.getLongitude(), currentShop.getIntLongitude(), tags, hours);
             
             shopsReference.document(uid).set(shop);
             startActivity(new Intent(this, Activity_Shop.class));

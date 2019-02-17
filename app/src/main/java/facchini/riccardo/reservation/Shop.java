@@ -20,10 +20,11 @@ public class Shop implements Parcelable
     private String phone;
     private double latitude;
     private double longitude;
+    private int intLongitude;
     private ArrayList<String> tags;
     private Map<String, List<String>> hours;
     
-    public Shop(String uid, String name, String mail, String address1, String address2, String city, String zip, String phone, double latitude, double longitude, ArrayList<String> tags, Map<String, List<String>> hours)
+    public Shop(String uid, String name, String mail, String address1, String address2, String city, String zip, String phone, double latitude, double longitude, int intLongitude, ArrayList<String> tags, Map<String, List<String>> hours)
     {
         this.uid = uid;
         this.name = name;
@@ -35,6 +36,7 @@ public class Shop implements Parcelable
         this.phone = phone;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.intLongitude = intLongitude;
         this.tags = new ArrayList<>(tags);
         this.hours = new HashMap<>(hours);
     }
@@ -51,6 +53,7 @@ public class Shop implements Parcelable
         this.phone = s.phone;
         this.latitude = s.latitude;
         this.longitude = s.longitude;
+        this.intLongitude = s.intLongitude;
         this.tags = new ArrayList<>(s.tags);
         this.hours = new HashMap<>(s.hours);
     }
@@ -67,6 +70,7 @@ public class Shop implements Parcelable
         this.phone = (String) m.get("phone");
         this.latitude = (double) m.get("latitude");
         this.longitude = (double) m.get("longitude");
+        this.intLongitude = (int) ((long) m.get("intLongitude"));
         this.tags = new ArrayList<>((ArrayList<String>) m.get("tags"));
         this.hours = new HashMap<>((HashMap<String, List<String>>) m.get("hours"));
     }
@@ -84,6 +88,7 @@ public class Shop implements Parcelable
         dest.writeString(phone);
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
+        dest.writeInt(intLongitude);
         dest.writeList(new ArrayList<>(tags));
         dest.writeMap(new HashMap<>(hours));
     }
@@ -100,6 +105,7 @@ public class Shop implements Parcelable
         this.phone = in.readString();
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
+        this.intLongitude = in.readInt();
         this.tags = in.readArrayList(Shop.class.getClassLoader());
         this.hours = in.readHashMap(Shop.class.getClassLoader());
     }
@@ -196,6 +202,8 @@ public class Shop implements Parcelable
     public double getLatitude() {return latitude;}
     
     public double getLongitude() {return longitude;}
+    
+    public int getIntLongitude() {return intLongitude;}
     
     @Override
     public int describeContents()

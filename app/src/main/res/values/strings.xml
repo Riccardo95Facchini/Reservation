@@ -77,6 +77,6 @@
     <string name="finish">finish</string>
     <string name="changeFieldsEditShop">Change the fields you wish to modify</string>
     <string name="reservationShopDetails">Shop Details</string>
-    <string name="lcoationProblem">Location problem</string>
-    <string name="noGPSLocationError">It seems we can\'t find your current position, we are very sorry, please try waiting a moment with the GPS active and try again</string>
+    <string name="addressSearch">Address Search</string>
+    <string name="addressSearchInput">Insert the address from where you want to search</string>
 </resources>

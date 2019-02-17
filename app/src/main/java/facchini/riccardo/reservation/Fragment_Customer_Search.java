@@ -1,24 +1,19 @@
 package facchini.riccardo.reservation;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Criteria;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,9 +25,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -41,12 +33,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Locale;
 
 public class Fragment_Customer_Search extends Fragment implements OnItemClickListener
 {
@@ -63,11 +55,7 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     private Adapter_Customer_Search adapter;
     
     //Location
-    private FusedLocationProviderClient client;
-    private LocationManager locationManager;
-    private LocationListener locationListener;
     private Location myLocation;
-    private boolean locationCalled = false;
     private int distance = 1;
     
     private double deltaLng, deltaLat;
@@ -139,7 +127,12 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
                     String text = searchText.getText().toString().trim();
                     
                     if (!text.isEmpty())
-                        searchTag(text);
+                    {
+                        if (myLocation != null)
+                            searchTag(text);
+                        else
+                            getLocation();
+                    }
                 }
                 return false;
             }
@@ -153,12 +146,24 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
                 String text = searchText.getText().toString().trim();
                 
                 if (!text.isEmpty())
-                    searchTag(text);
+                {
+                    if (myLocation != null)
+                        searchTag(text);
+                    else
+                        getLocation();
+                }
             }
         });
         
-        if (!locationCalled)
-            getLocation();
+        searchText.setOnFocusChangeListener(new View.OnFocusChangeListener()
+        {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if (myLocation == null && hasFocus)
+                    getLocation();
+            }
+        });
     }
     
     @Override
@@ -180,58 +185,39 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     
     private void getLocation()
     {
-        locationCalled = true;
+        final EditText input = new EditText(getContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        final Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
         
-        /*Location manager system from https://developer.android.com/guide/topics/location/strategies#java*/
-        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new LocationListener()
+        new AlertDialog.Builder(getContext()).setCancelable(false).setView(input)
+                .setTitle(getString(R.string.addressSearch))
+                .setMessage(getString(R.string.addressSearchInput))
+                .setPositiveButton("Set", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        try
+                        {
+                            myLocation = new Location("myLocation");
+                            Address selectedAddress = geocoder.getFromLocationName(input.getText().toString(), 1).get(0);
+                            myLocation.setLatitude(selectedAddress.getLatitude());
+                            myLocation.setLongitude(selectedAddress.getLongitude());
+                        } catch (IOException e)
+                        {
+                            Toast.makeText(getContext(), "Error, address could not be found", Toast.LENGTH_SHORT).show();
+                            searchText.clearFocus();
+                        }
+                    }
+                }).setNegativeButton("Back", new DialogInterface.OnClickListener()
         {
             @Override
-            public void onLocationChanged(Location location)
+            public void onClick(DialogInterface dialog, int which)
             {
-                myLocation = location;
-                locationManager.removeUpdates(locationListener);
+                searchText.clearFocus();
+                myLocation = null;
             }
-            
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) { }
-            
-            @Override
-            public void onProviderEnabled(String provider) {}
-            
-            @Override
-            public void onProviderDisabled(String provider) {}
-        };
-        
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            return;
-        
-        /*Location manager system from https://developer.android.com/guide/topics/location/strategies#java
-         * Requires both from network and gps provider*/
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        
-        //Also try to get the last known location
-        myLocation = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), false));
-        
-        /*Other method using FusedLocationProvider*/
-        client = LocationServices.getFusedLocationProviderClient(getActivity());
-        client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>()
-        {
-            @Override
-            public void onSuccess(Location location)
-            {
-                myLocation = location;
-                locationManager.removeUpdates(locationListener);
-            }
-        }).addOnFailureListener(new OnFailureListener()
-        {
-            @Override
-            public void onFailure(@NonNull Exception e)
-            {
-                e.printStackTrace();
-            }
-        });
+        }).show();
     }
     
     
@@ -252,45 +238,62 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
         
         if (myLocation != null)
         {
-            double minLat = myLocation.getLatitude() - deltaLat,
+            final double minLat = myLocation.getLatitude() - deltaLat,
                     maxLat = myLocation.getLatitude() + deltaLat,
                     minLng = myLocation.getLongitude() - deltaLng,
                     maxLng = myLocation.getLongitude() + deltaLng;
             
+            int minIntLng = (int) minLng;
+            int maxIntLng = (int) maxLng;
             
-            Task taskLat = shopsCollection.whereArrayContains("tags", text)
-                    .whereGreaterThanOrEqualTo("latitude", minLat)
-                    .whereLessThanOrEqualTo("latitude", maxLat)
-                    .get();
+            Task queryOne, queryTwo, queryThree;
+            Task<List<QuerySnapshot>> allTasks;
+            if (minIntLng != maxIntLng)
+            {
+                queryOne = shopsCollection.whereArrayContains("tags", text)
+                        .whereGreaterThanOrEqualTo("latitude", minLat)
+                        .whereLessThanOrEqualTo("latitude", maxLat).whereEqualTo("intLongitude", minIntLng)
+                        .get();
+                
+                queryTwo = shopsCollection.whereArrayContains("tags", text)
+                        .whereGreaterThanOrEqualTo("latitude", minLat)
+                        .whereLessThanOrEqualTo("latitude", maxLat).whereEqualTo("intLongitude", maxIntLng)
+                        .get();
+                if (minIntLng + 1 < maxIntLng)
+                {
+                    queryThree = shopsCollection.whereArrayContains("tags", text)
+                            .whereGreaterThanOrEqualTo("latitude", minLat)
+                            .whereLessThanOrEqualTo("latitude", maxLat).whereEqualTo("intLongitude", minIntLng + 1)
+                            .get();
+                    allTasks = Tasks.whenAllSuccess(queryOne, queryTwo, queryThree);
+                } else
+                    allTasks = Tasks.whenAllSuccess(queryOne, queryTwo);
+                
+            } else
+            {
+                queryOne = shopsCollection.whereArrayContains("tags", text)
+                        .whereGreaterThanOrEqualTo("latitude", minLat)
+                        .whereLessThanOrEqualTo("latitude", maxLat).whereEqualTo("intLongitude", minIntLng)
+                        .get();
+                
+                allTasks = Tasks.whenAllSuccess(queryOne);
+            }
             
-            Task taskLng = shopsCollection.whereArrayContains("tags", text)
-                    .whereGreaterThanOrEqualTo("longitude", minLng)
-                    .whereLessThanOrEqualTo("longitude", maxLng)
-                    .get();
-            
-            Task<List<QuerySnapshot>> allTasks = Tasks.whenAllSuccess(taskLat, taskLng);
             allTasks.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>()
             {
                 @Override
                 public void onSuccess(List<QuerySnapshot> querySnapshots)
                 {
-                    Set<String> queryShops = new HashSet<>();
                     Location shopLocation = new Location("ShopLocation");
                     
-                    int i = 0;
                     for (QuerySnapshot snapshot : querySnapshots)
                     {
                         for (QueryDocumentSnapshot doc : snapshot)
                         {
-                            String uid = (String) doc.getData().get("uid");
+                            Shop shop = new Shop(doc.getData());
                             
-                            if (i == 0)
+                            if (!(shop.getLongitude() > maxLng) && !(shop.getLongitude() < minLng))
                             {
-                                queryShops.add(uid);
-                            } else if (queryShops.contains(uid))
-                            {
-                                Shop shop = new Shop(doc.getData());
-                                
                                 shopLocation.setLatitude(shop.getLatitude());
                                 shopLocation.setLongitude(shop.getLongitude());
                                 float dist = myLocation.distanceTo(shopLocation);
@@ -299,10 +302,7 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
                                     foundShops.add(new SearchResult(shop, dist));
                             }
                         }
-                        i++;
                     }
-                    
-                    queryShops.clear();
                     
                     if (foundShops.isEmpty())
                     {
@@ -344,29 +344,9 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     private void getDeltas()
     {
         int dist = 1000 * distance;
-        if (myLocation == null)
-        {
-            new AlertDialog.Builder(getContext()).setCancelable(false)
-                    .setTitle(getString(R.string.lcoationProblem))
-                    .setMessage(getString(R.string.noGPSLocationError))
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null)
-                                    .replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
-                        }
-                    }).show();
-            
-            
-        } else
-        {
-            locationManager.removeUpdates(locationListener); //Stop listening for locations
-            final double earthRadius = 6371000; //meters
-            
-            deltaLat = (dist / earthRadius) * (180 / Math.PI);
-            deltaLng = Math.toDegrees((dist / (earthRadius * Math.cos(Math.toRadians(myLocation.getLatitude())))));
-        }
+        final double earthRadius = 6371000; //meters
+        
+        deltaLat = (dist / earthRadius) * (180 / Math.PI);
+        deltaLng = Math.toDegrees((dist / (earthRadius * Math.cos(Math.toRadians(myLocation.getLatitude())))));
     }
 }

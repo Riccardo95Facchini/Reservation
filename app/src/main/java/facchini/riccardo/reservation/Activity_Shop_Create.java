@@ -290,8 +290,9 @@ public class Activity_Shop_Create extends AppCompatActivity
                     .putExtra("longitude", longitude);
         } else
         {
+            int intLongitude = (int) longitude;
             Bundle b = new Bundle();
-            Shop shop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude, longitude, currentShop.getTags(), currentShop.getHours());
+            Shop shop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude, longitude, intLongitude, currentShop.getTags(), currentShop.getHours());
             b.putParcelable("CurrentShop", shop);
             intent.putExtras(b);
             intent.setClass(this, Activity_Shop_TagHours.class);
