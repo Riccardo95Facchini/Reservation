@@ -119,16 +119,23 @@ public class Activity_Shop_TagHours extends AppCompatActivity
                 tags = currentShop.getTags();
                 tags.remove(currentShop.getName().replaceAll("[^a-zA-Z\\s]", " ")
                         .replaceAll("\\s+", " ").toLowerCase().trim());
-                tags.remove(currentShop.getName().toLowerCase().trim());
+                
             } catch (Exception e)
             {
                 e.printStackTrace();
             }
             
+            String name = currentShop.getName().toLowerCase().trim();
+            ArrayList<String> toRemove = new ArrayList<>();
             for (String t : tags)
             {
-                tagsText.append(t.concat(" "));
+                if (name.contains(t) || currentShop.getName().contains(t))
+                    toRemove.add(t);
+                else
+                    tagsText.append(t.concat(" "));
             }
+            tags.removeAll(toRemove);
+            toRemove.clear();
         }
         
         createSpinnerAdapter();
