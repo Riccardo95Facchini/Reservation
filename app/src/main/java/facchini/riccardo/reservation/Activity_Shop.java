@@ -21,8 +21,10 @@ public class Activity_Shop extends AppCompatActivity
     private FirebaseAuth.AuthStateListener authStateListener;
     
     private byte backButton;
+    private int currentMenu = R.id.bottomHome;
     
     private BottomNavigationView bottomMenu;
+    private Menu topMenu;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -30,6 +32,7 @@ public class Activity_Shop extends AppCompatActivity
         super.onCreate(savedInstanceState);
         backButton = 0;
         setContentView(R.layout.activity_shop);
+        currentMenu = R.id.bottomHome;
         
         bottomMenu = findViewById(R.id.bottomMenu);
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
@@ -49,9 +52,13 @@ public class Activity_Shop extends AppCompatActivity
             {
                 case R.id.bottomHome:
                     selected = new Fragment_Shop_Home();
+                    currentMenu = R.id.bottomHome;
+                    topMenu.getItem(1).setVisible(true);
                     break;
                 case R.id.bottomProfile:
                     selected = new Fragment_Shop_Profile();
+                    currentMenu = R.id.bottomProfile;
+                    topMenu.getItem(1).setVisible(false);
                     break;
             }
             
@@ -133,8 +140,15 @@ public class Activity_Shop extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        topMenu = menu;
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_logout, menu);
+        inflater.inflate(R.menu.menu_action_bar, menu);
+    
+        if (currentMenu == R.id.bottomHome)
+            topMenu.getItem(1).setVisible(true);
+        else
+            topMenu.getItem(1).setVisible(false);
+        
         return true;
     }
     

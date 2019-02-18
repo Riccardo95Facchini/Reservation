@@ -24,6 +24,7 @@ public class Activity_Customer extends AppCompatActivity
     private int currentMenu = R.id.bottomHome;
     
     private BottomNavigationView bottomMenu;
+    private Menu topMenu;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -36,6 +37,7 @@ public class Activity_Customer extends AppCompatActivity
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
         
         getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
+        currentMenu = R.id.bottomHome;
         setupFirebaseListener();
     }
     
@@ -55,14 +57,17 @@ public class Activity_Customer extends AppCompatActivity
                 case R.id.bottomHome:
                     currentMenu = R.id.bottomHome;
                     selected = new Fragment_Customer_Home();
+                    topMenu.getItem(1).setVisible(true);
                     break;
                 case R.id.bottomSearch:
                     currentMenu = R.id.bottomSearch;
                     selected = new Fragment_Customer_Search();
+                    topMenu.getItem(1).setVisible(false);
                     break;
                 case R.id.bottomProfile:
                     currentMenu = R.id.bottomProfile;
                     selected = new Fragment_Customer_Profile();
+                    topMenu.getItem(1).setVisible(false);
                     break;
             }
             
@@ -143,8 +148,16 @@ public class Activity_Customer extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_logout, menu);
+        MenuInflater menuInflater = getMenuInflater();
+        topMenu = menu;
+        
+        menuInflater.inflate(R.menu.menu_action_bar, menu);
+        
+        if (currentMenu == R.id.bottomHome)
+            topMenu.getItem(1).setVisible(true);
+        else
+            topMenu.getItem(1).setVisible(false);
+        
         return true;
     }
     
@@ -161,6 +174,9 @@ public class Activity_Customer extends AppCompatActivity
         {
             case R.id.sign_out_menu:
                 AuthUI.getInstance().signOut(this);
+                return true;
+            case R.id.refresh_menu:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
