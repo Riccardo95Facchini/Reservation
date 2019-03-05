@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "358289882494",
+    "firebase_url": "https://reservation-fed21.firebaseio.com",
+    "project_id": "reservation-fed21",
+    "storage_bucket": "reservation-fed21.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:358289882494:android:507d92c756f9132b",
+        "android_client_info": {
+          "package_name": "facchini.riccardo.reservation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "358289882494-2b0ic7u0cq81ituc87bobggc71p6630r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "facchini.riccardo.reservation",
+            "certificate_hash": "c651727b099f445c2b53ab0bcf95ef2447ddea4d"
+          }
+        },
+        {
+          "client_id": "358289882494-6slan7a2sjgjs59ahti43m202d8guju0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-qK43RxM1WRHQ9c-tYwvqvU1iZRDjC-U"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "358289882494-6slan7a2sjgjs59ahti43m202d8guju0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
