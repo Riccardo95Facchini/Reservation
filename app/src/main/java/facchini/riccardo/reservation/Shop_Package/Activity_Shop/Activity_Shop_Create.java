@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Shop_Package.Activity_Shop;
 
 import android.content.Intent;
 import android.location.Address;
@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +15,9 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.Locale;
+
+import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Activity_Shop_Create extends AppCompatActivity
 {

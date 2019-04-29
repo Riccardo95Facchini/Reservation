@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +30,14 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import facchini.riccardo.reservation.Customer_Package.Customer;
+import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_Home;
+import facchini.riccardo.reservation.OnItemClickListener;
+import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.Reservation_Package.Reservation_Customer_Home;
+import facchini.riccardo.reservation.SharedViewModel;
+import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Fragment_Customer_Home extends Fragment implements OnItemClickListener
 {

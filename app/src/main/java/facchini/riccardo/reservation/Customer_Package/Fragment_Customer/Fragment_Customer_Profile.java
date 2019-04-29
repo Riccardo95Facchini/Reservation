@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.SharedViewModel;
 
 public class Fragment_Customer_Profile extends Fragment
 {

@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Reservation_Package;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

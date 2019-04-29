@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Customer_Package.Activity_Customer;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -12,8 +12,9 @@ import android.widget.EditText;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
-import java.util.Map;
+import facchini.riccardo.reservation.Activity_Login;
+import facchini.riccardo.reservation.Customer_Package.Customer;
+import facchini.riccardo.reservation.R;
 
 public class Activity_Customer_Create extends AppCompatActivity
 {

@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Customer_Package;
 
 import java.util.Map;
 

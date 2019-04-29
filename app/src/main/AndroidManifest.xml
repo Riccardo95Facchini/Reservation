@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Activity_Customer_SelectedShop" /> <!-- Login activity -->
+        <activity android:name=".Customer_Package.Activity_Customer.Activity_Customer_SelectedShop" /> <!-- Login activity -->
         <activity android:name=".Activity_Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,18 +22,18 @@
             </intent-filter>
         </activity> <!-- Create customer activity -->
         <activity
-            android:name=".Activity_Customer_Create"
+            android:name=".Customer_Package.Activity_Customer.Activity_Customer_Create"
             android:label="@string/customerRegistration"
             android:parentActivityName=".Activity_Login" /> <!-- Create customer activity -->
         <activity
-            android:name=".Activity_Shop_Create"
+            android:name=".Shop_Package.Activity_Shop.Activity_Shop_Create"
             android:label="@string/shopRegistration"
             android:parentActivityName=".Activity_Login" /> <!-- Add tags and hours activity -->
         <activity
-            android:name=".Activity_Shop_TagHours"
+            android:name=".Shop_Package.Activity_Shop.Activity_Shop_TagHours"
             android:label="@string/tagsAndHours" /> <!-- Customer Activity -->
-        <activity android:name=".Activity_Customer" /> <!-- Shop Activity -->
-        <activity android:name=".Activity_Shop" />
+        <activity android:name=".Customer_Package.Activity_Customer.Activity_Customer" /> <!-- Shop Activity -->
+        <activity android:name=".Shop_Package.Activity_Shop.Activity_Shop" />
     </application>
 
 </manifest>

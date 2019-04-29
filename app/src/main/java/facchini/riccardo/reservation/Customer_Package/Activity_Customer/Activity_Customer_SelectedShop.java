@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Customer_Package.Activity_Customer;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -32,6 +32,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import facchini.riccardo.reservation.Fragment_DatePicker;
+import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.Reservation_Package.ReservationDatabase;
+import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Activity_Customer_SelectedShop extends AppCompatActivity implements DatePickerDialog.OnDateSetListener
 {

@@ -25,6 +25,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
 
+import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer;
+import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_Create;
+import facchini.riccardo.reservation.Shop_Package.Activity_Shop.Activity_Shop;
+import facchini.riccardo.reservation.Shop_Package.Activity_Shop.Activity_Shop_Create;
+
 public class Activity_Login extends AppCompatActivity
 {
     //Constants

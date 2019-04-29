@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Shop_Package.Fragment_Shop;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -11,6 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.SharedViewModel;
+import facchini.riccardo.reservation.Shop_Package.Shop;
+import facchini.riccardo.reservation.Shop_Package.Activity_Shop.Activity_Shop_Create;
 
 public class Fragment_Shop_Profile extends Fragment
 {

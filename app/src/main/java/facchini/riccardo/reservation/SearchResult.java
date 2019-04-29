@@ -1,5 +1,7 @@
 package facchini.riccardo.reservation;
 
+import facchini.riccardo.reservation.Shop_Package.Shop;
+
 public class SearchResult
 {
     private Shop shopFound;

@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Shop_Package.Activity_Shop;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -13,7 +13,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -26,6 +25,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import facchini.riccardo.reservation.Activity_Login;
+import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Activity_Shop_TagHours extends AppCompatActivity
 {

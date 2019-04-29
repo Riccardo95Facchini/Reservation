@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Shop_Package.Fragment_Shop;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -27,6 +27,13 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import facchini.riccardo.reservation.Customer_Package.Customer;
+import facchini.riccardo.reservation.Shop_Package.Adapter_Shop.Adapter_Shop_Home;
+import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.Reservation_Package.Reservation_Shop_Home;
+import facchini.riccardo.reservation.SharedViewModel;
+import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Fragment_Shop_Home extends Fragment
 {

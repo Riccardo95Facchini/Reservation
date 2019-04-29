@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
@@ -16,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -40,6 +39,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+
+import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_SelectedShop;
+import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_Search;
+import facchini.riccardo.reservation.OnItemClickListener;
+import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.SearchResult;
+import facchini.riccardo.reservation.SharedViewModel;
+import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Fragment_Customer_Search extends Fragment implements OnItemClickListener
 {

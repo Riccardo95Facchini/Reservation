@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Customer_Package.Adapter_Customer;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -12,6 +12,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.List;
+
+import facchini.riccardo.reservation.OnItemClickListener;
+import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.Reservation_Package.Reservation_Customer_Home;
+import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer_Home.Reservation_Customer_ViewHolder>
 {

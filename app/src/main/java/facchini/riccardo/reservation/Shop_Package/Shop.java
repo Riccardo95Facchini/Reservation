@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Shop_Package;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,4 +1,4 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Customer_Package.Adapter_Customer;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,6 +9,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+
+import facchini.riccardo.reservation.OnItemClickListener;
+import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.SearchResult;
+import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Customer_Search.Shops_ViewHolder>
 {

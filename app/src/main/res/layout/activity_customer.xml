@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity_Customer">
+    tools:context=".Customer_Package.Activity_Customer.Activity_Customer">
 
     <FrameLayout
         android:id="@+id/fragmentContainer"
