@@ -10,8 +10,13 @@
         android:icon="@drawable/android_refresh_1161734"
         android:title="@string/refresh"
         android:visible="false"
-        app:showAsAction="always"
-        />
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/chat_menu"
+        android:icon="@android:drawable/stat_notify_chat"
+        android:title="@string/chat"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
 
 
 </menu>

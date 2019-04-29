@@ -1,8 +1,9 @@
-package facchini.riccardo.reservation;
+package facchini.riccardo.reservation.Reservation_Package;
 
 import java.util.Date;
 
 import facchini.riccardo.reservation.Customer_Package.Customer;
+import facchini.riccardo.reservation.Reservation_Package.Reservation;
 
 public class Reservation_Shop_Home extends Reservation
 {

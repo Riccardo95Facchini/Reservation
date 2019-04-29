@@ -184,6 +184,9 @@ public class Activity_Customer extends AppCompatActivity
             case R.id.refresh_menu:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
                 return true;
+            case R.id.chat_menu:
+                //Intent intent = new Intent(getBaseContext(), );
+                //startActivity(intent);
             default:
                 return super.onOptionsItemSelected(item);
         }

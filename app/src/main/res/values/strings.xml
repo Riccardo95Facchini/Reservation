@@ -80,4 +80,5 @@
     <string name="addressSearch">Address Search</string>
     <string name="addressSearchInput">Insert the address from where you want to search</string>
     <string name="refresh">Refresh</string>
+    <string name="chat">Chat</string>
 </resources>
