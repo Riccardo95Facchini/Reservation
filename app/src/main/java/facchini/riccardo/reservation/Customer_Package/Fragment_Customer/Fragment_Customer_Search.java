@@ -40,6 +40,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import facchini.riccardo.reservation.Chat.Activity_Chat;
 import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_SelectedShop;
 import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_Search;
 import facchini.riccardo.reservation.OnItemClickListener;

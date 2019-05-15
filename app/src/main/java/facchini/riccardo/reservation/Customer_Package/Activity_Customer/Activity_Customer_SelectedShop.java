@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import facchini.riccardo.reservation.Chat.Activity_Chat;
 import facchini.riccardo.reservation.Fragment_DatePicker;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.ReservationDatabase;
@@ -53,6 +55,7 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
     
     private TextView shopNameText, shopInfoText, shopHoursText;
     private Button selectDateButton;
+    private ImageButton startChatButton;
     
     
     @Override
@@ -79,6 +82,7 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         shopInfoText = findViewById(R.id.shopInfoText);
         shopHoursText = findViewById(R.id.shopHoursText);
         selectDateButton = findViewById(R.id.selectDateButton);
+        startChatButton = findViewById(R.id.startChatButton);
         
         shopNameText.setText(selectedShop.getName());
         shopInfoText.setText(String.format("City: %s \tAddress: %s %s", selectedShop.getCity(),
@@ -92,6 +96,24 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
             {
                 DialogFragment datePicker = new Fragment_DatePicker();
                 datePicker.show(getSupportFragmentManager(), "DatePicker");
+            }
+        });
+        
+        startChatButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent chatIntent = new Intent(Activity_Customer_SelectedShop.this, Activity_Chat.class);
+                String customerUid = (String) customer.get("customer");
+                String customerName = customer.get("name") + " " + customer.get("surname");
+                
+                chatIntent.putExtra("thisUserUid", customerUid);
+                chatIntent.putExtra("thisUserUsername", customerName);
+                
+                chatIntent.putExtra("otherUserUid", selectedShop.getUid());
+                chatIntent.putExtra("otherUserUsername", selectedShop.getName());
+                startActivity(chatIntent);
             }
         });
     }

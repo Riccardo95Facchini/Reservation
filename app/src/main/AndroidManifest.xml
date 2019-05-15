@@ -13,6 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".Chat.Activity_Chat"></activity>
         <activity android:name=".Customer_Package.Activity_Customer.Activity_Customer_SelectedShop" /> <!-- Login activity -->
         <activity android:name=".Activity_Login">
             <intent-filter>
