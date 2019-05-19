@@ -32,130 +32,122 @@ public class Activity_Chat extends AppCompatActivity
     ScrollView scrollView;
     Firebase reference;
     
-    String thisUserUid = "", otherUserUid = "", thisUserUsername = "", otherUserUsername = "";
+    String thisUserUid, otherUserUid, thisUserUsername, otherUserUsername, nodeName;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        try
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_chat);
+        
+        layout = findViewById(R.id.layout1);
+        layout_2 = findViewById(R.id.layout2);
+        sendButton = findViewById(R.id.sendButton);
+        messageArea = findViewById(R.id.messageArea);
+        scrollView = findViewById(R.id.scrollView);
+        
+        Intent pastIntent = getIntent();
+        thisUserUid = pastIntent.getStringExtra("thisUserUid");
+        thisUserUsername = pastIntent.getStringExtra("thisUserUsername");
+        otherUserUid = pastIntent.getStringExtra("otherUserUid");
+        otherUserUsername = pastIntent.getStringExtra("otherUserUsername");
+        
+        Firebase.setAndroidContext(this);
+        
+        setTitle(otherUserUsername);
+        
+        //First smaller string
+        if (thisUserUid.compareTo(otherUserUid) <= 0)
         {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_chat);
-            
-            
-            layout = findViewById(R.id.layout1);
-            layout_2 = findViewById(R.id.layout2);
-            sendButton = findViewById(R.id.sendButton);
-            messageArea = findViewById(R.id.messageArea);
-            scrollView = findViewById(R.id.scrollView);
-            
-            Intent pastIntent = getIntent();
-            thisUserUid = pastIntent.getStringExtra("thisUserUid");
-            thisUserUsername = pastIntent.getStringExtra("thisUserUsername");
-            otherUserUid = pastIntent.getStringExtra("otherUserUid");
-            otherUserUsername = pastIntent.getStringExtra("otherUserUsername");
-            
-            Firebase.setAndroidContext(this);
-            
-            setTitle(otherUserUsername);
-            
-            //First smaller string
-            if (thisUserUid.compareTo(otherUserUid) <= 0)
-                reference = new Firebase("https://reservation-fed21.firebaseio.com/messages/" + thisUserUid + "_" + otherUserUid);
-            else
-                reference = new Firebase("https://reservation-fed21.firebaseio.com/messages/" + otherUserUid + "_" + thisUserUid);
-            
-            sendButton.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    String messageText = messageArea.getText().toString();
-                    
-                    if (!messageText.equals(""))
-                    {
-                        Map<String, String> map = new HashMap<>();
-                        map.put("message", messageText);
-                        map.put("user", thisUserUsername);
-                        reference.push().setValue(map);
-                        messageArea.setText("");
-                    }
-                }
-            });
-            
-            reference.addChildEventListener(new ChildEventListener()
-            {
-                @Override
-                public void onChildAdded(com.firebase.client.DataSnapshot dataSnapshot, String s)
-                {
-                    Map map = dataSnapshot.getValue(Map.class);
-                    String message = map.get("message").toString();
-                    String userName = map.get("user").toString();
-                    
-                    if (userName.equals(thisUserUsername))
-                    {
-                        addMessageBox(message, 1);
-                    } else
-                    {
-                        addMessageBox(message, 2);
-                    }
-                }
-                
-                @Override
-                public void onChildChanged(com.firebase.client.DataSnapshot dataSnapshot, String s)
-                {
-                
-                }
-                
-                @Override
-                public void onChildRemoved(com.firebase.client.DataSnapshot dataSnapshot)
-                {
-                
-                }
-                
-                @Override
-                public void onChildMoved(com.firebase.client.DataSnapshot dataSnapshot, String s)
-                {
-                
-                }
-                
-                @Override
-                public void onCancelled(FirebaseError firebaseError)
-                {
-                
-                }
-            });
-        } catch (Exception e)
+            nodeName = thisUserUid + "_" + otherUserUid;
+            reference = new Firebase("https://reservation-fed21.firebaseio.com/messages/" + nodeName);
+        } else
         {
-            e.printStackTrace();
+            nodeName = otherUserUid + "_" + thisUserUid;
+            reference = new Firebase("https://reservation-fed21.firebaseio.com/messages/" + nodeName);
         }
+        
+        sendButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String messageText = messageArea.getText().toString();
+                
+                if (!messageText.equals(""))
+                {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("message", messageText);
+                    map.put("user", thisUserUsername);
+                    reference.push().setValue(map);
+                    messageArea.setText("");
+                }
+            }
+        });
+        
+        reference.addChildEventListener(new ChildEventListener()
+        {
+            @Override
+            public void onChildAdded(com.firebase.client.DataSnapshot dataSnapshot, String s)
+            {
+                Map map = dataSnapshot.getValue(Map.class);
+                String message = map.get("message").toString();
+                String userName = map.get("user").toString();
+                
+                if (userName.equals(thisUserUsername))
+                {
+                    addMessageBox(message, 1);
+                } else
+                {
+                    addMessageBox(message, 2);
+                }
+            }
+            
+            @Override
+            public void onChildChanged(com.firebase.client.DataSnapshot dataSnapshot, String s)
+            {
+                
+            }
+            
+            @Override
+            public void onChildRemoved(com.firebase.client.DataSnapshot dataSnapshot)
+            {
+                
+            }
+            
+            @Override
+            public void onChildMoved(com.firebase.client.DataSnapshot dataSnapshot, String s)
+            {
+                
+            }
+            
+            @Override
+            public void onCancelled(FirebaseError firebaseError)
+            {
+                
+            }
+        });
     }
     
     public void addMessageBox(String message, int type)
     {
-        try
+        TextView textView = new TextView(Activity_Chat.this);
+        textView.setText(message);
+        
+        LinearLayout.LayoutParams lp2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp2.weight = 1.0f;
+        
+        if (type == 1)
         {
-            TextView textView = new TextView(Activity_Chat.this);
-            textView.setText(message);
-            
-            LinearLayout.LayoutParams lp2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp2.weight = 1.0f;
-            
-            if (type == 1)
-            {
-                lp2.gravity = Gravity.RIGHT;
-                textView.setBackgroundResource(R.drawable.bubble_in);
-            } else
-            {
-                lp2.gravity = Gravity.LEFT;
-                textView.setBackgroundResource(R.drawable.bubble_out);
-            }
-            textView.setLayoutParams(lp2);
-            layout.addView(textView);
-            scrollView.fullScroll(View.FOCUS_DOWN);
-        } catch (Exception e)
+            lp2.gravity = Gravity.RIGHT;
+            textView.setBackgroundResource(R.drawable.bubble_in);
+        } else
         {
-            e.printStackTrace();
+            lp2.gravity = Gravity.LEFT;
+            textView.setBackgroundResource(R.drawable.bubble_out);
         }
+        textView.setLayoutParams(lp2);
+        layout.addView(textView);
+        scrollView.fullScroll(View.FOCUS_DOWN);
     }
 }

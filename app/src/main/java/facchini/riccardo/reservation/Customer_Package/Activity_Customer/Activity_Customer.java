@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import facchini.riccardo.reservation.Activity_Login;
+import facchini.riccardo.reservation.Chat.Activity_Chat_Homepage;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Home;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Profile;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Search;
@@ -185,8 +186,8 @@ public class Activity_Customer extends AppCompatActivity
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
                 return true;
             case R.id.chat_menu:
-                //Intent intent = new Intent(getBaseContext(), );
-                //startActivity(intent);
+                Intent intent = new Intent(getBaseContext(), Activity_Chat_Homepage.class);
+                startActivity(intent);
             default:
                 return super.onOptionsItemSelected(item);
         }

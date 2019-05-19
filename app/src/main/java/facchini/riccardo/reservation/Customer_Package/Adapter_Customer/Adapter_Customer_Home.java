@@ -72,7 +72,7 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
         {
             super(itemView);
             
-            textViewShop = itemView.findViewById(R.id.textViewCustomer);
+            textViewShop = itemView.findViewById(R.id.textViewChatWith);
             textViewAddress = itemView.findViewById(R.id.textViewAddress);
             textViewWhen = itemView.findViewById(R.id.textViewWhen);
             infoButton = itemView.findViewById(R.id.infoButton);

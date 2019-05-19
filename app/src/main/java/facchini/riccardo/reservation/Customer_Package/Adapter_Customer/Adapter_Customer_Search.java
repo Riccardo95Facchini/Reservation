@@ -69,7 +69,7 @@ public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Custom
         {
             super(itemView);
             
-            textViewName = itemView.findViewById(R.id.textViewCustomer);
+            textViewName = itemView.findViewById(R.id.textViewChatWith);
             textViewAddress = itemView.findViewById(R.id.textViewAddress);
             textViewDistance = itemView.findViewById(R.id.textViewDistance);
             textViewTimes = itemView.findViewById(R.id.textViewTimes);

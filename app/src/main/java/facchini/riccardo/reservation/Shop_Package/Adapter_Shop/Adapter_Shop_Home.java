@@ -59,7 +59,7 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
         {
             super(itemView);
             
-            textViewCustomer = itemView.findViewById(R.id.textViewCustomer);
+            textViewCustomer = itemView.findViewById(R.id.textViewChatWith);
             textViewWhen = itemView.findViewById(R.id.textViewWhen);
         }
     }

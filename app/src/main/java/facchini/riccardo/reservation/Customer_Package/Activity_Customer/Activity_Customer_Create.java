@@ -12,6 +12,8 @@ import android.widget.EditText;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+
 import facchini.riccardo.reservation.Activity_Login;
 import facchini.riccardo.reservation.Customer_Package.Customer;
 import facchini.riccardo.reservation.R;

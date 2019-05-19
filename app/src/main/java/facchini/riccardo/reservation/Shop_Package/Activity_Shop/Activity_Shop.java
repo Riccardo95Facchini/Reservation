@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import facchini.riccardo.reservation.Activity_Login;
+import facchini.riccardo.reservation.Chat.Activity_Chat_Homepage;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_Home;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_Profile;
 import facchini.riccardo.reservation.R;
@@ -171,6 +172,9 @@ public class Activity_Shop extends AppCompatActivity
             case R.id.sign_out_menu:
                 AuthUI.getInstance().signOut(this);
                 return true;
+            case R.id.chat_menu:
+                Intent intent = new Intent(getBaseContext(), Activity_Chat_Homepage.class);
+                startActivity(intent);
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -1,5 +1,6 @@
 package facchini.riccardo.reservation.Customer_Package;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class Customer
@@ -51,4 +52,5 @@ public class Customer
     public String getPhone() {return phone;}
     
     public String getMail() {return mail;}
+    
 }
