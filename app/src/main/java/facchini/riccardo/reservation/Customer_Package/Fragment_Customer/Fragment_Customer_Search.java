@@ -212,9 +212,10 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
                             Address selectedAddress = geocoder.getFromLocationName(input.getText().toString(), 1).get(0);
                             myLocation.setLatitude(selectedAddress.getLatitude());
                             myLocation.setLongitude(selectedAddress.getLongitude());
-                        } catch (IOException e)
+                        } catch (Exception e)
                         {
                             Toast.makeText(getContext(), "Error, address could not be found", Toast.LENGTH_SHORT).show();
+                            myLocation = null;
                             searchText.clearFocus();
                         }
                     }

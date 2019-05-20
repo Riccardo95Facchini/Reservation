@@ -20,10 +20,13 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import facchini.riccardo.reservation.Chat.Activity_Chat;
+import facchini.riccardo.reservation.Chat.ChatData;
 import facchini.riccardo.reservation.Fragment_DatePicker;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.ReservationDatabase;
@@ -46,10 +50,10 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
     FirebaseFirestore db;
     CollectionReference reservationsCollection;
     
-    private Map<String, Object> customer;
     private Shop selectedShop;
     private ArrayAdapter<String> adapter;
     private Calendar selectedDate;
+    private String name, surname;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     
@@ -72,10 +76,8 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         if (b != null)
             selectedShop = b.getParcelable("Selected");
         
-        customer = new HashMap<>();
-        customer.put("customer", intent.getStringExtra("uid"));
-        customer.put("name", intent.getStringExtra("name"));
-        customer.put("surname", intent.getStringExtra("surname"));
+        name = intent.getStringExtra("name");
+        surname = intent.getStringExtra("surname");
         
         
         shopNameText = findViewById(R.id.shopNameText);
@@ -104,18 +106,18 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
             @Override
             public void onClick(View v)
             {
-                Intent chatIntent = new Intent(Activity_Customer_SelectedShop.this, Activity_Chat.class);
-                String customerUid = (String) customer.get("customer");
-                String customerName = customer.get("name") + " " + customer.get("surname");
-                
-                chatIntent.putExtra("thisUserUid", customerUid);
-                chatIntent.putExtra("thisUserUsername", customerName);
-                
-                chatIntent.putExtra("otherUserUid", selectedShop.getUid());
-                chatIntent.putExtra("otherUserUsername", selectedShop.getName());
-                startActivity(chatIntent);
+                startChat();
             }
         });
+    }
+    
+    private void startChat()
+    {
+        Intent chatIntent = new Intent(Activity_Customer_SelectedShop.this, Activity_Chat.class);
+        chatIntent.putExtra("thisUsername", String.format("%s %s", name, surname));
+        chatIntent.putExtra("otherUid", selectedShop.getUid());
+        chatIntent.putExtra("otherUsername", selectedShop.getName());
+        startActivity(chatIntent);
     }
     
     @Override
@@ -332,9 +334,9 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
             e.printStackTrace();
         }
         
-        String customerName = ((String) customer.get("name")).concat(" ").concat((String) customer.get("surname"));
+        String customerName = String.format("%s %s", name, surname);
         
-        ReservationDatabase reservationDatabase = new ReservationDatabase(selectedShop.getUid(), (String) customer.get("customer"), customerName, fullDate);
+        ReservationDatabase reservationDatabase = new ReservationDatabase(selectedShop.getUid(), FirebaseAuth.getInstance().getCurrentUser().getUid(), customerName, fullDate);
         db.collection("reservations").add(reservationDatabase);
         
         Toast.makeText(this, getString(R.string.reservationCompleted), Toast.LENGTH_LONG).show();

@@ -1,6 +1,7 @@
 package facchini.riccardo.reservation.Chat;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,13 +18,13 @@ import facchini.riccardo.reservation.R;
 public class Adapter_Chat extends RecyclerView.Adapter<Adapter_Chat.ChatEntry_ViewHolder>
 {
     private Context context;
-    private List<ChatEntry> chatEntryList;
+    private List<ChatData> chatDataList;
     private OnItemClickListener itemListener;
     
-    public Adapter_Chat(Context context, List<ChatEntry> chatEntryList)
+    public Adapter_Chat(Context context, List<ChatData> chatDataList)
     {
         this.context = context;
-        this.chatEntryList = chatEntryList;
+        this.chatDataList = chatDataList;
     }
     
     public void setOnItemClickListener(OnItemClickListener itemListener)
@@ -43,7 +44,15 @@ public class Adapter_Chat extends RecyclerView.Adapter<Adapter_Chat.ChatEntry_Vi
     @Override
     public void onBindViewHolder(@NonNull ChatEntry_ViewHolder holder, int pos)
     {
-        ChatEntry chat = chatEntryList.get(pos);
+        ChatData chat = chatDataList.get(pos);
+        
+        holder.imageNew.setImageResource(R.drawable.ic_new);
+        if (!chat.isRead())
+            holder.imageNew.setVisibility(View.VISIBLE);
+        else
+            holder.imageNew.setVisibility(View.GONE);
+        
+        //holder.profilePic.setImageResource();
         holder.textViewChatWith.setText(chat.getOtherName());
         holder.textViewWhen.setText(chat.getDateFormatted());
     }
@@ -51,22 +60,22 @@ public class Adapter_Chat extends RecyclerView.Adapter<Adapter_Chat.ChatEntry_Vi
     @Override
     public int getItemCount()
     {
-        return chatEntryList.size();
+        return chatDataList.size();
     }
     
     public class ChatEntry_ViewHolder extends RecyclerView.ViewHolder
     {
-        
         TextView textViewChatWith, textViewWhen;
-        ImageView profilePic;
+        ImageView profilePic, imageNew;
         
-        public ChatEntry_ViewHolder(@NonNull View itemView, final OnItemClickListener itemClickListener)
+        public ChatEntry_ViewHolder(@NonNull final View itemView, final OnItemClickListener itemClickListener)
         {
             super(itemView);
             
             textViewChatWith = itemView.findViewById(R.id.textViewChatWith);
             textViewWhen = itemView.findViewById(R.id.textViewWhen);
-            //profilePic;
+            imageNew = itemView.findViewById(R.id.imageNew);
+            profilePic = itemView.findViewById(R.id.profilePic);
             
             itemView.setOnClickListener(new View.OnClickListener()
             {
@@ -75,6 +84,7 @@ public class Adapter_Chat extends RecyclerView.Adapter<Adapter_Chat.ChatEntry_Vi
                 {
                     if (itemClickListener != null)
                     {
+                        imageNew.setVisibility(View.GONE);
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION)
                             itemListener.onItemClick(position);

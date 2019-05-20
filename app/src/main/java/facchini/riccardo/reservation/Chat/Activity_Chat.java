@@ -9,14 +9,19 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,14 +30,14 @@ import facchini.riccardo.reservation.R;
 
 public class Activity_Chat extends AppCompatActivity
 {
-    LinearLayout layout;
-    RelativeLayout layout_2;
-    ImageView sendButton;
-    EditText messageArea;
-    ScrollView scrollView;
-    Firebase reference;
+    private LinearLayout layout;
+    private ImageView sendButton;
+    private EditText messageArea;
+    private ScrollView scrollView;
+    private Firebase reference;
     
-    String thisUserUid, otherUserUid, thisUserUsername, otherUserUsername, nodeName;
+    private boolean justOpened = true;
+    private String thisUid, otherUid, thisUsername, otherUsername, nodeName;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -41,29 +46,28 @@ public class Activity_Chat extends AppCompatActivity
         setContentView(R.layout.activity_chat);
         
         layout = findViewById(R.id.layout1);
-        layout_2 = findViewById(R.id.layout2);
         sendButton = findViewById(R.id.sendButton);
         messageArea = findViewById(R.id.messageArea);
         scrollView = findViewById(R.id.scrollView);
         
         Intent pastIntent = getIntent();
-        thisUserUid = pastIntent.getStringExtra("thisUserUid");
-        thisUserUsername = pastIntent.getStringExtra("thisUserUsername");
-        otherUserUid = pastIntent.getStringExtra("otherUserUid");
-        otherUserUsername = pastIntent.getStringExtra("otherUserUsername");
+        thisUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        thisUsername = pastIntent.getStringExtra("thisUsername");
+        otherUid = pastIntent.getStringExtra("otherUid");
+        otherUsername = pastIntent.getStringExtra("otherUsername");
         
         Firebase.setAndroidContext(this);
         
-        setTitle(otherUserUsername);
+        setTitle(otherUsername);
         
         //First smaller string
-        if (thisUserUid.compareTo(otherUserUid) <= 0)
+        if (thisUid.compareTo(otherUid) <= 0)
         {
-            nodeName = thisUserUid + "_" + otherUserUid;
+            nodeName = thisUid + "_" + otherUid;
             reference = new Firebase("https://reservation-fed21.firebaseio.com/messages/" + nodeName);
         } else
         {
-            nodeName = otherUserUid + "_" + thisUserUid;
+            nodeName = otherUid + "_" + thisUid;
             reference = new Firebase("https://reservation-fed21.firebaseio.com/messages/" + nodeName);
         }
         
@@ -75,13 +79,7 @@ public class Activity_Chat extends AppCompatActivity
                 String messageText = messageArea.getText().toString();
                 
                 if (!messageText.equals(""))
-                {
-                    Map<String, String> map = new HashMap<>();
-                    map.put("message", messageText);
-                    map.put("user", thisUserUsername);
-                    reference.push().setValue(map);
-                    messageArea.setText("");
-                }
+                    updateDatabase(messageText);
             }
         });
         
@@ -94,7 +92,7 @@ public class Activity_Chat extends AppCompatActivity
                 String message = map.get("message").toString();
                 String userName = map.get("user").toString();
                 
-                if (userName.equals(thisUserUsername))
+                if (userName.equals(thisUsername))
                 {
                     addMessageBox(message, 1);
                 } else
@@ -127,10 +125,44 @@ public class Activity_Chat extends AppCompatActivity
                 
             }
         });
+        
     }
     
+    /**
+     * Does all the updates of the database, which includes setting the message in
+     * the Realtime DB and updating the two entry in the Cloud Firestore one
+     * @param messageText sent text
+     */
+    private void updateDatabase(String messageText)
+    {
+        HashMap<String, ChatData> mapThis = new HashMap<>();
+        ChatData thisData = new ChatData(thisUsername, otherUsername, otherUid, messageText, "", new Date());
+        thisData.setRead(true);
+        mapThis.put(otherUid, thisData);
+        FirebaseFirestore.getInstance().collection("chats").document(thisUid).set(mapThis, SetOptions.merge());
+        
+        HashMap<String, ChatData> mapOther = new HashMap<>();
+        ChatData otherData = new ChatData(otherUsername, thisUsername, thisUid, messageText, "", new Date());
+        mapOther.put(thisUid, otherData);
+        FirebaseFirestore.getInstance().collection("chats").document(otherUid).set(mapOther, SetOptions.merge());
+        
+        Map<String, String> map = new HashMap<>();
+        map.put("message", messageText);
+        map.put("user", thisUsername);
+        reference.push().setValue(map);
+        messageArea.setText("");
+    }
+    
+    /**
+     * Updates the messagebox by inserting a new bubble in the chat page
+     * @param message text of the current bubble
+     * @param type either 1 (incoming message) or 2 (outcoming message)
+     */
     public void addMessageBox(String message, int type)
     {
+        if (justOpened)
+            setThisRead();
+        
         TextView textView = new TextView(Activity_Chat.this);
         textView.setText(message);
         
@@ -150,4 +182,29 @@ public class Activity_Chat extends AppCompatActivity
         layout.addView(textView);
         scrollView.fullScroll(View.FOCUS_DOWN);
     }
+    
+    /**
+     * When the chat is opened checks if the message has been already read, if it's the first opening then it sets it as read.
+     * Called only if there is at least one message/bubble
+     */
+    private void setThisRead()
+    {
+        justOpened = false;
+        FirebaseFirestore.getInstance().collection("chats").document(thisUid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+        {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot)
+            {
+                ChatData thisData = new ChatData((HashMap<String, Object>) documentSnapshot.getData().get(otherUid));
+                if (thisData.isRead())
+                    return;
+                
+                HashMap<String, ChatData> mapThis = new HashMap<>();
+                thisData.setRead(true);
+                mapThis.put(otherUid, thisData);
+                FirebaseFirestore.getInstance().collection("chats").document(thisUid).set(mapThis, SetOptions.merge());
+            }
+        });
+    }
+    
 }
