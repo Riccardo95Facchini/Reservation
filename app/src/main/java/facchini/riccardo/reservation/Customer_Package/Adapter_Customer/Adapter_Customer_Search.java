@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import java.util.List;
@@ -51,8 +52,6 @@ public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Custom
         holder.textViewName.setText(shop.getName());
         holder.textViewAddress.setText(shop.displayFullAddress());
         holder.textViewDistance.setText(res.getFormatDistance());
-        holder.textViewTimes.setText(shop.displayHoursFormat());
-        holder.textViewPhoneMail.setText(String.format("Phone: %s \t Mail: %s", shop.getPhone(), shop.getMail()));
     }
     
     @Override
@@ -63,17 +62,18 @@ public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Custom
     
     class Shops_ViewHolder extends RecyclerView.ViewHolder
     {
-        TextView textViewName, textViewDistance, textViewAddress, textViewTimes, textViewPhoneMail;
+        TextView textViewName, textViewDistance, textViewAddress;
+        RatingBar ratingBar;
         
         public Shops_ViewHolder(@NonNull View itemView, final OnItemClickListener itemClickListener)
         {
             super(itemView);
             
-            textViewName = itemView.findViewById(R.id.textViewChatWith);
+            textViewName = itemView.findViewById(R.id.textViewShopName);
             textViewAddress = itemView.findViewById(R.id.textViewAddress);
             textViewDistance = itemView.findViewById(R.id.textViewDistance);
-            textViewTimes = itemView.findViewById(R.id.textViewTimes);
-            textViewPhoneMail = itemView.findViewById(R.id.textViewPhoneMail);
+            ratingBar  = itemView.findViewById(R.id.ratingBar);
+            
             
             itemView.setOnClickListener(new View.OnClickListener()
             {

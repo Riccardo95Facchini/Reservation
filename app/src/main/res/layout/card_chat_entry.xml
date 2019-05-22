@@ -45,7 +45,7 @@
                 tools:srcCompat="@tools:sample/avatars" />
 
             <TextView
-                android:id="@+id/textViewChatWith"
+                android:id="@+id/textViewShopName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -60,8 +60,8 @@
                 android:id="@+id/textViewWhen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/textViewChatWith"
-                android:layout_alignStart="@+id/textViewChatWith"
+                android:layout_below="@+id/textViewShopName"
+                android:layout_alignStart="@+id/textViewShopName"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="16dp"
                 android:text="8:30 14-02-2019"

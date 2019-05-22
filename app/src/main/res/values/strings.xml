@@ -81,4 +81,5 @@
     <string name="addressSearchInput">Insert the address from where you want to search</string>
     <string name="refresh">Refresh</string>
     <string name="chat">Chat</string>
+    <string name="write_a_message">Write a message...</string>
 </resources>

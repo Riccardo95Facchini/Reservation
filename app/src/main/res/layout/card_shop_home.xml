@@ -24,7 +24,7 @@
             android:padding="8dp">
 
             <TextView
-                android:id="@+id/textViewChatWith"
+                android:id="@+id/textViewShopName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
@@ -39,7 +39,7 @@
                 android:id="@+id/textViewWhen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/textViewChatWith"
+                android:layout_below="@id/textViewShopName"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="5dp"
                 android:text="8:30 14-02-2019"

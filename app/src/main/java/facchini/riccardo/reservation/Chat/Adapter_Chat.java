@@ -1,7 +1,6 @@
 package facchini.riccardo.reservation.Chat;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -72,7 +71,7 @@ public class Adapter_Chat extends RecyclerView.Adapter<Adapter_Chat.ChatEntry_Vi
         {
             super(itemView);
             
-            textViewChatWith = itemView.findViewById(R.id.textViewChatWith);
+            textViewChatWith = itemView.findViewById(R.id.textViewShopName);
             textViewWhen = itemView.findViewById(R.id.textViewWhen);
             imageNew = itemView.findViewById(R.id.imageNew);
             profilePic = itemView.findViewById(R.id.profilePic);
