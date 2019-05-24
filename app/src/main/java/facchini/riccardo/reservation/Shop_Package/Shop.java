@@ -21,11 +21,14 @@ public class Shop implements Parcelable
     private double latitude;
     private double longitude;
     private double averageReviews;
+    private int numReviews;
     private int intLongitude;
     private ArrayList<String> tags;
     private Map<String, List<String>> hours;
     
-    public Shop(String uid, String name, String mail, String address1, String address2, String city, String zip, String phone, double latitude, double longitude, double averageReviews, int intLongitude, ArrayList<String> tags, Map<String, List<String>> hours)
+    public Shop(String uid, String name, String mail, String address1, String address2, String city,
+                String zip, String phone, double latitude, double longitude, double averageReviews,
+                int numReviews, int intLongitude, ArrayList<String> tags, Map<String, List<String>> hours)
     {
         this.uid = uid;
         this.name = name;
@@ -38,6 +41,7 @@ public class Shop implements Parcelable
         this.latitude = latitude;
         this.longitude = longitude;
         this.averageReviews = averageReviews;
+        this.numReviews = numReviews;
         this.intLongitude = intLongitude;
         this.tags = new ArrayList<>(tags);
         this.hours = new HashMap<>(hours);
@@ -56,6 +60,7 @@ public class Shop implements Parcelable
         this.latitude = s.latitude;
         this.longitude = s.longitude;
         this.averageReviews = s.averageReviews;
+        this.numReviews = s.numReviews;
         this.intLongitude = s.intLongitude;
         this.tags = new ArrayList<>(s.tags);
         this.hours = new HashMap<>(s.hours);
@@ -81,7 +86,7 @@ public class Shop implements Parcelable
         {
             this.averageReviews = (long) m.get("averageReviews");
         }
-        
+        this.numReviews = (int) ((long) m.get("numReviews"));
         this.intLongitude = (int) ((long) m.get("intLongitude"));
         this.tags = new ArrayList<>((ArrayList<String>) m.get("tags"));
         this.hours = new HashMap<>((HashMap<String, List<String>>) m.get("hours"));
@@ -101,6 +106,7 @@ public class Shop implements Parcelable
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
         dest.writeDouble(averageReviews);
+        dest.writeInt(numReviews);
         dest.writeInt(intLongitude);
         dest.writeList(new ArrayList<>(tags));
         dest.writeMap(new HashMap<>(hours));
@@ -119,6 +125,7 @@ public class Shop implements Parcelable
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
         this.averageReviews = in.readDouble();
+        this.numReviews = in.readInt();
         this.intLongitude = in.readInt();
         this.tags = in.readArrayList(Shop.class.getClassLoader());
         this.hours = in.readHashMap(Shop.class.getClassLoader());
@@ -237,6 +244,8 @@ public class Shop implements Parcelable
     public double getLongitude() {return longitude;}
     
     public double getAverageReviews() {return averageReviews;}
+    
+    public int getNumReviews() {return numReviews;}
     
     public int getIntLongitude() {return intLongitude;}
     

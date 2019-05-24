@@ -52,6 +52,13 @@ public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Custom
         holder.textViewName.setText(shop.getName());
         holder.textViewAddress.setText(shop.displayFullAddress());
         holder.textViewDistance.setText(res.getFormatDistance());
+        try
+        {
+            holder.ratingBar.setRating((float) shop.getAverageReviews());
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
     
     @Override
