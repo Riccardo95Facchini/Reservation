@@ -86,4 +86,7 @@
     <string name="current_user_uid_key">current_user_uid_key</string>
     <string name="current_user_username_key">current_user_username_key</string>
     <string name="reservations_preferences">Reservations_Preferences</string>
+    <string name="last_location_string_key">last_location_string_key</string>
+    <string name="last_latitude_key">last_latitude_key</string>
+    <string name="last_longitude_key">last_longitude_key</string>
 </resources>

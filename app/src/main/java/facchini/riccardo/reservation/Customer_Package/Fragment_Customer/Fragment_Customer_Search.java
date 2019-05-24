@@ -2,8 +2,10 @@ package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -63,6 +65,8 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     private ArrayList<SearchResult> foundShops = new ArrayList<>();
     private Adapter_Customer_Search adapter;
     
+    private SharedPreferences sharedPreferences;
+    
     //Location
     private Location myLocation;
     private int distance = 1;
@@ -92,6 +96,8 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
+        sharedPreferences = getContext().getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
+        
         searchText = view.findViewById(R.id.searchText);
         searchButton = view.findViewById(R.id.searchButton);
         
@@ -192,10 +198,18 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
         startActivity(intent);
     }
     
+    
+    /**
+     * Finds the latitude and longitude of the address inserted, if it's the same of the last search it recovers the values,
+     * otherwise it computes them and stores them for the next time
+     */
     private void getLocation()
     {
+        final String lastLocationString = sharedPreferences.getString(getString(R.string.last_location_string_key), "");
+        
         final EditText input = new EditText(getContext());
         input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setText(lastLocationString);
         final Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
         
         new AlertDialog.Builder(getContext()).setCancelable(false).setView(input)
@@ -206,17 +220,41 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        try
+                        myLocation = new Location("myLocation");
+                        if (!input.getText().toString().isEmpty() && input.getText().toString().equals(lastLocationString))
                         {
-                            myLocation = new Location("myLocation");
-                            Address selectedAddress = geocoder.getFromLocationName(input.getText().toString(), 1).get(0);
-                            myLocation.setLatitude(selectedAddress.getLatitude());
-                            myLocation.setLongitude(selectedAddress.getLongitude());
-                        } catch (Exception e)
+                            try
+                            {
+                                myLocation.setLatitude(sharedPreferences.getFloat(getString(R.string.last_latitude_key), 0f));
+                                myLocation.setLongitude(sharedPreferences.getFloat(getString(R.string.last_longitude_key), 0f));
+                            } catch (Exception e)
+                            {
+                                Toast.makeText(getContext(), "Error, address could not be found", Toast.LENGTH_SHORT).show();
+                                myLocation = null;
+                                searchText.clearFocus();
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString(getString(R.string.last_location_string_key), "");
+                            }
+                        } else
                         {
-                            Toast.makeText(getContext(), "Error, address could not be found", Toast.LENGTH_SHORT).show();
-                            myLocation = null;
-                            searchText.clearFocus();
+                            try
+                            {
+                                Address selectedAddress = geocoder.getFromLocationName(input.getText().toString(), 1).get(0);
+                                myLocation.setLatitude(selectedAddress.getLatitude());
+                                myLocation.setLongitude(selectedAddress.getLongitude());
+                                
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString(getString(R.string.last_location_string_key), input.getText().toString());
+                                editor.putFloat(getString(R.string.last_latitude_key), (float) selectedAddress.getLatitude());
+                                editor.putFloat(getString(R.string.last_longitude_key), (float) selectedAddress.getLongitude());
+                                editor.apply();
+                                
+                            } catch (Exception e)
+                            {
+                                Toast.makeText(getContext(), "Error, address could not be found", Toast.LENGTH_SHORT).show();
+                                myLocation = null;
+                                searchText.clearFocus();
+                            }
                         }
                     }
                 }).setNegativeButton("Back", new DialogInterface.OnClickListener()
@@ -229,7 +267,6 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
             }
         }).show();
     }
-    
     
     /**
      * Searches if shops with the given tag exist and displays them to the user
