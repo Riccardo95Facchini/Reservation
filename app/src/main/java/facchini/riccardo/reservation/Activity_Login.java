@@ -1,10 +1,13 @@
 package facchini.riccardo.reservation;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -156,10 +159,12 @@ public class Activity_Login extends AppCompatActivity
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot)
             {
+                String currentName = "";
                 if (documentSnapshot.exists())
                 {
                     isCustomer = true;
-                    userTypeDecision();
+                    currentName = (String) documentSnapshot.get("name");
+                    userTypeDecision(currentName);
                 } else
                     checkShopExists();
             }
@@ -183,10 +188,14 @@ public class Activity_Login extends AppCompatActivity
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot)
             {
+                String currentName = "";
                 if (documentSnapshot.exists())
+                {
                     isShop = true;
+                    currentName = (String) documentSnapshot.get("name");
+                }
                 
-                userTypeDecision();
+                userTypeDecision(currentName);
             }
         }).addOnFailureListener(new OnFailureListener()
         {
@@ -199,10 +208,18 @@ public class Activity_Login extends AppCompatActivity
     }
     
     /**
-     * Decides what to do bases on the user type that logged in
+     * Decides what to do bases on the user type that logged in, also sets uid and username in shared preferences for later use
      */
-    private void userTypeDecision()
+    private void userTypeDecision(String currentName)
     {
+        if(!currentName.isEmpty())
+        {
+            SharedPreferences.Editor sharedPref = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE).edit();
+            sharedPref.putString(getString(R.string.current_user_uid_key), uid);
+            sharedPref.putString(getString(R.string.current_user_username_key), currentName);
+            sharedPref.apply();
+        }
+        
         if (isCustomer)
         {
             startActivity(new Intent(this, Activity_Customer.class));

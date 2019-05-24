@@ -2,8 +2,10 @@ package facchini.riccardo.reservation.Customer_Package.Activity_Customer;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -20,25 +22,19 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import facchini.riccardo.reservation.Chat.Activity_Chat;
-import facchini.riccardo.reservation.Chat.ChatData;
 import facchini.riccardo.reservation.Fragment_DatePicker;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.ReservationDatabase;
@@ -336,7 +332,10 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         
         String customerName = String.format("%s %s", name, surname);
         
-        ReservationDatabase reservationDatabase = new ReservationDatabase(selectedShop.getUid(), FirebaseAuth.getInstance().getCurrentUser().getUid(), customerName, fullDate);
+        String thisUid = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE)
+                .getString(getString(R.string.current_user_username_key), "");
+        
+        ReservationDatabase reservationDatabase = new ReservationDatabase(selectedShop.getUid(), thisUid, customerName, fullDate);
         db.collection("reservations").add(reservationDatabase);
         
         Toast.makeText(this, getString(R.string.reservationCompleted), Toast.LENGTH_LONG).show();

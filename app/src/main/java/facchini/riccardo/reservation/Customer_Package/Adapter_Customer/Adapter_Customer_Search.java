@@ -52,13 +52,7 @@ public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Custom
         holder.textViewName.setText(shop.getName());
         holder.textViewAddress.setText(shop.displayFullAddress());
         holder.textViewDistance.setText(res.getFormatDistance());
-        try
-        {
-            holder.ratingBar.setRating((float) shop.getAverageReviews());
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        holder.ratingBar.setRating((float) shop.getAverageReviews());
     }
     
     @Override
@@ -79,7 +73,7 @@ public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Custom
             textViewName = itemView.findViewById(R.id.textViewShopName);
             textViewAddress = itemView.findViewById(R.id.textViewAddress);
             textViewDistance = itemView.findViewById(R.id.textViewDistance);
-            ratingBar  = itemView.findViewById(R.id.ratingBar);
+            ratingBar = itemView.findViewById(R.id.ratingBar);
             
             
             itemView.setOnClickListener(new View.OnClickListener()

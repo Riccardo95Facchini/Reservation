@@ -1,6 +1,8 @@
 package facchini.riccardo.reservation.Shop_Package.Fragment_Shop;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,7 +17,6 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -63,7 +64,8 @@ public class Fragment_Shop_Home extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         db = FirebaseFirestore.getInstance();
-        shopUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
+        shopUid = pref.getString(getString(R.string.current_user_uid_key), "");
         customersCollection = db.collection("customers");
         shopsCollection = db.collection("shops");
         reservationsCollection = db.collection("reservations");

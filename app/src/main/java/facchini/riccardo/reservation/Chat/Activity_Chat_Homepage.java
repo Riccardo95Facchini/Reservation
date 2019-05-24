@@ -1,5 +1,6 @@
 package facchini.riccardo.reservation.Chat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,7 +10,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,7 +22,7 @@ import java.util.Map;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
 
-public class Activity_Chat_Homepage extends AppCompatActivity /*implements OnItemClickListener*/
+public class Activity_Chat_Homepage extends AppCompatActivity
 {
     //Firestore
     private FirebaseFirestore db;
@@ -41,8 +41,13 @@ public class Activity_Chat_Homepage extends AppCompatActivity /*implements OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity__chat__homepage);
         
+        setTitle(R.string.conversations);
+        
         db = FirebaseFirestore.getInstance();
-        userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        
+        userUid = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE)
+                .getString(getString(R.string.current_user_uid_key), "");
+        
         chatsCollection = db.collection("chats");
         
         noChats = findViewById(R.id.noChatsText);

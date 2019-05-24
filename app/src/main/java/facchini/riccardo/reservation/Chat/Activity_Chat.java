@@ -128,9 +128,17 @@ public class Activity_Chat extends AppCompatActivity
         
     }
     
+    @Override
+    protected void onStop()
+    {
+        setThisRead();
+        super.onStop();
+    }
+    
     /**
      * Does all the updates of the database, which includes setting the message in
      * the Realtime DB and updating the two entry in the Cloud Firestore one
+     *
      * @param messageText sent text
      */
     private void updateDatabase(String messageText)
@@ -155,8 +163,9 @@ public class Activity_Chat extends AppCompatActivity
     
     /**
      * Updates the messagebox by inserting a new bubble in the chat page
+     *
      * @param message text of the current bubble
-     * @param type either 1 (incoming message) or 2 (outcoming message)
+     * @param type    either 1 (incoming message) or 2 (outcoming message)
      */
     public void addMessageBox(String message, int type)
     {
@@ -184,8 +193,7 @@ public class Activity_Chat extends AppCompatActivity
     }
     
     /**
-     * When the chat is opened checks if the message has been already read, if it's the first opening then it sets it as read.
-     * Called only if there is at least one message/bubble
+     * Sets the isRead value in the database to true if it isn't already.
      */
     private void setThisRead()
     {

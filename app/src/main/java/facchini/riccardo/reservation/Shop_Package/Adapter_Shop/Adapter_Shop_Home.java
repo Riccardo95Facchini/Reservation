@@ -1,15 +1,19 @@
 package facchini.riccardo.reservation.Shop_Package.Adapter_Shop;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.List;
 
+import facchini.riccardo.reservation.Chat.Activity_Chat;
 import facchini.riccardo.reservation.Customer_Package.Customer;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.Reservation_Shop_Home;
@@ -18,6 +22,7 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
 {
     
     private Context context;
+    private String customerUid;
     private List<Reservation_Shop_Home> reservationCustomerHomeList;
     
     public Adapter_Shop_Home(Context context, List<Reservation_Shop_Home> reservationCustomerHomeList)
@@ -41,6 +46,8 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
         Reservation_Shop_Home res = reservationCustomerHomeList.get(pos);
         Customer customer = res.getCustomer();
         
+        customerUid = customer.getUid();
+        
         holder.textViewCustomer.setText(customer.getName().concat(" ").concat(customer.getSurname()));
         holder.textViewWhen.setText(res.getDateFormatted());
     }
@@ -54,6 +61,7 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
     class Reservation_Shop_ViewHolder extends RecyclerView.ViewHolder
     {
         TextView textViewCustomer, textViewWhen;
+        ImageButton startChatButton;
         
         public Reservation_Shop_ViewHolder(@NonNull View itemView)
         {
@@ -61,6 +69,27 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
             
             textViewCustomer = itemView.findViewById(R.id.textViewShopName);
             textViewWhen = itemView.findViewById(R.id.textViewWhen);
+            startChatButton = itemView.findViewById(R.id.startChatButton);
+            
+            startChatButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(final View v)
+                {
+                    startChat(v);
+                }
+            });
+        }
+        
+        void startChat(View v)
+        {
+            Intent chatIntent = new Intent(v.getContext(), Activity_Chat.class);
+            SharedPreferences pref = context.getSharedPreferences(context.getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
+            String thisUsername = pref.getString(context.getString(R.string.current_user_username_key), "");
+            chatIntent.putExtra("thisUsername", thisUsername);
+            chatIntent.putExtra("otherUid", customerUid);
+            chatIntent.putExtra("otherUsername", textViewCustomer.getText());
+            v.getContext().startActivity(chatIntent);
         }
     }
 }
