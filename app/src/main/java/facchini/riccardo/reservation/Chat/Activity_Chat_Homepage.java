@@ -39,7 +39,7 @@ public class Activity_Chat_Homepage extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity__chat__homepage);
+        setContentView(R.layout.activity_chat_homepage);
         
         setTitle(R.string.conversations);
         

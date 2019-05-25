@@ -35,16 +35,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import facchini.riccardo.reservation.Chat.Activity_Chat;
 import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_SelectedShop;
-import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_Search;
+import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_SearchCard;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.SearchResult;
@@ -63,7 +61,7 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     
     private SharedViewModel viewModel;
     private ArrayList<SearchResult> foundShops = new ArrayList<>();
-    private Adapter_Customer_Search adapter;
+    private Adapter_Customer_SearchCard adapter;
     
     private SharedPreferences sharedPreferences;
     
@@ -368,7 +366,7 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     private void setAdapter()
     {
         Collections.sort(foundShops, searchResultComparator);
-        adapter = new Adapter_Customer_Search(getContext(), foundShops);
+        adapter = new Adapter_Customer_SearchCard(getContext(), foundShops);
         adapter.setOnItemClickListener(this);
         foundShopsView.setAdapter(adapter);
     }

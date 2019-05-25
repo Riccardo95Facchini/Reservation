@@ -16,14 +16,14 @@ import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.SearchResult;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
-public class Adapter_Customer_Search extends RecyclerView.Adapter<Adapter_Customer_Search.Shops_ViewHolder>
+public class Adapter_Customer_SearchCard extends RecyclerView.Adapter<Adapter_Customer_SearchCard.Shops_ViewHolder>
 {
     private Context context;
     private List<SearchResult> shopsList;
     private OnItemClickListener itemListener;
     
     
-    public Adapter_Customer_Search(Context context, List<SearchResult> shopsList)
+    public Adapter_Customer_SearchCard(Context context, List<SearchResult> shopsList)
     {
         this.context = context;
         this.shopsList = shopsList;

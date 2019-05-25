@@ -1,9 +1,11 @@
 package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,7 +35,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import facchini.riccardo.reservation.Customer_Package.Customer;
-import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_Home;
+import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_ReservationCard;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.Reservation_Customer_Home;
@@ -50,9 +52,10 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     private String customerUid;
     private SharedViewModel viewModel;
     private List<Reservation_Customer_Home> resList;
+    private SharedPreferences pref;
     
     private RecyclerView recyclerView;
-    private Adapter_Customer_Home adapterCustomerHome;
+    private Adapter_Customer_ReservationCard adapterCustomerHome;
     
     private TextView noReservationsText;
     private ProgressBar progressBar;
@@ -66,11 +69,29 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     }
     
     @Override
+    public void onResume()
+    {
+        super.onResume();
+        
+        try
+        {
+            if (pref.getBoolean(getString(R.string.need_update_key), false))
+            {
+                pref.edit().putBoolean(getString(R.string.need_update_key), false).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         db = FirebaseFirestore.getInstance();
         
-        SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
+        pref = getContext().getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
         customerUid = pref.getString(getString(R.string.current_user_uid_key), "");
         customersCollection = db.collection("customers");
         shopsCollection = db.collection("shops");
@@ -169,7 +190,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     {
         Collections.sort(resList, reservationComparator);
         
-        adapterCustomerHome = new Adapter_Customer_Home(getContext(), resList);
+        adapterCustomerHome = new Adapter_Customer_ReservationCard(getContext(), resList);
         recyclerView.setAdapter(adapterCustomerHome);
         adapterCustomerHome.setOnItemClickListener(this);
         

@@ -1,8 +1,9 @@
 package facchini.riccardo.reservation.Customer_Package.Adapter_Customer;
 
-import android.app.AlertDialog;
+import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,12 +14,13 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_ShopInfo;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.Reservation_Customer_Home;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
-public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer_Home.Reservation_Customer_ViewHolder>
+public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapter_Customer_ReservationCard.Reservation_Customer_ViewHolder>
 {
     
     private Context context;
@@ -26,7 +28,7 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
     private OnItemClickListener itemListener;
     
     
-    public Adapter_Customer_Home(Context context, List<Reservation_Customer_Home> reservationCustomerHomeList)
+    public Adapter_Customer_ReservationCard(Context context, List<Reservation_Customer_Home> reservationCustomerHomeList)
     {
         this.context = context;
         this.reservationCustomerHomeList = reservationCustomerHomeList;
@@ -83,18 +85,7 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
                 public void onClick(View v)
                 {
                     Shop shop = reservationCustomerHomeList.get(getAdapterPosition()).getShop();
-                    
-                    new AlertDialog.Builder(context).setCancelable(true)
-                            .setTitle(context.getString(R.string.reservationShopDetails))
-                            .setMessage(shop.displayProfile())
-                            .setPositiveButton("Ok", new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    //Do nothing
-                                }
-                            }).show();
+                    startShopInfoActivity(shop);
                 }
             });
             
@@ -112,6 +103,20 @@ public class Adapter_Customer_Home extends RecyclerView.Adapter<Adapter_Customer
                     return true;
                 }
             });
+        }
+        
+        /**
+         * Puts shop into a bundle in the intent and launches it
+         *
+         * @param shop The shop for which the info are requested
+         */
+        private void startShopInfoActivity(Shop shop)
+        {
+            Intent intent = new Intent(context, Activity_Customer_ShopInfo.class);
+            Bundle b = new Bundle();
+            b.putParcelable("Selected", shop);
+            intent.putExtras(b);
+            context.startActivity(intent);
         }
     }
 }

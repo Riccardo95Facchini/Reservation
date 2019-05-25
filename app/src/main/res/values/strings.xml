@@ -89,4 +89,7 @@
     <string name="last_location_string_key">last_location_string_key</string>
     <string name="last_latitude_key">last_latitude_key</string>
     <string name="last_longitude_key">last_longitude_key</string>
+    <string name="leave_a_review">Leave a review!</string>
+    <string name="reviews">Reviews</string>
+    <string name="need_update_key">need_update_key</string>
 </resources>

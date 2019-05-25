@@ -80,7 +80,11 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
                 }
             });
         }
-        
+    
+        /**
+         * Starts the chat with the selected user
+         * @param v Current view
+         */
         void startChat(View v)
         {
             Intent chatIntent = new Intent(v.getContext(), Activity_Chat.class);
