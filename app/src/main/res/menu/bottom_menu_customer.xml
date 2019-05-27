@@ -10,7 +10,7 @@
         android:icon="@drawable/ic_search_black_24dp"
         android:title="@android:string/search_go" />
     <item
-        android:id="@+id/bottomProfile"
-        android:icon="@drawable/ic_account_circle_black_24dp"
-        android:title="@string/profile" />
+        android:id="@+id/bottomHistory"
+        android:icon="@drawable/ic_history_black_24dp"
+        android:title="@string/history" />
 </menu>

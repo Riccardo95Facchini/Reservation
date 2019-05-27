@@ -21,6 +21,13 @@ public class Customer
         this.mail = mail;
     }
     
+    public Customer(String uid, String name, String surname)
+    {
+        this.uid = uid;
+        this.name = name;
+        this.surname = surname;
+    }
+    
     public Customer(Map<String, Object> c)
     {
         this.uid = (String) c.get("uid");

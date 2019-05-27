@@ -55,7 +55,7 @@
     <string name="availableHours">available hours</string>
     <string name="timeDB" translatable="false">time</string>
     <string name="userLowercase" translatable="false">user</string>
-    <string name="noReservations">No pending reservations forund</string>
+    <string name="noReservations">No reservations found</string>
     <string name="noShopsFound">No shops found</string>
     <string name="mon">MON</string>
     <string name="sun">SUN</string>
@@ -93,4 +93,6 @@
     <string name="reviews">Reviews</string>
     <string name="need_update_key">need_update_key</string>
     <string name="isCustomer_key">isCustomer_key</string>
+    <string name="history">History</string>
+    <string name="past_reservations">Past Reservations</string>
 </resources>

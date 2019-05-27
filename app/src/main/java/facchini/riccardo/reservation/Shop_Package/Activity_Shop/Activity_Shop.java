@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import facchini.riccardo.reservation.Activity_Login;
 import facchini.riccardo.reservation.Chat.Activity_Chat_Homepage;
+import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_History;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_Home;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_Profile;
 import facchini.riccardo.reservation.R;
@@ -56,17 +57,15 @@ public class Activity_Shop extends AppCompatActivity
         {
             Fragment selected = null;
             
+            currentMenu = menuItem.getItemId();
+            
             switch (menuItem.getItemId())
             {
                 case R.id.bottomHome:
                     selected = new Fragment_Shop_Home();
-                    currentMenu = R.id.bottomHome;
-                    topMenu.getItem(1).setVisible(true);
                     break;
-                case R.id.bottomProfile:
-                    selected = new Fragment_Shop_Profile();
-                    currentMenu = R.id.bottomProfile;
-                    topMenu.getItem(1).setVisible(false);
+                case R.id.bottomHistory:
+                    selected = new Fragment_Shop_History();
                     break;
             }
             
@@ -78,6 +77,13 @@ public class Activity_Shop extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
+        if (currentMenu == R.id.profile_menu)
+        {
+            super.onBackPressed();
+            currentMenu = bottomMenu.getSelectedItemId();
+            return;
+        }
+        
         if (backButton > 0)
             finish();
         else
@@ -113,9 +119,15 @@ public class Activity_Shop extends AppCompatActivity
     @Override
     protected void onResume()
     {
-        super.onResume();
-        //On resume adds again the listener for the authentication
-        FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+        try
+        {
+            super.onResume();
+            //On resume adds again the listener for the authentication
+            FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
     
     private void setupFirebaseListener()
@@ -152,7 +164,7 @@ public class Activity_Shop extends AppCompatActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action_bar, menu);
         
-        if (currentMenu == R.id.bottomHome)
+        if (currentMenu != R.id.profile_menu)
             topMenu.getItem(1).setVisible(true);
         else
             topMenu.getItem(1).setVisible(false);
@@ -181,6 +193,13 @@ public class Activity_Shop extends AppCompatActivity
             case R.id.chat_menu:
                 Intent intent = new Intent(getBaseContext(), Activity_Chat_Homepage.class);
                 startActivity(intent);
+                return true;
+            case R.id.profile_menu:
+                currentMenu = R.id.profile_menu;
+                Fragment selected = new Fragment_Shop_Profile();
+                topMenu.getItem(1).setVisible(false);
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, selected).commit();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

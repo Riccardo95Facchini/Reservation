@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import facchini.riccardo.reservation.Activity_Login;
 import facchini.riccardo.reservation.Chat.Activity_Chat_Homepage;
+import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_History;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Home;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Profile;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Search;
@@ -45,7 +46,7 @@ public class Activity_Customer extends AppCompatActivity
         bottomMenu = findViewById(R.id.bottomMenu);
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
         
-        getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
         currentMenu = R.id.bottomHome;
         setupFirebaseListener();
     }
@@ -61,26 +62,25 @@ public class Activity_Customer extends AppCompatActivity
             if (currentMenu == menuItem.getItemId())
                 return false;
             
+            currentMenu = menuItem.getItemId();
+            
             switch (menuItem.getItemId())
             {
                 case R.id.bottomHome:
-                    currentMenu = R.id.bottomHome;
                     selected = new Fragment_Customer_Home();
                     topMenu.getItem(1).setVisible(true);
                     break;
                 case R.id.bottomSearch:
-                    currentMenu = R.id.bottomSearch;
                     selected = new Fragment_Customer_Search();
                     topMenu.getItem(1).setVisible(false);
                     break;
-                case R.id.bottomProfile:
-                    currentMenu = R.id.bottomProfile;
-                    selected = new Fragment_Customer_Profile();
-                    topMenu.getItem(1).setVisible(false);
+                case R.id.bottomHistory:
+                    selected = new Fragment_Customer_History();
+                    topMenu.getItem(1).setVisible(true);
                     break;
             }
             
-            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, selected).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selected).commit();
             return true;
         }
     };
@@ -88,6 +88,13 @@ public class Activity_Customer extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
+        if (currentMenu == R.id.profile_menu)
+        {
+            super.onBackPressed();
+            currentMenu = bottomMenu.getSelectedItemId();
+            return;
+        }
+        
         if (backButton > 0)
             finish();
         else
@@ -188,12 +195,19 @@ public class Activity_Customer extends AppCompatActivity
                 edit.remove(getString(R.string.current_user_username_key)).apply();
                 AuthUI.getInstance().signOut(this);
                 return true;
+            case R.id.profile_menu:
+                currentMenu = R.id.profile_menu;
+                Fragment selected = new Fragment_Customer_Profile();
+                topMenu.getItem(1).setVisible(false);
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, selected).commit();
+                return true;
             case R.id.refresh_menu:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
                 return true;
             case R.id.chat_menu:
                 Intent intent = new Intent(getBaseContext(), Activity_Chat_Homepage.class);
                 startActivity(intent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

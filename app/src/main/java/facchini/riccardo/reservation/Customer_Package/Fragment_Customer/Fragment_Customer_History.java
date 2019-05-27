@@ -1,7 +1,6 @@
 package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 
 import android.app.AlertDialog;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -23,6 +22,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -32,15 +32,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import facchini.riccardo.reservation.Customer_Package.Customer;
 import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_ReservationCard;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.Reservation_Customer_Home;
-import facchini.riccardo.reservation.SharedViewModel;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
-public class Fragment_Customer_Home extends Fragment implements OnItemClickListener
+public class Fragment_Customer_History extends Fragment implements OnItemClickListener
 {
     //Firestore
     private FirebaseFirestore db;
@@ -48,12 +46,11 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     
     private Calendar now;
     private String customerUid;
-    private SharedViewModel viewModel;
     private List<Reservation_Customer_Home> resList;
     private SharedPreferences pref;
     
     private RecyclerView recyclerView;
-    private Adapter_Customer_ReservationCard adapterCustomerHome;
+    private Adapter_Customer_ReservationCard adapterCustomerHistory;
     
     private TextView noReservationsText;
     private ProgressBar progressBar;
@@ -62,8 +59,8 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        getActivity().setTitle(R.string.reservations);
-        return inflater.inflate(R.layout.fragment_customer_home, container, false);
+        getActivity().setTitle(R.string.past_reservations);
+        return inflater.inflate(R.layout.fragment_customer_history, container, false);
     }
     
     @Override
@@ -76,7 +73,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
             if (pref.getBoolean(getString(R.string.need_update_key), false))
             {
                 pref.edit().putBoolean(getString(R.string.need_update_key), false).commit();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_History()).commit();
             }
         } catch (Exception e)
         {
@@ -97,7 +94,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
         
         now = Calendar.getInstance();
         
-        recyclerView = view.findViewById(R.id.futureReservations);
+        recyclerView = view.findViewById(R.id.pastReservations);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         
@@ -114,26 +111,14 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         
-        
-        customersCollection.document(customerUid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
-        {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot)
-            {
-                if (documentSnapshot.exists())
-                    viewModel.setCurrentCustomer(new Customer(documentSnapshot.getData()));
-            }
-        });
-        
-        reservationsCollection.whereEqualTo("customerUid", customerUid).whereGreaterThan("time", now.getTime())
+        reservationsCollection.whereEqualTo("customerUid", customerUid).whereLessThan("time", now.getTime())
                 .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
         {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots)
             {
-                extractNextReservations(queryDocumentSnapshots);
+                extractPastReservations(queryDocumentSnapshots);
             }
         }).addOnFailureListener(new OnFailureListener()
         {
@@ -147,11 +132,11 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     
     
     /**
-     * Extracts and checks the future reservations of the user
+     * Extracts and checks the past reservations of the user
      *
-     * @param snap
+     * @param snap QuerySnapshot returned by the server
      */
-    private void extractNextReservations(final QuerySnapshot snap)
+    private void extractPastReservations(final QuerySnapshot snap)
     {
         progressBar.setVisibility(View.VISIBLE);
         if (snap.isEmpty())
@@ -186,11 +171,11 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
      */
     private void orderList()
     {
-        Collections.sort(resList, reservationComparator);
+        Collections.sort(resList, Collections.reverseOrder(reservationComparator));
         
-        adapterCustomerHome = new Adapter_Customer_ReservationCard(getContext(), resList);
-        recyclerView.setAdapter(adapterCustomerHome);
-        adapterCustomerHome.setOnItemClickListener(this);
+        adapterCustomerHistory = new Adapter_Customer_ReservationCard(getContext(), resList);
+        recyclerView.setAdapter(adapterCustomerHistory);
+        adapterCustomerHistory.setOnItemClickListener(this);
         
         progressBar.setVisibility(View.GONE);
     }
@@ -221,7 +206,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
                     {
                         reservationsCollection.document(resList.get(position).getResUid()).delete();
                         getActivity().getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
+                                .replace(R.id.fragmentContainer, new Fragment_Customer_History()).commit();
                     }
                 }).setNegativeButton("No", new DialogInterface.OnClickListener()
         {

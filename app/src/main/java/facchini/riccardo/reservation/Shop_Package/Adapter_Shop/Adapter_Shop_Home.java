@@ -22,7 +22,7 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
 {
     
     private Context context;
-    private String customerUid;
+    //private String customerUid;
     private List<Reservation_Shop_Home> reservationCustomerHomeList;
     
     public Adapter_Shop_Home(Context context, List<Reservation_Shop_Home> reservationCustomerHomeList)
@@ -46,10 +46,11 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
         Reservation_Shop_Home res = reservationCustomerHomeList.get(pos);
         Customer customer = res.getCustomer();
         
-        customerUid = customer.getUid();
+        //customerUid = customer.getUid();
         
         holder.textViewCustomer.setText(customer.getName().concat(" ").concat(customer.getSurname()));
         holder.textViewWhen.setText(res.getDateFormatted());
+        holder.customerUid = customer.getUid();
     }
     
     @Override
@@ -62,6 +63,7 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
     {
         TextView textViewCustomer, textViewWhen;
         ImageButton startChatButton;
+        String customerUid;
         
         public Reservation_Shop_ViewHolder(@NonNull View itemView)
         {
@@ -80,9 +82,10 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
                 }
             });
         }
-    
+        
         /**
          * Starts the chat with the selected user
+         *
          * @param v Current view
          */
         void startChat(View v)
