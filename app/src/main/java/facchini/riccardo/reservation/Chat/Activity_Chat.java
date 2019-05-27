@@ -1,6 +1,7 @@
 package facchini.riccardo.reservation.Chat;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -203,14 +205,17 @@ public class Activity_Chat extends AppCompatActivity
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot)
             {
-                ChatData thisData = new ChatData((HashMap<String, Object>) documentSnapshot.getData().get(otherUid));
-                if (thisData.isRead())
-                    return;
-                
-                HashMap<String, ChatData> mapThis = new HashMap<>();
-                thisData.setRead(true);
-                mapThis.put(otherUid, thisData);
-                FirebaseFirestore.getInstance().collection("chats").document(thisUid).set(mapThis, SetOptions.merge());
+                if (documentSnapshot.exists() && documentSnapshot.getData().get(otherUid) != null)
+                {
+                    ChatData thisData = new ChatData((HashMap<String, Object>) documentSnapshot.getData().get(otherUid));
+                    if (thisData.isRead())
+                        return;
+                    
+                    HashMap<String, ChatData> mapThis = new HashMap<>();
+                    thisData.setRead(true);
+                    mapThis.put(otherUid, thisData);
+                    FirebaseFirestore.getInstance().collection("chats").document(thisUid).set(mapThis, SetOptions.merge());
+                }
             }
         });
     }
