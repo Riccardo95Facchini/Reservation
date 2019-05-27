@@ -119,15 +119,9 @@ public class Activity_Shop extends AppCompatActivity
     @Override
     protected void onResume()
     {
-        try
-        {
-            super.onResume();
-            //On resume adds again the listener for the authentication
-            FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        super.onResume();
+        //On resume adds again the listener for the authentication
+        FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
     }
     
     private void setupFirebaseListener()

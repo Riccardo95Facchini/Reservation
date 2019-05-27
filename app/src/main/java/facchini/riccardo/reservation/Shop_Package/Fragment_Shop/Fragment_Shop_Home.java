@@ -137,19 +137,13 @@ public class Fragment_Shop_Home extends Fragment
         
         for (final QueryDocumentSnapshot doc : snap)
         {
-            customersCollection.document((String) doc.get("customerUid")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
-            {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot)
-                {
-                    if (documentSnapshot.exists())
-                        resList.add(new Reservation_Shop_Home(((Timestamp) doc.get("time")).toDate(),
-                                documentSnapshot.toObject(Customer.class)));
-                    
-                    if (resList.size() == snap.size())
-                        orderList();
-                }
-            });
+            String name = doc.get("customerName").toString().substring(0, doc.get("customerName").toString().indexOf(' '));
+            String surname = doc.get("customerName").toString().substring(doc.get("customerName").toString().indexOf(' ') + 1);
+            Customer c = new Customer(doc.get("customerUid").toString(), name, surname);
+            resList.add(new Reservation_Shop_Home(((Timestamp) doc.get("time")).toDate(), c));
+            
+            if (resList.size() == snap.size())
+                orderList();
         }
     }
     
