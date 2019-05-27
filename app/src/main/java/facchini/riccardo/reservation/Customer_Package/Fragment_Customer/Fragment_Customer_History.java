@@ -149,6 +149,7 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
         
         for (final QueryDocumentSnapshot doc : snap)
         {
+            //TODO: make it more efficient, no need to load each one in its entirety (change reservation structure to include essentials)
             shopsCollection.document((String) doc.get("shopUid")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
             {
                 @Override

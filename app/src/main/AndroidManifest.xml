@@ -13,29 +13,32 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Customer_Package.Activity_Customer.Activity_Customer_ShopInfo"></activity>
+        <activity android:name=".Customer_Package.Activity_Customer.Activity_Customer_ShopInfo" />
         <activity android:name=".Chat.Activity_Chat_Homepage" />
         <activity android:name=".Chat.Activity_Chat" />
-        <activity android:name=".Customer_Package.Activity_Customer.Activity_Customer_SelectedShop" /> <!-- Login activity -->
+        <activity android:name=".Customer_Package.Activity_Customer.Activity_Customer_SelectedShop" />
         <activity android:name=".Activity_Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Create customer activity -->
+        </activity>
         <activity
             android:name=".Customer_Package.Activity_Customer.Activity_Customer_Create"
             android:label="@string/customerRegistration"
-            android:parentActivityName=".Activity_Login" /> <!-- Create customer activity -->
+            android:parentActivityName=".Activity_Login" />
         <activity
             android:name=".Shop_Package.Activity_Shop.Activity_Shop_Create"
             android:label="@string/shopRegistration"
-            android:parentActivityName=".Activity_Login" /> <!-- Add tags and hours activity -->
+            android:parentActivityName=".Activity_Login" />
         <activity
             android:name=".Shop_Package.Activity_Shop.Activity_Shop_TagHours"
-            android:label="@string/tagsAndHours" /> <!-- Customer Activity -->
-        <activity android:name=".Customer_Package.Activity_Customer.Activity_Customer" /> <!-- Shop Activity -->
+            android:label="@string/tagsAndHours" />
+        <activity
+            android:name=".Shop_Package.Activity_Shop.Activity_Shop_Profile"
+            android:label="@string/profile" />
+        <activity android:name=".Customer_Package.Activity_Customer.Activity_Customer" />
         <activity android:name=".Shop_Package.Activity_Shop.Activity_Shop" />
     </application>
 

@@ -1,8 +1,10 @@
 package facchini.riccardo.reservation.Shop_Package.Activity_Shop;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -293,17 +295,29 @@ public class Activity_Shop_Create extends AppCompatActivity
                     .putExtra("mail", mail)
                     .putExtra("latitude", latitude)
                     .putExtra("longitude", longitude);
+            startActivity(intent);
         } else
         {
             int intLongitude = (int) longitude;
             Bundle b = new Bundle();
             Shop shop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude,
-                    longitude, 0, 0, intLongitude, currentShop.getTags(), currentShop.getHours());
+                    longitude, currentShop.getAverageReviews(), currentShop.getNumReviews(), intLongitude, currentShop.getTags(), currentShop.getHours());
             b.putParcelable("CurrentShop", shop);
             intent.putExtras(b);
-            intent.setClass(this, Activity_Shop_TagHours.class);
+            startActivityForResult(intent, 0);
         }
-        startActivity(intent);
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        if (requestCode == 0 && resultCode == Activity.RESULT_OK)
+        {
+            setResult(Activity.RESULT_OK);
+            finish();
+        }
     }
     
     /**

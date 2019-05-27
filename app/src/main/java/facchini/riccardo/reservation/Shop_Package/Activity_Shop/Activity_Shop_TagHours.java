@@ -1,5 +1,6 @@
 package facchini.riccardo.reservation.Shop_Package.Activity_Shop;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -368,7 +369,9 @@ public class Activity_Shop_TagHours extends AppCompatActivity
                     currentShop.getNumReviews(), currentShop.getIntLongitude(), tags, hours);
             
             shopsReference.document(uid).set(shop);
-            startActivity(new Intent(this, Activity_Shop.class));
+            setResult(Activity.RESULT_OK);
+            finish();
+            //startActivity(new Intent(this, Activity_Shop.class));
         }
     }
     

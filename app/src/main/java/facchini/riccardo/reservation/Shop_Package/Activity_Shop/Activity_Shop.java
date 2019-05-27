@@ -22,7 +22,6 @@ import facchini.riccardo.reservation.Activity_Login;
 import facchini.riccardo.reservation.Chat.Activity_Chat_Homepage;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_History;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_Home;
-import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_Profile;
 import facchini.riccardo.reservation.R;
 
 public class Activity_Shop extends AppCompatActivity
@@ -190,9 +189,8 @@ public class Activity_Shop extends AppCompatActivity
                 return true;
             case R.id.profile_menu:
                 currentMenu = R.id.profile_menu;
-                Fragment selected = new Fragment_Shop_Profile();
-                topMenu.getItem(1).setVisible(false);
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, selected).commit();
+                Intent profileIntent = new Intent(getBaseContext(), Activity_Shop_Profile.class);
+                startActivity(profileIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

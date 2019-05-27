@@ -1,6 +1,5 @@
 package facchini.riccardo.reservation.Customer_Package.Activity_Customer;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,8 +13,6 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import facchini.riccardo.reservation.R;
@@ -58,9 +55,9 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
         TextView textReviews = findViewById(R.id.textReviews);
         TextView textPhoneMail = findViewById(R.id.textPhoneMail);
         TextView textAddress = findViewById(R.id.textAddress);
-        buttonSend = findViewById(R.id.buttonSend);
+        buttonSend = findViewById(R.id.buttonEdit);
         //ImageView shopPic = findViewById(R.id.shopPic);  TODO: profile pic
-        ratingReview = findViewById(R.id.ratingReview);
+        ratingReview = findViewById(R.id.ratingAvg);
         RatingBar ratingAvg = findViewById(R.id.ratingAvg);
         
         textShopName.setText(shop.getName());

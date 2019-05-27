@@ -126,20 +126,6 @@ public class Fragment_Shop_History extends Fragment
             
             if (resList.size() == snap.size())
                 orderList();
-
-//            customersCollection.document((String) doc.get("customerUid")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
-//            {
-//                @Override
-//                public void onSuccess(DocumentSnapshot documentSnapshot)
-//                {
-//                    if (documentSnapshot.exists())
-//                        resList.add(new Reservation_Shop_Home(((Timestamp) doc.get("time")).toDate(),
-//                                documentSnapshot.toObject(Customer.class)));
-//
-//                    if (resList.size() == snap.size())
-//                        orderList();
-//                }
-//            });
         }
     }
     

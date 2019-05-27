@@ -70,7 +70,7 @@
         app:layout_constraintTop_toBottomOf="@+id/shopPic" />
 
     <RatingBar
-        android:id="@+id/ratingReview"
+        android:id="@+id/ratingAvg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -120,16 +120,16 @@
         app:layout_constraintTop_toBottomOf="@+id/textHours" />
 
     <Button
-        android:id="@+id/buttonSend"
+        android:id="@+id/buttonEdit"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:backgroundTint="@color/colorPrimary"
         android:enabled="false"
         android:text="@string/sendButtonText"
-        app:layout_constraintEnd_toEndOf="@+id/ratingReview"
-        app:layout_constraintStart_toStartOf="@+id/ratingReview"
-        app:layout_constraintTop_toBottomOf="@+id/ratingReview"
+        app:layout_constraintEnd_toEndOf="@+id/ratingAvg"
+        app:layout_constraintStart_toStartOf="@+id/ratingAvg"
+        app:layout_constraintTop_toBottomOf="@+id/ratingAvg"
         />
 
 </android.support.constraint.ConstraintLayout>
