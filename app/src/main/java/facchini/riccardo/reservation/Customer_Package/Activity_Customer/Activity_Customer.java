@@ -1,6 +1,8 @@
 package facchini.riccardo.reservation.Customer_Package.Activity_Customer;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -180,6 +182,10 @@ public class Activity_Customer extends AppCompatActivity
         switch (item.getItemId())
         {
             case R.id.sign_out_menu:
+                SharedPreferences.Editor edit = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE).edit();
+                edit.remove(getString(R.string.current_user_uid_key));
+                edit.remove(getString(R.string.isCustomer_key));
+                edit.remove(getString(R.string.current_user_username_key)).apply();
                 AuthUI.getInstance().signOut(this);
                 return true;
             case R.id.refresh_menu:

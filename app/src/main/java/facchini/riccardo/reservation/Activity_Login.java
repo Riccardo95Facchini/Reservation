@@ -55,6 +55,8 @@ public class Activity_Login extends AppCompatActivity
     private boolean isCustomer = false;
     private boolean isShop = false;
     
+    SharedPreferences sharedPref;
+    
     //UI
     //Buttons
     private ImageButton createCustomerButton;
@@ -72,6 +74,17 @@ public class Activity_Login extends AppCompatActivity
         setContentView(R.layout.activity_login);
         
         setTitle(R.string.loading);
+        
+        sharedPref = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
+        
+        uid = sharedPref.getString(getString(R.string.current_user_uid_key), "");
+        
+        if (!uid.isEmpty())
+        {
+            isCustomer = sharedPref.getBoolean(getString(R.string.isCustomer_key), false);
+            isShop = !isCustomer;
+            userTypeDecision(sharedPref.getString(getString(R.string.current_user_username_key), ""), true);
+        }
         
         //Initialize Firebase Components
         firebaseAuth = FirebaseAuth.getInstance();
@@ -164,7 +177,7 @@ public class Activity_Login extends AppCompatActivity
                 {
                     isCustomer = true;
                     currentName = (String) documentSnapshot.get("name");
-                    userTypeDecision(currentName);
+                    userTypeDecision(currentName, false);
                 } else
                     checkShopExists();
             }
@@ -195,7 +208,7 @@ public class Activity_Login extends AppCompatActivity
                     currentName = (String) documentSnapshot.get("name");
                 }
                 
-                userTypeDecision(currentName);
+                userTypeDecision(currentName, false);
             }
         }).addOnFailureListener(new OnFailureListener()
         {
@@ -208,32 +221,41 @@ public class Activity_Login extends AppCompatActivity
     }
     
     /**
-     * Decides what to do bases on the user type that logged in, also sets uid and username in shared preferences for later use
+     * Decides what to do bases on the user type that logged in, if data already present skips the connection to the server to login.
+     * Sets uid and username in shared preferences for later use.
+     *
+     * @param currentName Username of the user currently logged in
+     * @param skipped     True if data already stored locally, used to skip server request.
      */
-    private void userTypeDecision(String currentName)
+    private void userTypeDecision(String currentName, boolean skipped)
     {
-        if(!currentName.isEmpty())
+        SharedPreferences.Editor edit = sharedPref.edit();
+        if (!skipped && !currentName.isEmpty())
         {
-            SharedPreferences.Editor sharedPref = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE).edit();
-            sharedPref.putString(getString(R.string.current_user_uid_key), uid);
-            sharedPref.putString(getString(R.string.current_user_username_key), currentName);
-            sharedPref.apply();
+            edit.putString(getString(R.string.current_user_uid_key), uid);
+            edit.putString(getString(R.string.current_user_username_key), currentName);
+            edit.apply();
         }
         
         if (isCustomer)
         {
             startActivity(new Intent(this, Activity_Customer.class));
-            firebaseAuth.removeAuthStateListener(authStateListener);
+            edit.putBoolean(getString(R.string.isCustomer_key), true).apply();
+            if (!skipped)
+                firebaseAuth.removeAuthStateListener(authStateListener);
             finish();
         } else if (isShop)
         {
             startActivity(new Intent(this, Activity_Shop.class));
-            firebaseAuth.removeAuthStateListener(authStateListener);
+            edit.putBoolean(getString(R.string.isCustomer_key), false).apply();
+            if (!skipped)
+                firebaseAuth.removeAuthStateListener(authStateListener);
             finish();
         } else
         {
             //Stay here and make the user create a either a shop or a customer account
             disableProgressEnableButtons();
+            edit.putBoolean(getString(R.string.isCustomer_key), false).apply();
             setTitle(R.string.registrations);
         }
     }

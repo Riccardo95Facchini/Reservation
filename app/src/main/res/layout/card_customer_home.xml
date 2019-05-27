@@ -58,11 +58,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@+id/textViewAddress"
                 android:layout_alignParentEnd="true"
-                android:layout_marginTop="-15dp"
-                android:layout_marginEnd="5dp"
-                android:backgroundTint="@android:color/transparent"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:srcCompat="@android:drawable/ic_menu_info_details" />
+                android:layout_marginEnd="8dp"
+                android:layout_centerVertical="true"
+                android:background="@null"
+                android:src="@drawable/ic_info_primary_32dp"/>
 
         </RelativeLayout>
 
