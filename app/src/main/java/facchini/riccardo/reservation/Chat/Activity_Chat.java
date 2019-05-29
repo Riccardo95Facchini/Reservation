@@ -1,9 +1,8 @@
 package facchini.riccardo.reservation.Chat;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -64,14 +62,11 @@ public class Activity_Chat extends AppCompatActivity
         
         //First smaller string
         if (thisUid.compareTo(otherUid) <= 0)
-        {
             nodeName = thisUid + "_" + otherUid;
-            reference = new Firebase("https://reservation-fed21.firebaseio.com/messages/" + nodeName);
-        } else
-        {
+        else
             nodeName = otherUid + "_" + thisUid;
-            reference = new Firebase("https://reservation-fed21.firebaseio.com/messages/" + nodeName);
-        }
+        
+        reference = new Firebase("https://reservation-fed21.firebaseio.com/messages/" + nodeName);
         
         sendButton.setOnClickListener(new View.OnClickListener()
         {

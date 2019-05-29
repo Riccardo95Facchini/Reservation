@@ -57,7 +57,7 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
         TextView textAddress = findViewById(R.id.textAddress);
         buttonSend = findViewById(R.id.buttonEdit);
         //ImageView shopPic = findViewById(R.id.shopPic);  TODO: profile pic
-        ratingReview = findViewById(R.id.ratingAvg);
+        ratingReview = findViewById(R.id.ratingReview);
         RatingBar ratingAvg = findViewById(R.id.ratingAvg);
         
         textShopName.setText(shop.getName());

@@ -176,7 +176,7 @@ public class Activity_Login extends AppCompatActivity
                 if (documentSnapshot.exists())
                 {
                     isCustomer = true;
-                    currentName = (String) documentSnapshot.get("name");
+                    currentName = documentSnapshot.get("name") + " " + documentSnapshot.get("surname");
                     userTypeDecision(currentName, false);
                 } else
                     checkShopExists();

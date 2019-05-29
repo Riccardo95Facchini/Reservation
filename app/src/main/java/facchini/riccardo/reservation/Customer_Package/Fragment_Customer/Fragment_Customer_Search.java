@@ -73,7 +73,7 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     
     //Firestore
     FirebaseFirestore db;
-    CollectionReference tagsCollection, shopsCollection;
+    CollectionReference shopsCollection;
     
     @Nullable
     @Override
@@ -127,7 +127,6 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
         progressBar.setVisibility(View.GONE);
         
         db = FirebaseFirestore.getInstance();
-        tagsCollection = db.collection("tags");
         shopsCollection = db.collection("shops");
         
         searchText.setOnKeyListener(new View.OnKeyListener()

@@ -156,6 +156,9 @@ public class Activity_Shop extends AppCompatActivity
         topMenu = menu;
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action_bar, menu);
+    
+        topMenu.getItem(2).setVisible(true);
+        topMenu.getItem(3).setVisible(true);
         
         if (currentMenu != R.id.profile_menu)
             topMenu.getItem(1).setVisible(true);
