@@ -5,24 +5,25 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -35,7 +36,7 @@ import java.util.List;
 import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_ReservationCard;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
-import facchini.riccardo.reservation.Reservation_Package.Reservation_Customer_Home;
+import facchini.riccardo.reservation.Reservation_Package.Reservation;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Fragment_Customer_History extends Fragment implements OnItemClickListener
@@ -46,7 +47,7 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
     
     private Calendar now;
     private String customerUid;
-    private List<Reservation_Customer_Home> resList;
+    private List<Reservation> resList;
     private SharedPreferences pref;
     
     private RecyclerView recyclerView;
@@ -87,7 +88,7 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
         db = FirebaseFirestore.getInstance();
         
         pref = getContext().getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
-        customerUid = pref.getString(getString(R.string.current_user_uid_key), "");
+        customerUid = FirebaseAuth.getInstance().getUid();
         customersCollection = db.collection("customers");
         shopsCollection = db.collection("shops");
         reservationsCollection = db.collection("reservations");
@@ -112,7 +113,7 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
     {
         super.onActivityCreated(savedInstanceState);
         
-        reservationsCollection.whereEqualTo("customerUid", customerUid).whereLessThan("time", now.getTime())
+        reservationsCollection.whereEqualTo("customerUid", customerUid).whereLessThan("time", now.getTime()).orderBy("time")
                 .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
         {
             @Override
@@ -157,8 +158,8 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
                 {
                     if (documentSnapshot.exists())
                         resList.add(
-                                new Reservation_Customer_Home(((Timestamp) doc.get("time")).toDate(),
-                                        documentSnapshot.toObject(Shop.class), doc.getId()));
+                                new Reservation(doc.getId(), ((Timestamp) doc.get("time")).toDate(),
+                                        documentSnapshot.toObject(Shop.class)));
                     
                     if (resList.size() == snap.size())
                         orderList();
@@ -184,10 +185,10 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
     /**
      * Defined comparator for reservations to order them
      */
-    public Comparator<Reservation_Customer_Home> reservationComparator = new Comparator<Reservation_Customer_Home>()
+    public Comparator<Reservation> reservationComparator = new Comparator<Reservation>()
     {
         @Override
-        public int compare(Reservation_Customer_Home o1, Reservation_Customer_Home o2)
+        public int compare(Reservation o1, Reservation o2)
         {
             return o1.getDate().compareTo(o2.getDate());
         }
@@ -196,10 +197,10 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
     @Override
     public void onItemClick(final int position)
     {
-        Reservation_Customer_Home res = resList.get(position);
+        Reservation res = resList.get(position);
         new AlertDialog.Builder(getContext()).setCancelable(true)
                 .setTitle(getString(R.string.areYouSure))
-                .setMessage(getString(R.string.deleteReservationFor).concat(res.getShop().getName()).concat(getString(R.string.onWithTabs)).concat(res.getDateFormatted()))
+                .setMessage(getString(R.string.deleteReservationFor).concat(res.getOtherUser().getName()).concat(getString(R.string.onWithTabs)).concat(res.getDateFormatted()))
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener()
                 {
                     @Override

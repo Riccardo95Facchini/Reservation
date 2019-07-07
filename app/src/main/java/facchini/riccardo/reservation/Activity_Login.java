@@ -3,11 +3,10 @@ package facchini.riccardo.reservation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -76,18 +75,18 @@ public class Activity_Login extends AppCompatActivity
         setTitle(R.string.loading);
         
         sharedPref = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
+    
+        firebaseAuth = FirebaseAuth.getInstance();
         
-        uid = sharedPref.getString(getString(R.string.current_user_uid_key), "");
+        uid = firebaseAuth.getUid();
         
-        if (!uid.isEmpty())
+        if (uid != null && !uid.isEmpty())
         {
             isCustomer = sharedPref.getBoolean(getString(R.string.isCustomer_key), false);
             isShop = !isCustomer;
             userTypeDecision(sharedPref.getString(getString(R.string.current_user_username_key), ""), true);
         }
         
-        //Initialize Firebase Components
-        firebaseAuth = FirebaseAuth.getInstance();
         //firebaseStorage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
         
@@ -232,7 +231,6 @@ public class Activity_Login extends AppCompatActivity
         SharedPreferences.Editor edit = sharedPref.edit();
         if (!skipped && !currentName.isEmpty())
         {
-            edit.putString(getString(R.string.current_user_uid_key), uid);
             edit.putString(getString(R.string.current_user_username_key), currentName);
             edit.apply();
         }

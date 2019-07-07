@@ -1,7 +1,7 @@
 package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 
 import android.app.AlertDialog;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,11 +10,11 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -190,7 +190,6 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
         intent.putExtras(b);
         intent.putExtra("uid", viewModel.getCurrentCustomer().getUid());
         intent.putExtra("name", viewModel.getCurrentCustomer().getName());
-        intent.putExtra("surname", viewModel.getCurrentCustomer().getSurname());
         intent.setClass(getContext(), Activity_Customer_SelectedShop.class);
         startActivity(intent);
     }

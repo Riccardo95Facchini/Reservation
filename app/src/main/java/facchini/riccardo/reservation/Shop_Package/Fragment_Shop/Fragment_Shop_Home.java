@@ -1,22 +1,22 @@
 package facchini.riccardo.reservation.Shop_Package.Fragment_Shop;
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,11 +30,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import facchini.riccardo.reservation.Customer_Package.Customer;
-import facchini.riccardo.reservation.Shop_Package.Adapter_Shop.Adapter_Shop_Home;
 import facchini.riccardo.reservation.R;
-import facchini.riccardo.reservation.Reservation_Package.Reservation_Shop_Home;
+import facchini.riccardo.reservation.Reservation_Package.Reservation;
 import facchini.riccardo.reservation.SharedViewModel;
+import facchini.riccardo.reservation.Shop_Package.Adapter_Shop.Adapter_Shop_Home;
 import facchini.riccardo.reservation.Shop_Package.Shop;
+import facchini.riccardo.reservation.User;
 
 public class Fragment_Shop_Home extends Fragment
 {
@@ -45,7 +46,7 @@ public class Fragment_Shop_Home extends Fragment
     private Calendar now;
     private String shopUid;
     private SharedViewModel viewModel;
-    private List<Reservation_Shop_Home> resList;
+    private List<Reservation> resList;
     
     private RecyclerView recyclerView;
     private Adapter_Shop_Home adapterShopHome;
@@ -64,8 +65,7 @@ public class Fragment_Shop_Home extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         db = FirebaseFirestore.getInstance();
-        SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
-        shopUid = pref.getString(getString(R.string.current_user_uid_key), "");
+        shopUid = FirebaseAuth.getInstance().getUid();
         customersCollection = db.collection("customers");
         shopsCollection = db.collection("shops");
         reservationsCollection = db.collection("reservations");
@@ -137,10 +137,8 @@ public class Fragment_Shop_Home extends Fragment
         
         for (final QueryDocumentSnapshot doc : snap)
         {
-            String name = doc.get("customerName").toString().substring(0, doc.get("customerName").toString().indexOf(' '));
-            String surname = doc.get("customerName").toString().substring(doc.get("customerName").toString().indexOf(' ') + 1);
-            Customer c = new Customer(doc.get("customerUid").toString(), name, surname);
-            resList.add(new Reservation_Shop_Home(((Timestamp) doc.get("time")).toDate(), c));
+            Customer c = new Customer((User) doc.get("customerUid"));
+            resList.add(new Reservation(doc.getId(), ((Timestamp) doc.get("time")).toDate(), c));
             
             if (resList.size() == snap.size())
                 orderList();
@@ -160,10 +158,10 @@ public class Fragment_Shop_Home extends Fragment
     /**
      * Defined comparator for reservations to order them
      */
-    public Comparator<Reservation_Shop_Home> reservationComparator = new Comparator<Reservation_Shop_Home>()
+    public Comparator<Reservation> reservationComparator = new Comparator<Reservation>()
     {
         @Override
-        public int compare(Reservation_Shop_Home o1, Reservation_Shop_Home o2)
+        public int compare(Reservation o1, Reservation o2)
         {
             return o1.getDate().compareTo(o2.getDate());
         }

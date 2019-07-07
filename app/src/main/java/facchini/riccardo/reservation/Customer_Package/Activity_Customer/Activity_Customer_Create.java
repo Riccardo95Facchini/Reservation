@@ -1,7 +1,6 @@
 package facchini.riccardo.reservation.Customer_Package.Activity_Customer;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,10 +8,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.ArrayList;
 
 import facchini.riccardo.reservation.Activity_Login;
 import facchini.riccardo.reservation.Customer_Package.Customer;
@@ -32,8 +31,7 @@ public class Activity_Customer_Create extends AppCompatActivity
     //Buttons
     private Button sendButton;
     //Text view
-    private EditText firstNameText;
-    private EditText surnameText;
+    private EditText nameText;
     private EditText phoneText;
     private EditText mailText;
     
@@ -52,8 +50,7 @@ public class Activity_Customer_Create extends AppCompatActivity
         
         //Initialize UI elements
         sendButton = findViewById(R.id.sendButton);
-        firstNameText = findViewById(R.id.shopNameText);
-        surnameText = findViewById(R.id.address1Text);
+        nameText = findViewById(R.id.nameText);
         phoneText = findViewById(R.id.phoneText);
         mailText = findViewById(R.id.mailText);
         
@@ -103,15 +100,13 @@ public class Activity_Customer_Create extends AppCompatActivity
             }
         });
         
-        firstNameText.addTextChangedListener(new TextWatcher()
+        nameText.addTextChangedListener(new TextWatcher()
         {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count)
             {
                 if (s.toString().trim().length() == 0)
                     sendButton.setEnabled(false);
-                else if (surnameText.getText().toString().length() > 0)
-                    sendButton.setEnabled(true);
             }
             
             @Override
@@ -121,23 +116,6 @@ public class Activity_Customer_Create extends AppCompatActivity
             public void afterTextChanged(Editable s) { }
         });
         
-        surnameText.addTextChangedListener(new TextWatcher()
-        {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
-                if (s.toString().trim().length() == 0)
-                    sendButton.setEnabled(false);
-                else if (firstNameText.getText().toString().length() > 0)
-                    sendButton.setEnabled(true);
-            }
-            
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            
-            @Override
-            public void afterTextChanged(Editable s) { }
-        });
     }
     
     private void sendData()
@@ -146,7 +124,7 @@ public class Activity_Customer_Create extends AppCompatActivity
         customers = db.collection("customers");
         mail = mail.isEmpty() ? mailText.getText().toString() : mail;
         phone = phone.isEmpty() ? phoneText.getText().toString() : phone;
-        Customer newCustomer = new Customer(uid, firstNameText.getText().toString(), surnameText.getText().toString(), phone, mail);
+        Customer newCustomer = new Customer(uid, nameText.getText().toString(), phone, mail);
         customers.document(uid).set(newCustomer);
         
         startActivity(new Intent(this, Activity_Login.class));

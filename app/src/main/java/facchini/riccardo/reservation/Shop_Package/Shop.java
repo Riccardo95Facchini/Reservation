@@ -3,60 +3,67 @@ package facchini.riccardo.reservation.Shop_Package;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Shop implements Parcelable
+import facchini.riccardo.reservation.Converters;
+import facchini.riccardo.reservation.User;
+
+/**
+ * Shop class
+ */
+public class Shop extends User
 {
-    private String uid;
-    private String name;
-    private String mail;
-    private String address1;
-    private String address2;
+    private String address;
     private String city;
     private String zip;
-    private String phone;
     private double latitude;
     private double longitude;
     private double averageReviews;
     private int numReviews;
     private int intLongitude;
     private ArrayList<String> tags;
-    private Map<String, List<String>> hours;
+    private Map<String, ArrayList<String>> hours;
     
-    public Shop(String uid, String name, String mail, String address1, String address2, String city,
-                String zip, String phone, double latitude, double longitude, double averageReviews,
-                int numReviews, int intLongitude, ArrayList<String> tags, Map<String, List<String>> hours)
+    private final static SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+    
+    //region Shop.Constructors
+    
+    public Shop()
     {
-        this.uid = uid;
-        this.name = name;
-        this.mail = mail;
-        this.address1 = address1;
-        this.address2 = address2;
+        super();
+    }
+    
+    public Shop(String uid, String name, String phone, String mail, String address, String city, String zip,
+                double latitude, double longitude, double averageReviews, int numReviews, int intLongitude,
+                ArrayList<String> tags, Map<String, ArrayList<String>> hours)
+    {
+        super(uid, name, phone, mail);
+        this.address = address;
         this.city = city;
         this.zip = zip;
-        this.phone = phone;
         this.latitude = latitude;
         this.longitude = longitude;
         this.averageReviews = averageReviews;
         this.numReviews = numReviews;
         this.intLongitude = intLongitude;
-        this.tags = new ArrayList<>(tags);
-        this.hours = new HashMap<>(hours);
+        this.tags = tags;
+        this.hours = hours;
     }
     
-    public Shop(Shop s)
+    /*public Shop(Shop s)
     {
-        this.uid = s.uid;
-        this.name = s.name;
-        this.mail = s.mail;
-        this.address1 = s.address1;
-        this.address2 = s.address2;
+        super(s.uid, s.name, s.phone, s.mail);
+        this.address = s.address;
         this.city = s.city;
         this.zip = s.zip;
-        this.phone = s.phone;
         this.latitude = s.latitude;
         this.longitude = s.longitude;
         this.averageReviews = s.averageReviews;
@@ -65,17 +72,14 @@ public class Shop implements Parcelable
         this.tags = new ArrayList<>(s.tags);
         this.hours = new HashMap<>(s.hours);
     }
+    */
     
     public Shop(Map<String, Object> m)
     {
-        this.uid = (String) m.get("uid");
-        this.name = (String) m.get("name");
-        this.mail = (String) m.get("mail");
-        this.address1 = (String) m.get("address1");
-        this.address2 = (String) m.get("address2");
+        super(m);
+        this.address = (String) m.get("address");
         this.city = (String) m.get("city");
         this.zip = (String) m.get("zip");
-        this.phone = (String) m.get("phone");
         this.latitude = (double) m.get("latitude");
         this.longitude = (double) m.get("longitude");
         
@@ -89,20 +93,20 @@ public class Shop implements Parcelable
         this.numReviews = (int) ((long) m.get("numReviews"));
         this.intLongitude = (int) ((long) m.get("intLongitude"));
         this.tags = new ArrayList<>((ArrayList<String>) m.get("tags"));
-        this.hours = new HashMap<>((HashMap<String, List<String>>) m.get("hours"));
+        this.hours = new HashMap<>((HashMap<String, ArrayList<String>>) m.get("hours"));
     }
+    
+    //endregion Shop.Constructors
+    
+    //region Shop.ParcelableMethods
     
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {
-        dest.writeString(uid);
-        dest.writeString(name);
-        dest.writeString(mail);
-        dest.writeString(address1);
-        dest.writeString(address2);
+        super.writeToParcel(dest, flags);
+        dest.writeString(address);
         dest.writeString(city);
         dest.writeString(zip);
-        dest.writeString(phone);
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
         dest.writeDouble(averageReviews);
@@ -114,14 +118,10 @@ public class Shop implements Parcelable
     
     private Shop(Parcel in)
     {
-        this.uid = in.readString();
-        this.name = in.readString();
-        this.mail = in.readString();
-        this.address1 = in.readString();
-        this.address2 = in.readString();
+        super(in);
+        this.address = in.readString();
         this.city = in.readString();
         this.zip = in.readString();
-        this.phone = in.readString();
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
         this.averageReviews = in.readDouble();
@@ -146,14 +146,16 @@ public class Shop implements Parcelable
         }
     };
     
-    public Shop()
-    {
+    @Override
+    public int describeContents() { return 0; }
     
-    }
+    //endregion Shop.ParcelableMethods
+    
+    //region Shop.Display
     
     public String displayFullAddress()
     {
-        return String.format("%s %s %s %s", address1, address2, city, zip);
+        return String.format("%s %s %s", address, city, zip);
     }
     
     public String displayInfo()
@@ -171,73 +173,74 @@ public class Shop implements Parcelable
         StringBuilder h = new StringBuilder();
         
         ArrayList<String> days = new ArrayList<>();
+        days.add("Sunday");
         days.add("Monday");
         days.add("Tuesday");
         days.add("Wednesday");
         days.add("Thursday");
         days.add("Friday");
         days.add("Saturday");
-        days.add("Sunday");
+        ArrayList<String> entry;
         
-        for (String day : days)
+        for (int i = 0; i < 7; i++)
         {
-            List<String> entry = null;
-            try
-            {
-                entry = hours.get(day);
-                
-                if (!entry.get(0).equalsIgnoreCase("closed") && !entry.get(2).equalsIgnoreCase("closed"))
-                    h.append(String.format("%s: \t %s-%s \t %s-%s\n", day,
-                            entry.get(0), entry.get(1), entry.get(2), entry.get(3)));
-                
-                else if (!entry.get(0).equalsIgnoreCase("closed"))
-                    h.append(String.format("%s: \t %s-%s\n", day, entry.get(0), entry.get(1)));
-                
-                else if (!entry.get(3).equalsIgnoreCase("closed"))
-                    h.append(String.format("%s: \t %s-%s\n", day, entry.get(2), entry.get(3)));
-            } catch (Exception e)
-            {
-                //Nothing
-            }
+            entry = hours.get(days.get(i));
             
+            if (!entry.get(0).equalsIgnoreCase("closed") && !entry.get(2).equalsIgnoreCase("closed"))
+                h.append(String.format("%s: \t %s-%s \t %s-%s\n", days.get(i),
+                        entry.get(0), entry.get(1), entry.get(2), entry.get(3)));
+            else if (!entry.get(0).equalsIgnoreCase("closed"))
+                h.append(String.format("%s: \t %s-%s\n", days.get(i), entry.get(0), entry.get(1)));
+            else if (!entry.get(3).equalsIgnoreCase("closed"))
+                h.append(String.format("%s: \t %s-%s\n", days.get(i), entry.get(0), entry.get(1)));
+            else
+                h.append(String.format("%s: \t %s\n", days.get(i), "Closed"));
         }
+        
         return h.toString();
+    }
+    
+    private String format(Long time)
+    {
+        if (time < 0)
+            return "Closed";
+        else
+            return df.format(Converters.fromTimestamp(time));
     }
     
     public String displayHoursDay(String day)
     {
-        String ret;
-        
         try
         {
-            ret = String.format("%s-%s \t %s-%s", hours.get(day).get(0), hours.get(day).get(1), hours.get(day).get(2), hours.get(day).get(3));
+            return String.format("%s-%s \t %s-%s", hours.get(day).get(0), hours.get(day).get(1), hours.get(day).get(2), hours.get(day).get(3));
         } catch (Exception e)
         {
-            ret = "Closed-Closed \t Closed-Closed";
+            return "Closed-Closed \t Closed-Closed";
         }
-        
-        return ret;
     }
     
-    public String getPhone() {return phone;}
+    //endregion Shop.Display
     
-    public String getMail() {return mail;}
+    //region Shop.Getters
     
-    public String getUid() {return uid;}
+//    public List<Long> selectedDayHours(int day)
+//    {
+//        ArrayList<Long> ret = new ArrayList<>();
+//        for (int j = day * 4; j < (day + 1) * 4; j++)
+//            ret.add(hours.get(j));
+//
+//        return ret;
+//    }
     
-    public String getName() {return name;}
-    
-    public String getAddress1() {return address1;}
-    
-    public String getAddress2() {return address2;}
+    public String getAddress() {return address;}
     
     public String getCity() {return city;}
     
     public String getZip() {return zip;}
     
-    public ArrayList<String> getTags() {return new ArrayList<String>(tags);}
+    public ArrayList<String> getTags() {return new ArrayList<>(tags);}
     
-    public Map<String, List<String>> getHours() {return new HashMap<>(hours);}
+    public Map<String, ArrayList<String>> getHours() {return hours;}
     
     public double getLatitude() {return latitude;}
     
@@ -249,9 +252,45 @@ public class Shop implements Parcelable
     
     public int getIntLongitude() {return intLongitude;}
     
-    @Override
-    public int describeContents()
+    //endregion Shop.Getters
+    
+    //region Shop.FromToArrayList
+    
+    public ArrayList<String> toArrayList()
     {
-        return 0;
+        ArrayList<String> list = new ArrayList<>();
+        list.add("SHOP");
+        list.addAll(super.toArrayList());
+        list.add(address);
+        list.add(city);
+        list.add(zip);
+        list.add(String.valueOf(latitude));
+        list.add(String.valueOf(longitude));
+        list.add(String.valueOf(averageReviews));
+        list.add(String.valueOf(numReviews));
+        list.add(String.valueOf(intLongitude));
+        list.add(new Gson().toJson(tags));
+        list.add(new Gson().toJson(hours));
+        return list;
     }
+    
+    public Shop(ArrayList<String> list)
+    {
+        super(list.get(0), list.get(1), list.get(2), list.get(3));
+        this.address = list.get(4);
+        this.city = list.get(5);
+        this.zip = list.get(6);
+        this.latitude = Double.parseDouble(list.get(7));
+        this.longitude = Double.parseDouble(list.get(8));
+        this.averageReviews = Double.parseDouble(list.get(9));
+        this.numReviews = Integer.parseInt(list.get(10));
+        this.intLongitude = Integer.parseInt(list.get(11));
+        
+        Type tagsListType = new TypeToken<ArrayList<String>>() {}.getType();
+        Type hoursListType = new TypeToken<ArrayList<Long>>() {}.getType();
+        this.tags = new Gson().fromJson(list.get(12), tagsListType);
+        this.hours = new Gson().fromJson(list.get(13), hoursListType);
+    }
+    
+    //endregion Shop.FromToArrayList
 }

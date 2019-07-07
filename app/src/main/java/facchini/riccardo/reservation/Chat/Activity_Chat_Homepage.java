@@ -1,15 +1,15 @@
 package facchini.riccardo.reservation.Chat;
 
-import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -45,8 +45,7 @@ public class Activity_Chat_Homepage extends AppCompatActivity
         
         db = FirebaseFirestore.getInstance();
         
-        userUid = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE)
-                .getString(getString(R.string.current_user_uid_key), "");
+        userUid = FirebaseAuth.getInstance().getUid();
         
         chatsCollection = db.collection("chats");
         

@@ -3,7 +3,7 @@ package facchini.riccardo.reservation.Customer_Package.Activity_Customer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +11,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -40,7 +41,7 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
         reviewsRef = FirebaseFirestore.getInstance().collection("reviews");
         
         pref = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
-        userUid = pref.getString(getString(R.string.current_user_uid_key), "");
+        userUid = FirebaseAuth.getInstance().getUid();
         
         
         Intent intent = getIntent();
@@ -61,7 +62,7 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
         RatingBar ratingAvg = findViewById(R.id.ratingAvg);
         
         textShopName.setText(shop.getName());
-        textAddress.setText(String.format("%s %s %s %s", shop.getAddress1(), shop.getAddress2(),
+        textAddress.setText(String.format("%s %s %s", shop.getAddress(),
                 shop.getCity(), shop.getZip()));
         textReviews.setText(String.format("(%.2f/5) %d %s", shop.getAverageReviews(), shop.getNumReviews(), getString(R.string.reviews)));
         textPhoneMail.setText(String.format("Phone: %s\nMail: %s", shop.getPhone(), shop.getMail()));

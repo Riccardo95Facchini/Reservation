@@ -1,7 +1,7 @@
 package facchini.riccardo.reservation;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
 import facchini.riccardo.reservation.Customer_Package.Customer;
 import facchini.riccardo.reservation.Shop_Package.Shop;

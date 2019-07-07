@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -13,6 +12,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -24,7 +25,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 import facchini.riccardo.reservation.Activity_Login;
@@ -46,11 +46,11 @@ public class Activity_Shop_TagHours extends AppCompatActivity
     private Map<String, TextView> hoursTexts;
     
     private ArrayList<String> tags;
-    private Map<String, List<String>> hours;
+    private Map<String, ArrayList<String>> hours;
     
     private Shop currentShop = null;
     private boolean editing = false;
-    private String uid, mail, phone, name, address1, address2, city, zip;
+    private String uid, mail, phone, name, address, city, zip;
     private double latitude, longitude;
     
     private ArrayAdapter<String> adapter;
@@ -310,8 +310,7 @@ public class Activity_Shop_TagHours extends AppCompatActivity
             mail = intent.getStringExtra("mail");
             phone = intent.getStringExtra("phone");
             name = intent.getStringExtra("name");
-            address1 = intent.getStringExtra("address1");
-            address2 = intent.getStringExtra("address2");
+            address = intent.getStringExtra("address");
             city = intent.getStringExtra("city");
             zip = intent.getStringExtra("zip");
             latitude = intent.getDoubleExtra("latitude", 0);
@@ -356,15 +355,15 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         if (!editing)
         {
             int intLongitude = (int) longitude;
-            shop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude, longitude,
+            shop = new Shop(uid, name, mail, address, city, zip, phone, latitude, longitude,
                     0, 0, intLongitude, tags, hours);
             shopsReference.document(uid).set(shop);
             startActivity(new Intent(this, Activity_Login.class));
         } else
         {
             uid = currentShop.getUid();
-            shop = new Shop(uid, currentShop.getName(), currentShop.getMail(), currentShop.getAddress1(),
-                    currentShop.getAddress2(), currentShop.getCity(), currentShop.getZip(), currentShop.getPhone(),
+            shop = new Shop(uid, currentShop.getName(), currentShop.getMail(), currentShop.getAddress(),
+                    currentShop.getCity(), currentShop.getZip(), currentShop.getPhone(),
                     currentShop.getLatitude(), currentShop.getLongitude(), currentShop.getAverageReviews(),
                     currentShop.getNumReviews(), currentShop.getIntLongitude(), tags, hours);
             

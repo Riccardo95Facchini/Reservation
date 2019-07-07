@@ -1,11 +1,10 @@
 package facchini.riccardo.reservation.Customer_Package.Adapter_Customer;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,18 +16,18 @@ import java.util.List;
 import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_ShopInfo;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
-import facchini.riccardo.reservation.Reservation_Package.Reservation_Customer_Home;
+import facchini.riccardo.reservation.Reservation_Package.Reservation;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapter_Customer_ReservationCard.Reservation_Customer_ViewHolder>
 {
     
     private Context context;
-    private List<Reservation_Customer_Home> reservationCustomerHomeList;
+    private List<Reservation> reservationCustomerHomeList;
     private OnItemClickListener itemListener;
     
     
-    public Adapter_Customer_ReservationCard(Context context, List<Reservation_Customer_Home> reservationCustomerHomeList)
+    public Adapter_Customer_ReservationCard(Context context, List<Reservation> reservationCustomerHomeList)
     {
         this.context = context;
         this.reservationCustomerHomeList = reservationCustomerHomeList;
@@ -51,8 +50,8 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
     @Override
     public void onBindViewHolder(@NonNull Reservation_Customer_ViewHolder holder, int pos)
     {
-        Reservation_Customer_Home res = reservationCustomerHomeList.get(pos);
-        Shop shop = res.getShop();
+        Reservation res = reservationCustomerHomeList.get(pos);
+        Shop shop = (Shop) res.getOtherUser();
         
         holder.textViewShop.setText(shop.getName());
         holder.textViewAddress.setText(shop.displayFullAddress());
@@ -84,7 +83,7 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
                 @Override
                 public void onClick(View v)
                 {
-                    Shop shop = reservationCustomerHomeList.get(getAdapterPosition()).getShop();
+                    Shop shop = (Shop) reservationCustomerHomeList.get(getAdapterPosition()).getOtherUser();
                     startShopInfoActivity(shop);
                 }
             });

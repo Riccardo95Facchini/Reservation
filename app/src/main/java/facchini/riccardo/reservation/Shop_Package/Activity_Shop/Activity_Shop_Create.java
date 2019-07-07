@@ -4,21 +4,19 @@ import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.ArrayMap;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import facchini.riccardo.reservation.R;
@@ -38,7 +36,7 @@ public class Activity_Shop_Create extends AppCompatActivity
     private Button continueButton;
     //Text
     private TextView textTop;
-    private EditText shopNameText, address1Text, address2Text, cityText, zipText, phoneText, mailText;
+    private EditText shopNameText, addressText, address2Text, cityText, zipText, phoneText, mailText;
     
     
     @Override
@@ -76,8 +74,8 @@ public class Activity_Shop_Create extends AppCompatActivity
     {
         //Initialize UI elements
         textTop = findViewById(R.id.textTop);
-        shopNameText = findViewById(R.id.shopNameText);
-        address1Text = findViewById(R.id.address1Text);
+        shopNameText = findViewById(R.id.nameText);
+        addressText = findViewById(R.id.address1Text);
         address2Text = findViewById(R.id.address2Text);
         cityText = findViewById(R.id.cityText);
         zipText = findViewById(R.id.zipText);
@@ -91,8 +89,7 @@ public class Activity_Shop_Create extends AppCompatActivity
         {
             textTop.setText(getString(R.string.changeFieldsEditShop));
             shopNameText.setText(currentShop.getName());
-            address1Text.setText(currentShop.getAddress1());
-            address2Text.setText(currentShop.getAddress2());
+            addressText.setText(currentShop.getAddress());
             cityText.setText(currentShop.getCity());
             zipText.setText(currentShop.getZip());
             phoneText.setText(currentShop.getPhone());
@@ -149,7 +146,7 @@ public class Activity_Shop_Create extends AppCompatActivity
             public void afterTextChanged(Editable s) { }
         });
         
-        address1Text.addTextChangedListener(new TextWatcher()
+        addressText.addTextChangedListener(new TextWatcher()
         {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count)
@@ -261,7 +258,7 @@ public class Activity_Shop_Create extends AppCompatActivity
     private boolean isFormFull()
     {
         return shopNameText.getText().toString().length() > 0 &&
-                address1Text.getText().toString().length() > 0 &&
+                addressText.getText().toString().length() > 0 &&
                 address2Text.getText().toString().length() > 0 &&
                 cityText.getText().toString().length() > 0 &&
                 zipText.getText().toString().length() > 0 &&
@@ -275,20 +272,18 @@ public class Activity_Shop_Create extends AppCompatActivity
         
         String name = shopNameText.getText().toString().trim();
         String mail = mailText.getText().toString().trim();
-        String address1 = address1Text.getText().toString().trim();
-        String address2 = address2Text.getText().toString().trim();
+        String address = addressText.getText().toString().trim();
         String city = cityText.getText().toString().trim();
         String zip = zipText.getText().toString().trim();
         String phone = phoneText.getText().toString().trim();
-        double latitude = address.getLatitude();
-        double longitude = address.getLongitude();
+        double latitude = this.address.getLatitude();
+        double longitude = this.address.getLongitude();
         
         if (!editing)
         {
             intent.putExtra("uid", uid)
                     .putExtra("name", name)
-                    .putExtra("address1", address1)
-                    .putExtra("address2", address2)
+                    .putExtra("address", address)
                     .putExtra("city", city)
                     .putExtra("zip", zip)
                     .putExtra("phone", phone)
@@ -300,7 +295,7 @@ public class Activity_Shop_Create extends AppCompatActivity
         {
             int intLongitude = (int) longitude;
             Bundle b = new Bundle();
-            Shop shop = new Shop(uid, name, mail, address1, address2, city, zip, phone, latitude,
+            Shop shop = new Shop(uid, name, mail, address, city, zip, phone, latitude,
                     longitude, currentShop.getAverageReviews(), currentShop.getNumReviews(), intLongitude, currentShop.getTags(), currentShop.getHours());
             b.putParcelable("CurrentShop", shop);
             intent.putExtras(b);
@@ -329,7 +324,7 @@ public class Activity_Shop_Create extends AppCompatActivity
     {
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         String fullAddress = String.format("%s %s %s %s",
-                address1Text.getText().toString().trim(),
+                addressText.getText().toString().trim(),
                 address2Text.getText().toString().trim(),
                 cityText.getText().toString().trim(),
                 zipText.getText().toString().trim());

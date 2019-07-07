@@ -2,13 +2,8 @@ package facchini.riccardo.reservation.Customer_Package.Activity_Customer;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -19,9 +14,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -37,7 +37,7 @@ import java.util.List;
 import facchini.riccardo.reservation.Chat.Activity_Chat;
 import facchini.riccardo.reservation.Fragment_DatePicker;
 import facchini.riccardo.reservation.R;
-import facchini.riccardo.reservation.Reservation_Package.ReservationDatabase;
+import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Activity_Customer_SelectedShop extends AppCompatActivity implements DatePickerDialog.OnDateSetListener
@@ -76,15 +76,15 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         surname = intent.getStringExtra("surname");
         
         
-        shopNameText = findViewById(R.id.shopNameText);
+        shopNameText = findViewById(R.id.nameText);
         shopInfoText = findViewById(R.id.shopInfoText);
         shopHoursText = findViewById(R.id.shopHoursText);
         selectDateButton = findViewById(R.id.selectDateButton);
         startChatButton = findViewById(R.id.startChatButton);
         
         shopNameText.setText(selectedShop.getName());
-        shopInfoText.setText(String.format("City: %s \tAddress: %s %s", selectedShop.getCity(),
-                selectedShop.getAddress1(), selectedShop.getAddress2()));
+        shopInfoText.setText(String.format("City: %s \tAddress: %s", selectedShop.getCity(),
+                selectedShop.getAddress()));
         shopHoursText.setText(selectedShop.displayHoursFormat());
         
         selectDateButton.setOnClickListener(new View.OnClickListener()
@@ -273,9 +273,10 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
                 return getString(R.string.fridayText);
             case Calendar.SATURDAY:
                 return getString(R.string.saturdayText);
+            default:
+                return null;
             
         }
-        return null;
     }
     
     /**
@@ -332,11 +333,10 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         
         String customerName = String.format("%s %s", name, surname);
         
-        String thisUid = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE)
-                .getString(getString(R.string.current_user_username_key), "");
+        String thisUid = FirebaseAuth.getInstance().getUid();
         
-        ReservationDatabase reservationDatabase = new ReservationDatabase(selectedShop.getUid(), thisUid, customerName, fullDate);
-        db.collection("reservations").add(reservationDatabase);
+        ReservationFirestore reservationFirestore = new ReservationFirestore(selectedShop.getUid(), thisUid, customerName, fullDate);
+        db.collection("reservations").add(reservationFirestore);
         
         Toast.makeText(this, getString(R.string.reservationCompleted), Toast.LENGTH_LONG).show();
     }

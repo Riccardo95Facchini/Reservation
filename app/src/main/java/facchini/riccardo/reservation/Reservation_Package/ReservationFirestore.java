@@ -2,7 +2,7 @@ package facchini.riccardo.reservation.Reservation_Package;
 
 import java.util.Date;
 
-public class ReservationDatabase
+public class ReservationFirestore
 {
     
     private String shopUid;
@@ -10,7 +10,7 @@ public class ReservationDatabase
     private String customerName;
     private Date time;
     
-    public ReservationDatabase(String shopUid, String customerUid, String customerName, Date time)
+    public ReservationFirestore(String shopUid, String customerUid, String customerName, Date time)
     {
         this.shopUid = shopUid;
         this.customerUid = customerUid;
