@@ -5,16 +5,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -25,6 +27,7 @@ import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Profile;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Search;
 import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.ReservationViewModel;
 
 public class Activity_Customer extends AppCompatActivity
 {
@@ -32,6 +35,7 @@ public class Activity_Customer extends AppCompatActivity
     
     private byte backButton;
     private int currentMenu = R.id.bottomHome;
+    private ReservationViewModel viewModel;
     
     private BottomNavigationView bottomMenu;
     private Menu topMenu;
@@ -42,6 +46,8 @@ public class Activity_Customer extends AppCompatActivity
         super.onCreate(savedInstanceState);
         backButton = 0;
         setContentView(R.layout.activity_customer);
+        
+        viewModel = ViewModelProviders.of(this).get(ReservationViewModel.class);
         
         bottomMenu = findViewById(R.id.bottomMenu);
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
@@ -68,6 +74,7 @@ public class Activity_Customer extends AppCompatActivity
             {
                 case R.id.bottomHome:
                     selected = new Fragment_Customer_Home();
+                    selected.setHasOptionsMenu(true);
                     topMenu.getItem(1).setVisible(true);
                     break;
                 case R.id.bottomSearch:
@@ -76,6 +83,7 @@ public class Activity_Customer extends AppCompatActivity
                     break;
                 case R.id.bottomHistory:
                     selected = new Fragment_Customer_History();
+                    selected.setHasOptionsMenu(true);
                     topMenu.getItem(1).setVisible(true);
                     break;
             }
@@ -204,9 +212,9 @@ public class Activity_Customer extends AppCompatActivity
                 topMenu.getItem(1).setVisible(false);
                 getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, selected).commit();
                 return true;
-            case R.id.refresh_menu:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
-                return true;
+//            case R.id.refresh_menu:
+//                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
+//                return true;
             case R.id.chat_menu:
                 Intent intent = new Intent(getBaseContext(), Activity_Chat_Homepage.class);
                 startActivity(intent);
