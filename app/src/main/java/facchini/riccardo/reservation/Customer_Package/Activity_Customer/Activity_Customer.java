@@ -19,6 +19,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Stack;
+
 import facchini.riccardo.reservation.Activity_Login;
 import facchini.riccardo.reservation.Chat.Activity_Chat_Homepage;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_History;
@@ -32,7 +34,9 @@ public class Activity_Customer extends AppCompatActivity
     private FirebaseAuth.AuthStateListener authStateListener;
     
     private byte backButton;
-    
+    private int lastFragment;
+    private static final int HOME = 0, SEARCH = 1, HISTORY = 2;
+    private Stack<Integer> bottomStack;
     private BottomNavigationView bottomMenu;
     
     @Override
@@ -40,6 +44,7 @@ public class Activity_Customer extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         backButton = 0;
+        bottomStack = new Stack<>();
         setContentView(R.layout.activity_customer);
         
         bottomMenu = findViewById(R.id.bottomMenu);
@@ -48,33 +53,33 @@ public class Activity_Customer extends AppCompatActivity
         Fragment home = new Fragment_Customer_Home();
         home.setHasOptionsMenu(true);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, home).commit();
+        lastFragment = HOME;
         setupFirebaseListener();
     }
-    
     
     private BottomNavigationView.OnNavigationItemSelectedListener selectedListener = new BottomNavigationView.OnNavigationItemSelectedListener()
     {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
         {
-            Fragment selected = null;
+            bottomStack.push(lastFragment);
             
             switch (menuItem.getItemId())
             {
                 case R.id.bottomHome:
-                    selected = new Fragment_Customer_Home();
-                    selected.setHasOptionsMenu(true);
+                    getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
+                    lastFragment = HOME;
                     break;
                 case R.id.bottomSearch:
-                    selected = new Fragment_Customer_Search();
+                    getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Customer_Search()).commit();
+                    lastFragment = SEARCH;
                     break;
                 case R.id.bottomHistory:
-                    selected = new Fragment_Customer_History();
-                    selected.setHasOptionsMenu(true);
+                    getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Customer_History()).commit();
+                    lastFragment = HISTORY;
                     break;
             }
             
-            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, selected).commit();
             return true;
         }
     };
@@ -104,7 +109,11 @@ public class Activity_Customer extends AppCompatActivity
                 }.start();
             }
         } else
+        {
             super.onBackPressed();
+            lastFragment = bottomStack.pop();
+            bottomMenu.getMenu().getItem(lastFragment).setChecked(true);
+        }
     }
     
     @Override
