@@ -13,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -27,18 +26,14 @@ import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Profile;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Search;
 import facchini.riccardo.reservation.R;
-import facchini.riccardo.reservation.ReservationViewModel;
 
 public class Activity_Customer extends AppCompatActivity
 {
     private FirebaseAuth.AuthStateListener authStateListener;
     
     private byte backButton;
-    private int currentMenu = R.id.bottomHome;
-    private ReservationViewModel viewModel;
     
     private BottomNavigationView bottomMenu;
-    private Menu topMenu;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,13 +42,12 @@ public class Activity_Customer extends AppCompatActivity
         backButton = 0;
         setContentView(R.layout.activity_customer);
         
-        viewModel = ViewModelProviders.of(this).get(ReservationViewModel.class);
-        
         bottomMenu = findViewById(R.id.bottomMenu);
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
         
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
-        currentMenu = R.id.bottomHome;
+        Fragment home = new Fragment_Customer_Home();
+        home.setHasOptionsMenu(true);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, home).commit();
         setupFirebaseListener();
     }
     
@@ -65,30 +59,22 @@ public class Activity_Customer extends AppCompatActivity
         {
             Fragment selected = null;
             
-            if (currentMenu == menuItem.getItemId())
-                return false;
-            
-            currentMenu = menuItem.getItemId();
-            
             switch (menuItem.getItemId())
             {
                 case R.id.bottomHome:
                     selected = new Fragment_Customer_Home();
                     selected.setHasOptionsMenu(true);
-                    topMenu.getItem(1).setVisible(true);
                     break;
                 case R.id.bottomSearch:
                     selected = new Fragment_Customer_Search();
-                    topMenu.getItem(1).setVisible(false);
                     break;
                 case R.id.bottomHistory:
                     selected = new Fragment_Customer_History();
                     selected.setHasOptionsMenu(true);
-                    topMenu.getItem(1).setVisible(true);
                     break;
             }
             
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selected).commit();
+            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, selected).commit();
             return true;
         }
     };
@@ -96,32 +82,29 @@ public class Activity_Customer extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        if (currentMenu == R.id.profile_menu)
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0)
         {
-            super.onBackPressed();
-            currentMenu = bottomMenu.getSelectedItemId();
-            return;
-        }
-        
-        if (backButton > 0)
-            finish();
-        else
-        {
-            Toast.makeText(this, getString(R.string.pressBackToExit), Toast.LENGTH_LONG).show();
-            backButton++;
-            
-            new CountDownTimer(2000, 1000)
+            if (backButton > 0)
+                finish();
+            else
             {
-                @Override
-                public void onTick(long millisUntilFinished) {}
+                Toast.makeText(this, getString(R.string.pressBackToExit), Toast.LENGTH_LONG).show();
+                backButton++;
                 
-                @Override
-                public void onFinish()
+                new CountDownTimer(2000, 1000)
                 {
-                    backButton = 0;
-                }
-            }.start();
-        }
+                    @Override
+                    public void onTick(long millisUntilFinished) {}
+                    
+                    @Override
+                    public void onFinish()
+                    {
+                        backButton = 0;
+                    }
+                }.start();
+            }
+        } else
+            super.onBackPressed();
     }
     
     @Override
@@ -173,17 +156,10 @@ public class Activity_Customer extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater menuInflater = getMenuInflater();
-        topMenu = menu;
         menuInflater.inflate(R.menu.menu_action_bar, menu);
         
-        topMenu.getItem(2).setVisible(true);
-        topMenu.getItem(3).setVisible(true);
-        
-        
-        if (currentMenu == R.id.bottomHome)
-            topMenu.getItem(1).setVisible(true);
-        else
-            topMenu.getItem(1).setVisible(false);
+        menu.getItem(1).setVisible(true);
+        menu.getItem(2).setVisible(true);
         
         return true;
     }
@@ -207,14 +183,9 @@ public class Activity_Customer extends AppCompatActivity
                 AuthUI.getInstance().signOut(this);
                 return true;
             case R.id.profile_menu:
-                currentMenu = R.id.profile_menu;
                 Fragment selected = new Fragment_Customer_Profile();
-                topMenu.getItem(1).setVisible(false);
                 getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, selected).commit();
                 return true;
-//            case R.id.refresh_menu:
-//                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
-//                return true;
             case R.id.chat_menu:
                 Intent intent = new Intent(getBaseContext(), Activity_Chat_Homepage.class);
                 startActivity(intent);

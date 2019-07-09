@@ -23,6 +23,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -335,8 +337,16 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         
         String thisUid = FirebaseAuth.getInstance().getUid();
         
-        ReservationFirestore reservationFirestore = new ReservationFirestore(selectedShop.getUid(), thisUid, customerName, fullDate);
-        db.collection("reservations").add(reservationFirestore);
+        final ReservationFirestore reservationFirestore = new ReservationFirestore(selectedShop.getUid(), thisUid, customerName, fullDate);
+        db.collection("reservations").add(reservationFirestore).addOnSuccessListener(new OnSuccessListener<DocumentReference>()
+        {
+            @Override
+            public void onSuccess(DocumentReference documentReference)
+            {
+                db.collection("reservationsUpdate").document(reservationFirestore.getCustomerUid()).update("reservations", FieldValue.increment(1));
+                db.collection("reservationsUpdate").document(reservationFirestore.getShopUid()).update("reservations", FieldValue.increment(1));
+            }
+        });
         
         Toast.makeText(this, getString(R.string.reservationCompleted), Toast.LENGTH_LONG).show();
     }

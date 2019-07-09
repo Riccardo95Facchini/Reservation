@@ -12,6 +12,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -27,8 +28,9 @@ import facchini.riccardo.reservation.Shop_Package.Shop;
 public class ReservationViewModel extends ViewModel
 {
     private MutableLiveData<List<Reservation>> nextReservations, pastReservations;
-    private CollectionReference shopsCollection, reservationsCollection;
-    private String uid;
+    private MutableLiveData<Boolean> isNextEmpty, isPastEmpty;
+    private CollectionReference shopsCollection, reservationsCollection, updatesCollection;
+    private String thisUid;
     FirebaseFirestore db;
     
     public ReservationViewModel()
@@ -36,17 +38,18 @@ public class ReservationViewModel extends ViewModel
         db = FirebaseFirestore.getInstance();
         shopsCollection = db.collection("shops");
         reservationsCollection = db.collection("reservations");
-        uid = FirebaseAuth.getInstance().getUid();
+        updatesCollection = db.collection("reservationsUpdate");
+        thisUid = FirebaseAuth.getInstance().getUid();
         nextReservations = new MutableLiveData<>();
-        //queryNextReservations();
         pastReservations = new MutableLiveData<>();
-        //queryPastReservations();
-        addListener();
+        isNextEmpty = new MutableLiveData<>();
+        isPastEmpty = new MutableLiveData<>();
+        addFirestoreListener();
     }
     
-    private void addListener()
+    private void addFirestoreListener()
     {
-        final DocumentReference docRef = db.collection("reservationsUpdate").document(uid);
+        DocumentReference docRef = updatesCollection.document(thisUid);
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>()
         {
             @Override
@@ -67,19 +70,21 @@ public class ReservationViewModel extends ViewModel
         queryPastReservations();
     }
     
-    public MutableLiveData<List<Reservation>> getNextReservations() {return nextReservations;}
-    
-    public MutableLiveData<List<Reservation>> getPastReservations() {return pastReservations;}
-    
+    //region ReservationViewModel.Query
     private void queryNextReservations()
     {
-        reservationsCollection.whereEqualTo("customerUid", uid).whereGreaterThan("time", Calendar.getInstance().getTime())/*.orderBy("time")*/
+        reservationsCollection.whereEqualTo("customerUid", thisUid).whereGreaterThan("time", Calendar.getInstance().getTime())/*.orderBy("time")*/
                 .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
         {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots)
             {
                 fillReservations(queryDocumentSnapshots, nextReservations);
+                
+                if (queryDocumentSnapshots.isEmpty())
+                    isNextEmpty.setValue(true);
+                else
+                    isNextEmpty.setValue(false);
             }
         }).addOnFailureListener(new OnFailureListener()
         {
@@ -93,13 +98,18 @@ public class ReservationViewModel extends ViewModel
     
     private void queryPastReservations()
     {
-        reservationsCollection.whereEqualTo("customerUid", uid).whereLessThan("time", Calendar.getInstance().getTime()).orderBy("time")
+        reservationsCollection.whereEqualTo("customerUid", thisUid).whereLessThan("time", Calendar.getInstance().getTime()).orderBy("time")
                 .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
         {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots)
             {
                 fillReservations(queryDocumentSnapshots, pastReservations);
+                
+                if (queryDocumentSnapshots.isEmpty())
+                    isPastEmpty.setValue(true);
+                else
+                    isPastEmpty.setValue(false);
             }
         }).addOnFailureListener(new OnFailureListener()
         {
@@ -120,7 +130,6 @@ public class ReservationViewModel extends ViewModel
         
         for (final QueryDocumentSnapshot doc : snap)
         {
-            
             shopsCollection.document((String) doc.get("shopUid")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
             {
                 @Override
@@ -131,9 +140,33 @@ public class ReservationViewModel extends ViewModel
                                 documentSnapshot.toObject(Shop.class)));
                     
                     if (res.size() == snap.size())
+                    {
                         liveData.setValue(res);
+                    }
                 }
             });
         }
     }
+    
+    public void delete(String resUid, String otherUid)
+    {
+        reservationsCollection.document(resUid).delete();
+        updatesCollection.document(thisUid).update("reservations", FieldValue.increment(-1));
+        updatesCollection.document(otherUid).update("reservations", FieldValue.increment(-1));
+    }
+    
+    //endregion ReservationViewModel.Query
+    
+    //region ReservationViewModel.Getters
+    
+    public MutableLiveData<List<Reservation>> getNextReservations() {return nextReservations;}
+    
+    public MutableLiveData<List<Reservation>> getPastReservations() {return pastReservations;}
+    
+    public MutableLiveData<Boolean> getIsNextEmpty() {return isNextEmpty;}
+    
+    public MutableLiveData<Boolean> getIsPastEmpty() {return isPastEmpty;}
+    
+    //endregion ReservationViewModel.Getters
+    
 }

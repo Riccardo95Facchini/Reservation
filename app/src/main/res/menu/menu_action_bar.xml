@@ -6,12 +6,6 @@
         android:title="@string/sign_out"
         app:showAsAction="never" />
     <item
-        android:id="@+id/refresh_menu"
-        android:icon="@drawable/android_refresh_1161734"
-        android:title="@string/refresh"
-        android:visible="false"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/profile_menu"
         android:title="@string/profile"
         android:visible="false"

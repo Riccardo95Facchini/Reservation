@@ -185,16 +185,22 @@ public class Shop extends User
         for (int i = 0; i < 7; i++)
         {
             entry = hours.get(days.get(i));
-            
-            if (!entry.get(0).equalsIgnoreCase("closed") && !entry.get(2).equalsIgnoreCase("closed"))
-                h.append(String.format("%s: \t %s-%s \t %s-%s\n", days.get(i),
-                        entry.get(0), entry.get(1), entry.get(2), entry.get(3)));
-            else if (!entry.get(0).equalsIgnoreCase("closed"))
-                h.append(String.format("%s: \t %s-%s\n", days.get(i), entry.get(0), entry.get(1)));
-            else if (!entry.get(3).equalsIgnoreCase("closed"))
-                h.append(String.format("%s: \t %s-%s\n", days.get(i), entry.get(0), entry.get(1)));
-            else
+    
+            try
+            {
+                if (!entry.get(0).equalsIgnoreCase("closed") && !entry.get(2).equalsIgnoreCase("closed"))
+                    h.append(String.format("%s: \t %s-%s \t %s-%s\n", days.get(i),
+                            entry.get(0), entry.get(1), entry.get(2), entry.get(3)));
+                else if (!entry.get(0).equalsIgnoreCase("closed"))
+                    h.append(String.format("%s: \t %s-%s\n", days.get(i), entry.get(0), entry.get(1)));
+                else if (!entry.get(3).equalsIgnoreCase("closed"))
+                    h.append(String.format("%s: \t %s-%s\n", days.get(i), entry.get(0), entry.get(1)));
+                else
+                    h.append(String.format("%s: \t %s\n", days.get(i), "Closed"));
+            } catch (Exception e)
+            {
                 h.append(String.format("%s: \t %s\n", days.get(i), "Closed"));
+            }
         }
         
         return h.toString();

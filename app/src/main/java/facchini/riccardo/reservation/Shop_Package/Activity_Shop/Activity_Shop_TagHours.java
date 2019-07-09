@@ -358,6 +358,8 @@ public class Activity_Shop_TagHours extends AppCompatActivity
             shop = new Shop(uid, name, mail, address, city, zip, phone, latitude, longitude,
                     0, 0, intLongitude, tags, hours);
             shopsReference.document(uid).set(shop);
+            int reservations = 0;
+            db.collection("reservationsUpdate").document(uid).set(reservations);
             startActivity(new Intent(this, Activity_Login.class));
         } else
         {
