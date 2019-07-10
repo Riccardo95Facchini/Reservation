@@ -95,4 +95,5 @@
     <string name="isCustomer_key">isCustomer_key</string>
     <string name="history">History</string>
     <string name="past_reservations">Past Reservations</string>
+    <string name="shopInfo">Shop info</string>
 </resources>

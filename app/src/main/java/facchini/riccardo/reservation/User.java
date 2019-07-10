@@ -15,6 +15,7 @@ public abstract class User implements Parcelable
     protected String name;
     protected String phone;
     protected String mail;
+    protected String pic;
     
     //region User.Constructors
     
@@ -30,13 +31,15 @@ public abstract class User implements Parcelable
      * @param name  Name to be displayed (name & surname for customers)
      * @param phone Phone number
      * @param mail  E-mail address
+     * @param pic   Profile picture address
      */
-    public User(String uid, String name, String phone, String mail)
+    public User(String uid, String name, String phone, String mail, String pic)
     {
         this.uid = uid;
         this.name = name;
         this.phone = phone;
         this.mail = mail;
+        this.pic = pic;
     }
     
     /**
@@ -44,10 +47,11 @@ public abstract class User implements Parcelable
      *
      * @param name Name to be displayed (name & surname for customers)
      */
-    public User(String uid, String name)
+    public User(String uid, String name, String pic)
     {
         this.uid = uid;
         this.name = name;
+        this.pic = pic;
         this.phone = "";
         this.mail = "";
     }
@@ -58,6 +62,7 @@ public abstract class User implements Parcelable
         this.name = (String) c.get("name");
         this.phone = (String) c.get("phone");
         this.mail = (String) c.get("mail");
+        this.pic = (String) c.get("pic");
     }
     
     public User(User u)
@@ -66,6 +71,7 @@ public abstract class User implements Parcelable
         this.name = u.name;
         this.phone = u.phone;
         this.mail = u.mail;
+        this.pic = u.pic;
     }
     
     //endregion User.Constructors
@@ -80,6 +86,8 @@ public abstract class User implements Parcelable
     
     public String getMail() {return mail;}
     
+    public String getPic() {return pic;}
+    
     // endregion User.Getters
     
     //region User.ParcelableMethods
@@ -91,6 +99,7 @@ public abstract class User implements Parcelable
         dest.writeString(name);
         dest.writeString(mail);
         dest.writeString(phone);
+        dest.writeString(pic);
     }
     
     protected User(Parcel in)
@@ -99,6 +108,7 @@ public abstract class User implements Parcelable
         this.name = in.readString();
         this.mail = in.readString();
         this.phone = in.readString();
+        this.pic = in.readString();
     }
     
     @Override
@@ -118,6 +128,7 @@ public abstract class User implements Parcelable
         list.add(name);
         list.add(phone);
         list.add(mail);
+        list.add(pic);
         return list;
     }
     

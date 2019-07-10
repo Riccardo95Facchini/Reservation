@@ -3,13 +3,15 @@ package facchini.riccardo.reservation.Shop_Package.Adapter_Shop;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
@@ -36,7 +38,7 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
     public Reservation_Shop_ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.card_shop_home, null);
+        View view = inflater.inflate(R.layout.card_reservation, null);
         return new Reservation_Shop_ViewHolder(view);
     }
     
@@ -48,8 +50,8 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
         
         //customerUid = customer.getUid();
         
-        holder.textViewCustomer.setText(customer.getName());
-        holder.textViewWhen.setText(res.getDateFormatted());
+        holder.textName.setText(customer.getName());
+        holder.textWhen.setText(res.getDateFormatted());
         holder.customerUid = customer.getUid();
     }
     
@@ -61,19 +63,23 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
     
     class Reservation_Shop_ViewHolder extends RecyclerView.ViewHolder
     {
-        TextView textViewCustomer, textViewWhen;
-        ImageButton startChatButton;
+        TextView textName, textWhen, textAddress;
+        ImageButton resButton;
         String customerUid;
         
         public Reservation_Shop_ViewHolder(@NonNull View itemView)
         {
             super(itemView);
             
-            textViewCustomer = itemView.findViewById(R.id.textViewShopName);
-            textViewWhen = itemView.findViewById(R.id.textViewWhen);
-            startChatButton = itemView.findViewById(R.id.startChatButton);
+            textName = itemView.findViewById(R.id.textViewShopName);
+            textWhen = itemView.findViewById(R.id.textViewWhen);
+            textAddress = itemView.findViewById(R.id.textAddress);
+            resButton = itemView.findViewById(R.id.resButton);
             
-            startChatButton.setOnClickListener(new View.OnClickListener()
+            textAddress.setVisibility(View.GONE);
+            resButton.setImageResource(R.drawable.ic_chat_primary_color_32dp);
+    
+            resButton.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(final View v)
@@ -95,7 +101,7 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
             String thisUsername = pref.getString(context.getString(R.string.current_user_username_key), "");
             chatIntent.putExtra("thisUsername", thisUsername);
             chatIntent.putExtra("otherUid", customerUid);
-            chatIntent.putExtra("otherUsername", textViewCustomer.getText());
+            chatIntent.putExtra("otherUsername", textName.getText());
             v.getContext().startActivity(chatIntent);
         }
     }

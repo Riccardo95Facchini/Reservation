@@ -125,7 +125,7 @@ public class Activity_Customer_Create extends AppCompatActivity
         
         mail = mail.isEmpty() ? mailText.getText().toString() : mail;
         phone = phone.isEmpty() ? phoneText.getText().toString() : phone;
-        Customer newCustomer = new Customer(uid, nameText.getText().toString(), phone, mail);
+        Customer newCustomer = new Customer(uid, nameText.getText().toString(), phone, mail, ""); //TODO: add pic
         customers.document(uid).set(newCustomer);
         int reservations = 0;
         db.collection("reservationsUpdate").document(uid).set(reservations);

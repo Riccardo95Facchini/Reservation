@@ -73,7 +73,7 @@ public class ReservationViewModel extends ViewModel
     //region ReservationViewModel.Query
     private void queryNextReservations()
     {
-        reservationsCollection.whereEqualTo("customerUid", thisUid).whereGreaterThan("time", Calendar.getInstance().getTime())/*.orderBy("time")*/
+        reservationsCollection.whereEqualTo("customerUid", thisUid).whereGreaterThan("time", Calendar.getInstance().getTime()).orderBy("time")
                 .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
         {
             @Override

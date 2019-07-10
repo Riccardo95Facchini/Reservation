@@ -10,7 +10,6 @@ import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import facchini.riccardo.reservation.Converters;
@@ -41,11 +40,11 @@ public class Shop extends User
         super();
     }
     
-    public Shop(String uid, String name, String phone, String mail, String address, String city, String zip,
+    public Shop(String uid, String name, String phone, String mail, String pic, String address, String city, String zip,
                 double latitude, double longitude, double averageReviews, int numReviews, int intLongitude,
                 ArrayList<String> tags, Map<String, ArrayList<String>> hours)
     {
-        super(uid, name, phone, mail);
+        super(uid, name, phone, mail, pic);
         this.address = address;
         this.city = city;
         this.zip = zip;
@@ -57,22 +56,6 @@ public class Shop extends User
         this.tags = tags;
         this.hours = hours;
     }
-    
-    /*public Shop(Shop s)
-    {
-        super(s.uid, s.name, s.phone, s.mail);
-        this.address = s.address;
-        this.city = s.city;
-        this.zip = s.zip;
-        this.latitude = s.latitude;
-        this.longitude = s.longitude;
-        this.averageReviews = s.averageReviews;
-        this.numReviews = s.numReviews;
-        this.intLongitude = s.intLongitude;
-        this.tags = new ArrayList<>(s.tags);
-        this.hours = new HashMap<>(s.hours);
-    }
-    */
     
     public Shop(Map<String, Object> m)
     {
@@ -185,7 +168,7 @@ public class Shop extends User
         for (int i = 0; i < 7; i++)
         {
             entry = hours.get(days.get(i));
-    
+            
             try
             {
                 if (!entry.get(0).equalsIgnoreCase("closed") && !entry.get(2).equalsIgnoreCase("closed"))
@@ -228,7 +211,7 @@ public class Shop extends User
     //endregion Shop.Display
     
     //region Shop.Getters
-    
+
 //    public List<Long> selectedDayHours(int day)
 //    {
 //        ArrayList<Long> ret = new ArrayList<>();
@@ -282,7 +265,7 @@ public class Shop extends User
     
     public Shop(ArrayList<String> list)
     {
-        super(list.get(0), list.get(1), list.get(2), list.get(3));
+        super(list.get(0), list.get(1), list.get(2), list.get(3), list.get(4));
         this.address = list.get(4);
         this.city = list.get(5);
         this.zip = list.get(6);

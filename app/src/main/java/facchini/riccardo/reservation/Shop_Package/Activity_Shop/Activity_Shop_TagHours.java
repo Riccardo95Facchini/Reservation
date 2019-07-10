@@ -355,8 +355,8 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         if (!editing)
         {
             int intLongitude = (int) longitude;
-            shop = new Shop(uid, name, mail, address, city, zip, phone, latitude, longitude,
-                    0, 0, intLongitude, tags, hours);
+            shop = new Shop(uid, name, mail, "", address, city, zip, phone, latitude, longitude,
+                    0, 0, intLongitude, tags, hours); //TODO: add pic
             shopsReference.document(uid).set(shop);
             int reservations = 0;
             db.collection("reservationsUpdate").document(uid).set(reservations);
@@ -364,7 +364,7 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         } else
         {
             uid = currentShop.getUid();
-            shop = new Shop(uid, currentShop.getName(), currentShop.getMail(), currentShop.getAddress(),
+            shop = new Shop(uid, currentShop.getName(), currentShop.getMail(), currentShop.getPic(), currentShop.getAddress(),
                     currentShop.getCity(), currentShop.getZip(), currentShop.getPhone(),
                     currentShop.getLatitude(), currentShop.getLongitude(), currentShop.getAverageReviews(),
                     currentShop.getNumReviews(), currentShop.getIntLongitude(), tags, hours);

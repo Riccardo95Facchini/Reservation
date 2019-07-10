@@ -3,13 +3,18 @@ package facchini.riccardo.reservation.Customer_Package.Adapter_Customer;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 
 import java.util.List;
 
@@ -43,7 +48,7 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
     public Reservation_Customer_ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.card_customer_home, null);
+        View view = inflater.inflate(R.layout.card_reservation, null);
         return new Reservation_Customer_ViewHolder(view, itemListener);
     }
     
@@ -53,9 +58,10 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
         Reservation res = reservationCustomerHomeList.get(pos);
         Shop shop = (Shop) res.getOtherUser();
         
-        holder.textViewShop.setText(shop.getName());
-        holder.textViewAddress.setText(shop.displayFullAddress());
-        holder.textViewWhen.setText(res.getDateFormatted());
+        holder.textName.setText(shop.getName());
+        holder.textAddress.setText(shop.displayFullAddress());
+        holder.textWhen.setText(res.getDateFormatted());
+        Glide.with(context).load(shop.getPic()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
     }
     
     @Override
@@ -66,17 +72,19 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
     
     class Reservation_Customer_ViewHolder extends RecyclerView.ViewHolder
     {
-        TextView textViewShop, textViewAddress, textViewWhen;
+        TextView textName, textAddress, textWhen;
         ImageButton infoButton;
+        ImageView profilePic;
         
         public Reservation_Customer_ViewHolder(@NonNull View itemView, final OnItemClickListener itemClickListener)
         {
             super(itemView);
             
-            textViewShop = itemView.findViewById(R.id.textViewShopName);
-            textViewAddress = itemView.findViewById(R.id.textViewAddress);
-            textViewWhen = itemView.findViewById(R.id.textViewWhen);
-            infoButton = itemView.findViewById(R.id.infoButton);
+            textName = itemView.findViewById(R.id.textName);
+            textAddress = itemView.findViewById(R.id.textAddress);
+            textWhen = itemView.findViewById(R.id.textWhen);
+            infoButton = itemView.findViewById(R.id.resButton);
+            profilePic = itemView.findViewById(R.id.profilePic);
             
             infoButton.setOnClickListener(new View.OnClickListener()
             {
@@ -111,6 +119,14 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
          */
         private void startShopInfoActivity(Shop shop)
         {
+//            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            View popupLayout = inflater.inflate(R.layout.popup_info, null);
+//
+//            PopupWindow pw = new PopupWindow(popupLayout);
+//
+//            pw.showAtLocation(context., Gravity.CENTER, 0, 0);
+//
+//
             Intent intent = new Intent(context, Activity_Customer_ShopInfo.class);
             Bundle b = new Bundle();
             b.putParcelable("Selected", shop);

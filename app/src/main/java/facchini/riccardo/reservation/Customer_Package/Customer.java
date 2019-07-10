@@ -19,14 +19,14 @@ public class Customer extends User
         super();
     }
     
-    public Customer(String uid, String name, String phone, String mail)
+    public Customer(String uid, String name, String phone, String mail, String pic)
     {
-        super(uid, name, phone, mail);
+        super(uid, name, phone, mail, pic);
     }
     
-    public Customer(String uid, String name)
+    public Customer(String uid, String name, String pic)
     {
-        super(uid, name);
+        super(uid, name, pic);
     }
     
     public Customer(Map<String, Object> c)
@@ -95,7 +95,7 @@ public class Customer extends User
     
     public Customer(ArrayList<String> list)
     {
-        super(list.get(0), list.get(1), list.get(2), list.get(3));
+        super(list.get(0), list.get(1), list.get(2), list.get(3), list.get(4));
     }
     
     //endregion Customer.FromToArrayList

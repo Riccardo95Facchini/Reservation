@@ -3,13 +3,17 @@ package facchini.riccardo.reservation.Customer_Package.Activity_Customer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -23,7 +27,7 @@ import facchini.riccardo.reservation.Shop_Package.Shop;
 public class Activity_Customer_ShopInfo extends AppCompatActivity
 {
     private RatingBar ratingReview;
-    private Button buttonSend;
+    private Button buttonChat;
     private CollectionReference reviewsRef;
     
     private Shop shop;
@@ -51,23 +55,22 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
         
         checkReviewExists();
         
-        TextView textShopName = findViewById(R.id.textShopName);
+        setTitle(shop.getName());
+        
         TextView textHours = findViewById(R.id.textHours);
         TextView textReviews = findViewById(R.id.textReviews);
         TextView textPhoneMail = findViewById(R.id.textPhoneMail);
         TextView textAddress = findViewById(R.id.textAddress);
-        buttonSend = findViewById(R.id.buttonEdit);
-        //ImageView shopPic = findViewById(R.id.shopPic);  TODO: profile pic
+        buttonChat = findViewById(R.id.buttonChat);
+        ImageView profilePic = findViewById(R.id.profilePic);
         ratingReview = findViewById(R.id.ratingReview);
         RatingBar ratingAvg = findViewById(R.id.ratingAvg);
         
-        textShopName.setText(shop.getName());
-        textAddress.setText(String.format("%s %s %s", shop.getAddress(),
-                shop.getCity(), shop.getZip()));
+        textAddress.setText(String.format("%s %s %s", shop.getAddress(), shop.getCity(), shop.getZip()));
         textReviews.setText(String.format("(%.2f/5) %d %s", shop.getAverageReviews(), shop.getNumReviews(), getString(R.string.reviews)));
         textPhoneMail.setText(String.format("Phone: %s\nMail: %s", shop.getPhone(), shop.getMail()));
         textHours.setText(shop.displayHoursFormat());
-        //shopPic.setImageResource();
+        Glide.with(this).load(shop.getPic()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(profilePic);
         ratingAvg.setRating((float) shop.getAverageReviews());
         
         ratingReview.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener()
@@ -76,21 +79,21 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser)
             {
                 if (rating <= 0 || rating == pastRating)
-                    buttonSend.setEnabled(false);
+                    buttonChat.setEnabled(false);
                 else
                 {
-                    buttonSend.setEnabled(true);
+                    buttonChat.setEnabled(true);
                     currentRating = (int) rating;
                 }
             }
         });
         
-        buttonSend.setOnClickListener(new View.OnClickListener()
+        buttonChat.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                sendReview();
+                //sendReview();
             }
         });
     }
