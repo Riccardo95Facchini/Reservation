@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -110,8 +109,6 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
         
         noReservationsText.setVisibility(View.GONE);
         
-        progressBar.setVisibility(View.GONE);
-        
         sharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         
         customersCollection.document(customerUid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
@@ -135,12 +132,12 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
             @Override
             public void onFinish()
             {
-                if (viewModel.getNextReservations().getValue() == null || viewModel.getNextReservations().getValue().isEmpty())
+                if (viewModel.getNextReservations(ReservationViewModel.CUSTOMER).getValue() == null || viewModel.getNextReservations(ReservationViewModel.CUSTOMER).getValue().isEmpty())
                     showReservations(null);
             }
         }.start();
         
-        viewModel.getNextReservations().observe(getActivity(), new Observer<List<Reservation>>()
+        viewModel.getNextReservations(ReservationViewModel.CUSTOMER).observe(getActivity(), new Observer<List<Reservation>>()
         {
             @Override
             public void onChanged(List<Reservation> reservations)
@@ -169,15 +166,14 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     
     private void showReservations(List<Reservation> res)
     {
+        reservations.clear();
         if (res == null || res.isEmpty())
         {
-            reservations.clear();
             recyclerView.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             noReservationsText.setVisibility(View.VISIBLE);
         } else
         {
-            reservations.clear();
             reservations.addAll(res);
             progressBar.setVisibility(View.GONE);
             recyclerView.setAdapter(adapterCustomerHome);
@@ -188,7 +184,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     @Override
     public void onItemClick(final int position)
     {
-        final Reservation res = viewModel.getNextReservations().getValue().get(position);
+        final Reservation res = viewModel.getNextReservations(ReservationViewModel.CUSTOMER).getValue().get(position);
         new AlertDialog.Builder(getContext()).setCancelable(true)
                 .setTitle(getString(R.string.areYouSure))
                 .setMessage(getString(R.string.deleteReservationFor).concat(res.getOtherUser().getName()).concat(getString(R.string.onWithTabs)).concat(res.getDateFormatted()))

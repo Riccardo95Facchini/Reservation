@@ -1,57 +1,55 @@
 package facchini.riccardo.reservation.Shop_Package.Fragment_Shop;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import facchini.riccardo.reservation.Customer_Package.Customer;
 import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.ReservationViewModel;
 import facchini.riccardo.reservation.Reservation_Package.Reservation;
 import facchini.riccardo.reservation.SharedViewModel;
 import facchini.riccardo.reservation.Shop_Package.Adapter_Shop.Adapter_Shop_Home;
 import facchini.riccardo.reservation.Shop_Package.Shop;
-import facchini.riccardo.reservation.User;
 
 public class Fragment_Shop_Home extends Fragment
 {
     //Firestore
     private FirebaseFirestore db;
-    private CollectionReference customersCollection, shopsCollection, reservationsCollection;
+    private CollectionReference shopsCollection;
     
-    private Calendar now;
     private String shopUid;
-    private SharedViewModel viewModel;
-    private List<Reservation> resList;
+    private SharedViewModel sharedViewModel;
+    private ReservationViewModel viewModel;
+    private List<Reservation> reservations;
     
     private RecyclerView recyclerView;
     private Adapter_Shop_Home adapterShopHome;
     
     private TextView noReservationsText;
+    private ProgressBar progressBar;
     
     @Nullable
     @Override
@@ -64,33 +62,29 @@ public class Fragment_Shop_Home extends Fragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
-        db = FirebaseFirestore.getInstance();
-        shopUid = FirebaseAuth.getInstance().getUid();
-        customersCollection = db.collection("customers");
-        shopsCollection = db.collection("shops");
-        reservationsCollection = db.collection("reservations");
-        
-        now = Calendar.getInstance();
-        
         recyclerView = view.findViewById(R.id.futureReservations);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setVisibility(View.VISIBLE);
-        
-        resList = new ArrayList<>();
-        
         noReservationsText = view.findViewById(R.id.noReservations);
-        noReservationsText.setVisibility(View.GONE);
-        
-        resList = new ArrayList<>();
+        progressBar = view.findViewById(R.id.progressBar);
     }
     
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
+        sharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
+        viewModel = ViewModelProviders.of(getActivity()).get(ReservationViewModel.class);
         
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        
+        noReservationsText.setVisibility(View.GONE);
+        
+        db = FirebaseFirestore.getInstance();
+        shopUid = FirebaseAuth.getInstance().getUid();
+        shopsCollection = db.collection("shops");
+        
+        reservations = new ArrayList<>();
+        adapterShopHome = new Adapter_Shop_Home(getContext(), reservations);
         
         shopsCollection.document(shopUid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
         {
@@ -98,50 +92,67 @@ public class Fragment_Shop_Home extends Fragment
             public void onSuccess(DocumentSnapshot documentSnapshot)
             {
                 if (documentSnapshot.exists())
-                    viewModel.setCurrentShop(new Shop(documentSnapshot.getData()));
+                    sharedViewModel.setCurrentShop(new Shop(documentSnapshot.getData()));
             }
         });
         
-        reservationsCollection.whereEqualTo("shopUid", shopUid).whereGreaterThan("time", now.getTime())
-                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
+        progressBar.setVisibility(View.VISIBLE);
+        
+        final CountDownTimer timer = new CountDownTimer(5000, 500)
         {
             @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots)
+            public void onTick(long millisUntilFinished)
+            { }
+            
+            @Override
+            public void onFinish()
             {
-                extractNextReservations(queryDocumentSnapshots);
+                if (viewModel.getNextReservations(ReservationViewModel.SHOP).getValue() == null || viewModel.getNextReservations(ReservationViewModel.SHOP).getValue().isEmpty())
+                    showReservations(null);
             }
-        }).addOnFailureListener(new OnFailureListener()
+        }.start();
+        
+        viewModel.getNextReservations(ReservationViewModel.SHOP).observe(getActivity(), new Observer<List<Reservation>>()
         {
             @Override
-            public void onFailure(@NonNull Exception e)
+            public void onChanged(List<Reservation> reservations)
             {
-                e.printStackTrace();
+                if (timer != null)
+                    timer.cancel();
+                showReservations(reservations);
             }
         });
+        
+        viewModel.getIsNextEmpty().observe(getActivity(), new Observer<Boolean>()
+        {
+            @Override
+            public void onChanged(Boolean isEmpty)
+            {
+                if (isEmpty)
+                {
+                    if (timer != null)
+                        timer.cancel();
+                    showReservations(null);
+                }
+            }
+        });
+        
     }
     
-    /**
-     * Extracts and checks the future reservations of the user
-     *
-     * @param snap
-     */
-    private void extractNextReservations(final QuerySnapshot snap)
+    private void showReservations(List<Reservation> res)
     {
-        if (snap.isEmpty())
+        reservations.clear();
+        if (res == null || res.isEmpty())
         {
             recyclerView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
             noReservationsText.setVisibility(View.VISIBLE);
-            return;
-        }
-        
-        
-        for (final QueryDocumentSnapshot doc : snap)
+        } else
         {
-            Customer c = new Customer((User) doc.get("customerUid"));
-            resList.add(new Reservation(doc.getId(), ((Timestamp) doc.get("time")).toDate(), c));
-            
-            if (resList.size() == snap.size())
-                orderList();
+            recyclerView.setVisibility(View.VISIBLE);
+            reservations.addAll(res);
+            progressBar.setVisibility(View.GONE);
+            recyclerView.setAdapter(adapterShopHome);
         }
     }
     
@@ -150,8 +161,8 @@ public class Fragment_Shop_Home extends Fragment
      */
     private void orderList()
     {
-        Collections.sort(resList, reservationComparator);
-        adapterShopHome = new Adapter_Shop_Home(getContext(), resList);
+        Collections.sort(reservations, reservationComparator);
+        adapterShopHome = new Adapter_Shop_Home(getContext(), reservations);
         recyclerView.setAdapter(adapterShopHome);
     }
     

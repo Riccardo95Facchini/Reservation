@@ -8,10 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 
 import java.util.List;
 
@@ -48,11 +52,10 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
         Reservation res = reservationCustomerHomeList.get(pos);
         Customer customer = (Customer) res.getOtherUser();
         
-        //customerUid = customer.getUid();
-        
         holder.textName.setText(customer.getName());
         holder.textWhen.setText(res.getDateFormatted());
         holder.customerUid = customer.getUid();
+        Glide.with(context).load(customer.getPic()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
     }
     
     @Override
@@ -65,16 +68,18 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
     {
         TextView textName, textWhen, textAddress;
         ImageButton resButton;
+        ImageView profilePic;
         String customerUid;
         
         public Reservation_Shop_ViewHolder(@NonNull View itemView)
         {
             super(itemView);
             
-            textName = itemView.findViewById(R.id.textViewShopName);
-            textWhen = itemView.findViewById(R.id.textViewWhen);
+            textName = itemView.findViewById(R.id.textName);
+            textWhen = itemView.findViewById(R.id.textWhen);
             textAddress = itemView.findViewById(R.id.textAddress);
             resButton = itemView.findViewById(R.id.resButton);
+            profilePic = itemView.findViewById(R.id.profilePic);
             
             textAddress.setVisibility(View.GONE);
             resButton.setImageResource(R.drawable.ic_chat_primary_color_32dp);

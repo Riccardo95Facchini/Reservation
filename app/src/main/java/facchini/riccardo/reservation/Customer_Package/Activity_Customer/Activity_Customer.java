@@ -186,7 +186,6 @@ public class Activity_Customer extends AppCompatActivity
         {
             case R.id.sign_out_menu:
                 SharedPreferences.Editor edit = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE).edit();
-                edit.remove(getString(R.string.current_user_uid_key));
                 edit.remove(getString(R.string.isCustomer_key));
                 edit.remove(getString(R.string.current_user_username_key)).apply();
                 AuthUI.getInstance().signOut(this);

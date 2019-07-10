@@ -5,24 +5,26 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Stack;
+
 import facchini.riccardo.reservation.Activity_Login;
 import facchini.riccardo.reservation.Chat.Activity_Chat_Homepage;
+import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_History;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_Home;
-import facchini.riccardo.reservation.R;
 
 public class Activity_Shop extends AppCompatActivity
 {
@@ -31,14 +33,18 @@ public class Activity_Shop extends AppCompatActivity
     private byte backButton;
     private int currentMenu = R.id.bottomHome;
     
+    private int lastFragment;
+    private static final int HOME = 0, HISTORY = 2;
+    private Stack<Integer> bottomStack;
+    
     private BottomNavigationView bottomMenu;
-    private Menu topMenu;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         backButton = 0;
+        bottomStack = new Stack<>();
         setContentView(R.layout.activity_shop);
         currentMenu = R.id.bottomHome;
         
@@ -46,6 +52,7 @@ public class Activity_Shop extends AppCompatActivity
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
         
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Shop_Home()).commit();
+        lastFragment = HOME;
         setupFirebaseListener();
     }
     
@@ -54,21 +61,22 @@ public class Activity_Shop extends AppCompatActivity
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
         {
-            Fragment selected = null;
+            bottomStack.push(lastFragment);
             
             currentMenu = menuItem.getItemId();
             
             switch (menuItem.getItemId())
             {
                 case R.id.bottomHome:
-                    selected = new Fragment_Shop_Home();
+                    getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Shop_Home()).commit();
+                    lastFragment = HOME;
                     break;
                 case R.id.bottomHistory:
-                    selected = new Fragment_Shop_History();
+                    getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Shop_History()).commit();
+                    lastFragment = HISTORY;
                     break;
             }
             
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selected).commit();
             return true;
         }
     };
@@ -76,31 +84,32 @@ public class Activity_Shop extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        if (currentMenu == R.id.profile_menu)
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0)
+        {
+            if (backButton > 0)
+                finish();
+            else
+            {
+                Toast.makeText(this, getString(R.string.pressBackToExit), Toast.LENGTH_LONG).show();
+                backButton++;
+                
+                new CountDownTimer(2000, 1000)
+                {
+                    @Override
+                    public void onTick(long millisUntilFinished) {}
+                    
+                    @Override
+                    public void onFinish()
+                    {
+                        backButton = 0;
+                    }
+                }.start();
+            }
+        } else
         {
             super.onBackPressed();
-            currentMenu = bottomMenu.getSelectedItemId();
-            return;
-        }
-        
-        if (backButton > 0)
-            finish();
-        else
-        {
-            Toast.makeText(this, getString(R.string.pressBackToExit), Toast.LENGTH_LONG).show();
-            backButton++;
-            
-            new CountDownTimer(2000, 1000)
-            {
-                @Override
-                public void onTick(long millisUntilFinished) {}
-                
-                @Override
-                public void onFinish()
-                {
-                    backButton = 0;
-                }
-            }.start();
+            lastFragment = bottomStack.pop();
+            bottomMenu.getMenu().getItem(lastFragment).setChecked(true);
         }
     }
     
@@ -153,17 +162,11 @@ public class Activity_Shop extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        topMenu = menu;
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_action_bar, menu);
-    
-        topMenu.getItem(2).setVisible(true);
-        topMenu.getItem(3).setVisible(true);
         
-        if (currentMenu != R.id.profile_menu)
-            topMenu.getItem(1).setVisible(true);
-        else
-            topMenu.getItem(1).setVisible(false);
+        menu.getItem(1).setVisible(true);
+        menu.getItem(2).setVisible(true);
         
         return true;
     }
@@ -181,7 +184,6 @@ public class Activity_Shop extends AppCompatActivity
         {
             case R.id.sign_out_menu:
                 SharedPreferences.Editor edit = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE).edit();
-                edit.remove(getString(R.string.current_user_uid_key));
                 edit.remove(getString(R.string.isCustomer_key));
                 edit.remove(getString(R.string.current_user_username_key)).apply();
                 AuthUI.getInstance().signOut(this);

@@ -10,7 +10,6 @@ public class Reservation
 {
     
     private String resUid;
-    
     private Date date;
     private User otherUser;
     
