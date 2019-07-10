@@ -6,8 +6,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 
 import java.util.List;
 
@@ -49,10 +53,12 @@ public class Adapter_Customer_SearchCard extends RecyclerView.Adapter<Adapter_Cu
         SearchResult res = shopsList.get(pos);
         Shop shop = res.getShopFound();
         
-        holder.textViewName.setText(shop.getName());
-        holder.textViewAddress.setText(shop.displayFullAddress());
-        holder.textViewDistance.setText(res.getFormatDistance());
+        holder.textName.setText(shop.getName());
+        holder.textAddress.setText(shop.displayFullAddress());
+        holder.textDistance.setText(res.getFormatDistance());
         holder.ratingBar.setRating((float) shop.getAverageReviews());
+        Glide.with(context).load(shop.getPic()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
+        
     }
     
     @Override
@@ -63,16 +69,18 @@ public class Adapter_Customer_SearchCard extends RecyclerView.Adapter<Adapter_Cu
     
     class Shops_ViewHolder extends RecyclerView.ViewHolder
     {
-        TextView textViewName, textViewDistance, textViewAddress;
+        TextView textName, textDistance, textAddress;
+        ImageView profilePic;
         RatingBar ratingBar;
         
         public Shops_ViewHolder(@NonNull View itemView, final OnItemClickListener itemClickListener)
         {
             super(itemView);
             
-            textViewName = itemView.findViewById(R.id.textViewShopName);
-            textViewAddress = itemView.findViewById(R.id.textViewAddress);
-            textViewDistance = itemView.findViewById(R.id.textViewDistance);
+            textName = itemView.findViewById(R.id.textName);
+            textAddress = itemView.findViewById(R.id.textAddress);
+            textDistance = itemView.findViewById(R.id.textDistance);
+            profilePic = itemView.findViewById(R.id.profilePic);
             ratingBar = itemView.findViewById(R.id.ratingBar);
             
             
