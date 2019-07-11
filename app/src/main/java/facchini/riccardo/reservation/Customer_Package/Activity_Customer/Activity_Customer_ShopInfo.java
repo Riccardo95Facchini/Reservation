@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -27,7 +27,7 @@ import facchini.riccardo.reservation.Shop_Package.Shop;
 public class Activity_Customer_ShopInfo extends AppCompatActivity
 {
     private RatingBar ratingReview;
-    private Button buttonChat;
+    private ImageButton buttonChat;
     private CollectionReference reviewsRef;
     
     private Shop shop;

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -21,7 +22,7 @@ import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Fragment_Shop_Profile extends Fragment
 {
-    private Button buttonEdit;
+    private ImageButton buttonEdit;
     
     private TextView textShopName;
     private TextView textHours;
