@@ -30,7 +30,7 @@ public class ReservationViewModel extends ViewModel
 {
     private MutableLiveData<List<Reservation>> nextReservations, pastReservations;
     private MutableLiveData<Boolean> isNextEmpty, isPastEmpty;
-    private CollectionReference shopsCollection, reservationsCollection, updatesCollection;
+    private CollectionReference customersCollection, shopsCollection, reservationsCollection, updatesCollection;
     private String thisUid;
     FirebaseFirestore db;
     
@@ -43,7 +43,7 @@ public class ReservationViewModel extends ViewModel
         tag = -1;
         db = FirebaseFirestore.getInstance();
         shopsCollection = db.collection("shops");
-        shopsCollection = db.collection("shops");
+        customersCollection = db.collection("customers");
         reservationsCollection = db.collection("reservations");
         updatesCollection = db.collection("reservationsUpdate");
         thisUid = FirebaseAuth.getInstance().getUid();
@@ -215,15 +215,13 @@ public class ReservationViewModel extends ViewModel
     
     //region ReservationViewModel.Getters
     
-    public MutableLiveData<List<Reservation>> getNextReservations(int tag)
+    public MutableLiveData<List<Reservation>> getNextReservations()
     {
-        this.tag = tag;
         return nextReservations;
     }
     
-    public MutableLiveData<List<Reservation>> getPastReservations(int tag)
+    public MutableLiveData<List<Reservation>> getPastReservations()
     {
-        this.tag = tag;
         return pastReservations;
     }
     
@@ -233,4 +231,9 @@ public class ReservationViewModel extends ViewModel
     
     //endregion ReservationViewModel.Getters
     
+    
+    public void setTag(int tag)
+    {
+        this.tag = tag;
+    }
 }

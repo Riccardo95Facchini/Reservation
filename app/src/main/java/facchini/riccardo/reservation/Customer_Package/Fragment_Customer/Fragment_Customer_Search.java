@@ -1,7 +1,6 @@
 package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 
 import android.app.AlertDialog;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,11 +9,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -26,6 +20,12 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -46,7 +46,6 @@ import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_C
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.SearchResult;
-import facchini.riccardo.reservation.SharedViewModel;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Fragment_Customer_Search extends Fragment implements OnItemClickListener
@@ -59,7 +58,6 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     private SeekBar distanceSeekBar;
     private TextView distanceText;
     
-    private SharedViewModel viewModel;
     private ArrayList<SearchResult> foundShops = new ArrayList<>();
     private Adapter_Customer_SearchCard adapter;
     
@@ -88,7 +86,6 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
     }
     
     @Override
@@ -182,14 +179,13 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     public void onItemClick(int position)
     {
         Shop selected = foundShops.get(position).getShopFound();
-        viewModel.setCurrentShop(selected);
         getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null);
         Intent intent = new Intent();
         Bundle b = new Bundle();
         b.putParcelable("Selected", selected);
         intent.putExtras(b);
-        intent.putExtra("uid", viewModel.getCurrentCustomer().getUid());
-        intent.putExtra("name", viewModel.getCurrentCustomer().getName());
+        intent.putExtra("uid", selected.getUid());
+        intent.putExtra("name", selected.getName());
         intent.setClass(getContext(), Activity_Customer_SelectedShop.class);
         startActivity(intent);
     }

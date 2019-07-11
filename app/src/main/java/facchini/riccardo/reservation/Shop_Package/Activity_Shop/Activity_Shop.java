@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -22,7 +23,9 @@ import java.util.Stack;
 
 import facchini.riccardo.reservation.Activity_Login;
 import facchini.riccardo.reservation.Chat.Activity_Chat_Homepage;
+import facchini.riccardo.reservation.CurrentUserViewModel;
 import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.ReservationViewModel;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_History;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_Home;
 
@@ -31,10 +34,8 @@ public class Activity_Shop extends AppCompatActivity
     private FirebaseAuth.AuthStateListener authStateListener;
     
     private byte backButton;
-    private int currentMenu = R.id.bottomHome;
-    
     private int lastFragment;
-    private static final int HOME = 0, HISTORY = 2;
+    private static final int HOME = 0, HISTORY = 2, PROFILE = 3;
     private Stack<Integer> bottomStack;
     
     private BottomNavigationView bottomMenu;
@@ -46,13 +47,16 @@ public class Activity_Shop extends AppCompatActivity
         backButton = 0;
         bottomStack = new Stack<>();
         setContentView(R.layout.activity_shop);
-        currentMenu = R.id.bottomHome;
+        
+        ViewModelProviders.of(this).get(ReservationViewModel.class).setTag(ReservationViewModel.SHOP);
+        ViewModelProviders.of(this).get(CurrentUserViewModel.class).setTag(CurrentUserViewModel.SHOP);
         
         bottomMenu = findViewById(R.id.bottomMenu);
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
         
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Fragment_Shop_Home()).commit();
         lastFragment = HOME;
+        bottomStack.push(lastFragment);
         setupFirebaseListener();
     }
     
@@ -61,18 +65,21 @@ public class Activity_Shop extends AppCompatActivity
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
         {
-            bottomStack.push(lastFragment);
-            
-            currentMenu = menuItem.getItemId();
+    
+            menuItem.setCheckable(true);
             
             switch (menuItem.getItemId())
             {
                 case R.id.bottomHome:
+                    if (lastFragment == HOME) return false;
                     getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Shop_Home()).commit();
+                    bottomStack.push(lastFragment);
                     lastFragment = HOME;
                     break;
                 case R.id.bottomHistory:
+                    if (lastFragment == HISTORY) return false;
                     getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Shop_History()).commit();
+                    bottomStack.push(lastFragment);
                     lastFragment = HISTORY;
                     break;
             }
@@ -108,8 +115,14 @@ public class Activity_Shop extends AppCompatActivity
         } else
         {
             super.onBackPressed();
+            
+            if (lastFragment == PROFILE)
+                bottomMenu.getMenu().getItem(lastFragment).setCheckable(true);
+            
             lastFragment = bottomStack.pop();
-            bottomMenu.getMenu().getItem(lastFragment).setChecked(true);
+            
+            if (lastFragment != PROFILE)
+                bottomMenu.getMenu().getItem(lastFragment).setChecked(true);
         }
     }
     
@@ -193,9 +206,11 @@ public class Activity_Shop extends AppCompatActivity
                 startActivity(intent);
                 return true;
             case R.id.profile_menu:
-                currentMenu = R.id.profile_menu;
-                Intent profileIntent = new Intent(getBaseContext(), Activity_Shop_Profile.class);
-                startActivity(profileIntent);
+                if (lastFragment == PROFILE) return false;
+                bottomStack.push(lastFragment);
+                bottomMenu.getMenu().getItem(lastFragment).setChecked(false);
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Shop_Profile()).commit();
+                lastFragment = PROFILE;
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -35,9 +35,6 @@
         <activity
             android:name=".Shop_Package.Activity_Shop.Activity_Shop_TagHours"
             android:label="@string/tagsAndHours" />
-        <activity
-            android:name=".Shop_Package.Activity_Shop.Activity_Shop_Profile"
-            android:label="@string/profile" />
         <activity android:name=".Customer_Package.Activity_Customer.Activity_Customer" />
         <activity android:name=".Shop_Package.Activity_Shop.Activity_Shop" />
     </application>

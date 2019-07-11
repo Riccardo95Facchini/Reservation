@@ -20,30 +20,17 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_ReservationCard;
-import facchini.riccardo.reservation.Customer_Package.Customer;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.ReservationViewModel;
 import facchini.riccardo.reservation.Reservation_Package.Reservation;
-import facchini.riccardo.reservation.SharedViewModel;
 
 public class Fragment_Customer_Home extends Fragment implements OnItemClickListener
 {
-    private FirebaseFirestore db;
-    private CollectionReference customersCollection;
-    
-    private String customerUid;
-    private SharedViewModel sharedViewModel;
     private ReservationViewModel viewModel;
     private SharedPreferences pref;
     private List<Reservation> reservations;
@@ -58,6 +45,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
+        super.onCreateView(inflater, container, savedInstanceState);
         getActivity().setTitle(R.string.reservations);
         return inflater.inflate(R.layout.fragment_customer_home, container, false);
     }
@@ -95,11 +83,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
         
         viewModel = ViewModelProviders.of(getActivity()).get(ReservationViewModel.class);
         
-        db = FirebaseFirestore.getInstance();
-        
         pref = getContext().getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
-        customerUid = FirebaseAuth.getInstance().getUid();
-        customersCollection = db.collection("customers");
         
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -109,17 +93,6 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
         
         noReservationsText.setVisibility(View.GONE);
         
-        sharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
-        
-        customersCollection.document(customerUid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
-        {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot)
-            {
-                if (documentSnapshot.exists())
-                    sharedViewModel.setCurrentCustomer(new Customer(documentSnapshot.getData()));
-            }
-        });
         
         progressBar.setVisibility(View.VISIBLE);
         
@@ -132,12 +105,12 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
             @Override
             public void onFinish()
             {
-                if (viewModel.getNextReservations(ReservationViewModel.CUSTOMER).getValue() == null || viewModel.getNextReservations(ReservationViewModel.CUSTOMER).getValue().isEmpty())
+                if (viewModel.getNextReservations().getValue() == null || viewModel.getNextReservations().getValue().isEmpty())
                     showReservations(null);
             }
         }.start();
         
-        viewModel.getNextReservations(ReservationViewModel.CUSTOMER).observe(getActivity(), new Observer<List<Reservation>>()
+        viewModel.getNextReservations().observe(getActivity(), new Observer<List<Reservation>>()
         {
             @Override
             public void onChanged(List<Reservation> reservations)
@@ -184,7 +157,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     @Override
     public void onItemClick(final int position)
     {
-        final Reservation res = viewModel.getNextReservations(ReservationViewModel.CUSTOMER).getValue().get(position);
+        final Reservation res = viewModel.getNextReservations().getValue().get(position);
         new AlertDialog.Builder(getContext()).setCancelable(true)
                 .setTitle(getString(R.string.areYouSure))
                 .setMessage(getString(R.string.deleteReservationFor).concat(res.getOtherUser().getName()).concat(getString(R.string.onWithTabs)).concat(res.getDateFormatted()))

@@ -74,12 +74,12 @@ public class Customer extends User
     //region Customer.Display
     public String displayProfile()
     {
-        return String.format("%s %s\nPhone: %s\nMail: %s", name, phone, mail);
+        return String.format("%s \nPhone: %s\nMail: %s", name, phone, mail);
     }
     
     public String displayInfo()
     {
-        return String.format("Name: %s %s\nPhone: %s\nMail: %s", name, phone.isEmpty() ? "N/A" : phone, mail.isEmpty() ? "N/A" : mail);
+        return String.format("Name: %s \nPhone: %s\nMail: %s", name, phone.isEmpty() ? "N/A" : phone, mail.isEmpty() ? "N/A" : mail);
     }
     //endregion Customer.Display
     

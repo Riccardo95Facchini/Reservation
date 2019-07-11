@@ -16,12 +16,6 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,18 +24,10 @@ import java.util.List;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.ReservationViewModel;
 import facchini.riccardo.reservation.Reservation_Package.Reservation;
-import facchini.riccardo.reservation.SharedViewModel;
 import facchini.riccardo.reservation.Shop_Package.Adapter_Shop.Adapter_Shop_Home;
-import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Fragment_Shop_Home extends Fragment
 {
-    //Firestore
-    private FirebaseFirestore db;
-    private CollectionReference shopsCollection;
-    
-    private String shopUid;
-    private SharedViewModel sharedViewModel;
     private ReservationViewModel viewModel;
     private List<Reservation> reservations;
     
@@ -55,8 +41,9 @@ public class Fragment_Shop_Home extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
+        super.onCreateView(inflater, container, savedInstanceState);
         getActivity().setTitle(R.string.reservations);
-        return inflater.inflate(R.layout.fragment_shop_home, container, false);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
     
     @Override
@@ -71,32 +58,17 @@ public class Fragment_Shop_Home extends Fragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        sharedViewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
         viewModel = ViewModelProviders.of(getActivity()).get(ReservationViewModel.class);
         
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         
         noReservationsText.setVisibility(View.GONE);
-        
-        db = FirebaseFirestore.getInstance();
-        shopUid = FirebaseAuth.getInstance().getUid();
-        shopsCollection = db.collection("shops");
+        progressBar.setVisibility(View.VISIBLE);
         
         reservations = new ArrayList<>();
         adapterShopHome = new Adapter_Shop_Home(getContext(), reservations);
         
-        shopsCollection.document(shopUid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
-        {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot)
-            {
-                if (documentSnapshot.exists())
-                    sharedViewModel.setCurrentShop(new Shop(documentSnapshot.getData()));
-            }
-        });
-        
-        progressBar.setVisibility(View.VISIBLE);
         
         final CountDownTimer timer = new CountDownTimer(5000, 500)
         {
@@ -107,12 +79,12 @@ public class Fragment_Shop_Home extends Fragment
             @Override
             public void onFinish()
             {
-                if (viewModel.getNextReservations(ReservationViewModel.SHOP).getValue() == null || viewModel.getNextReservations(ReservationViewModel.SHOP).getValue().isEmpty())
+                if (viewModel.getNextReservations().getValue() == null || viewModel.getNextReservations().getValue().isEmpty())
                     showReservations(null);
             }
         }.start();
         
-        viewModel.getNextReservations(ReservationViewModel.SHOP).observe(getActivity(), new Observer<List<Reservation>>()
+        viewModel.getNextReservations().observe(getActivity(), new Observer<List<Reservation>>()
         {
             @Override
             public void onChanged(List<Reservation> reservations)

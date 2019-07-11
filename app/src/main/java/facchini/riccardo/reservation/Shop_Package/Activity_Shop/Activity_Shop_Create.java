@@ -310,10 +310,7 @@ public class Activity_Shop_Create extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         
         if (requestCode == 0 && resultCode == Activity.RESULT_OK)
-        {
-            setResult(Activity.RESULT_OK);
             finish();
-        }
     }
     
     /**

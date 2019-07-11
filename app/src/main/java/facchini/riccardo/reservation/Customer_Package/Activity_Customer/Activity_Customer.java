@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -23,11 +24,13 @@ import java.util.Stack;
 
 import facchini.riccardo.reservation.Activity_Login;
 import facchini.riccardo.reservation.Chat.Activity_Chat_Homepage;
+import facchini.riccardo.reservation.CurrentUserViewModel;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_History;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Home;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Profile;
 import facchini.riccardo.reservation.Customer_Package.Fragment_Customer.Fragment_Customer_Search;
 import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.ReservationViewModel;
 
 public class Activity_Customer extends AppCompatActivity
 {
@@ -35,7 +38,8 @@ public class Activity_Customer extends AppCompatActivity
     
     private byte backButton;
     private int lastFragment;
-    private static final int HOME = 0, SEARCH = 1, HISTORY = 2;
+    private static final int HOME = 0, SEARCH = 1, HISTORY = 2, PROFILE = 3;
+    private static final String TAG_HOME = "HOME", TAG_SEARCH = "SEARCH", TAG_HISTORY = "HISTORY", TAG_PROFILE = "PROFILE";
     private Stack<Integer> bottomStack;
     private BottomNavigationView bottomMenu;
     
@@ -50,10 +54,14 @@ public class Activity_Customer extends AppCompatActivity
         bottomMenu = findViewById(R.id.bottomMenu);
         bottomMenu.setOnNavigationItemSelectedListener(selectedListener);
         
+        ViewModelProviders.of(this).get(ReservationViewModel.class).setTag(ReservationViewModel.CUSTOMER);
+        ViewModelProviders.of(this).get(CurrentUserViewModel.class).setTag(CurrentUserViewModel.CUSTOMER);
+        
         Fragment home = new Fragment_Customer_Home();
         home.setHasOptionsMenu(true);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, home).commit();
         lastFragment = HOME;
+        bottomStack.push(lastFragment);
         setupFirebaseListener();
     }
     
@@ -62,20 +70,26 @@ public class Activity_Customer extends AppCompatActivity
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
         {
-            bottomStack.push(lastFragment);
+            menuItem.setCheckable(true);
             
             switch (menuItem.getItemId())
             {
                 case R.id.bottomHome:
-                    getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
+                    if (lastFragment == HOME) return false;
+                    getSupportFragmentManager().beginTransaction().addToBackStack(TAG_HOME).replace(R.id.fragmentContainer, new Fragment_Customer_Home()).commit();
+                    bottomStack.push(lastFragment);
                     lastFragment = HOME;
                     break;
                 case R.id.bottomSearch:
-                    getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Customer_Search()).commit();
+                    if (lastFragment == SEARCH) return false;
+                    getSupportFragmentManager().beginTransaction().addToBackStack(TAG_SEARCH).replace(R.id.fragmentContainer, new Fragment_Customer_Search()).commit();
+                    bottomStack.push(lastFragment);
                     lastFragment = SEARCH;
                     break;
                 case R.id.bottomHistory:
-                    getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, new Fragment_Customer_History()).commit();
+                    if (lastFragment == HISTORY) return false;
+                    getSupportFragmentManager().beginTransaction().addToBackStack(TAG_HISTORY).replace(R.id.fragmentContainer, new Fragment_Customer_History()).commit();
+                    bottomStack.push(lastFragment);
                     lastFragment = HISTORY;
                     break;
             }
@@ -111,11 +125,18 @@ public class Activity_Customer extends AppCompatActivity
         } else
         {
             super.onBackPressed();
+            
+            if (lastFragment == PROFILE)
+                bottomMenu.getMenu().getItem(bottomStack.peek()).setCheckable(true);
+            
             lastFragment = bottomStack.pop();
-            bottomMenu.getMenu().getItem(lastFragment).setChecked(true);
+            
+            if (lastFragment != PROFILE)
+                bottomMenu.getMenu().getItem(lastFragment).setChecked(true);
         }
     }
     
+    //region Firebase
     @Override
     protected void onPause()
     {
@@ -154,6 +175,7 @@ public class Activity_Customer extends AppCompatActivity
             }
         };
     }
+    //endregion Firebase
     
     /**
      * Shows the menu (3 dots) when touched
@@ -191,12 +213,14 @@ public class Activity_Customer extends AppCompatActivity
                 AuthUI.getInstance().signOut(this);
                 return true;
             case R.id.profile_menu:
-                Fragment selected = new Fragment_Customer_Profile();
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.fragmentContainer, selected).commit();
+                if (lastFragment == PROFILE) return false;
+                bottomStack.push(lastFragment);
+                bottomMenu.getMenu().getItem(lastFragment).setCheckable(false);
+                getSupportFragmentManager().beginTransaction().addToBackStack(TAG_PROFILE).replace(R.id.fragmentContainer, new Fragment_Customer_Profile()).commit();
+                lastFragment = PROFILE;
                 return true;
             case R.id.chat_menu:
-                Intent intent = new Intent(getBaseContext(), Activity_Chat_Homepage.class);
-                startActivity(intent);
+                startActivity(new Intent(getBaseContext(), Activity_Chat_Homepage.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

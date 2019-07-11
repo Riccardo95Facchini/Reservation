@@ -1,23 +1,24 @@
 package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 
-import androidx.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+
+import facchini.riccardo.reservation.CurrentUserViewModel;
+import facchini.riccardo.reservation.Customer_Package.Customer;
 import facchini.riccardo.reservation.R;
-import facchini.riccardo.reservation.SharedViewModel;
 
 public class Fragment_Customer_Profile extends Fragment
 {
     
-    private SharedViewModel viewModel;
+    private CurrentUserViewModel viewModel;
     
     private TextView profileInfoText;
     
@@ -33,8 +34,8 @@ public class Fragment_Customer_Profile extends Fragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(getActivity()).get(SharedViewModel.class);
-        profileInfoText.setText(viewModel.getCurrentCustomer().displayProfile());
+        viewModel = ViewModelProviders.of(getActivity()).get(CurrentUserViewModel.class);
+        profileInfoText.setText(((Customer) viewModel.getCurrentUser().getValue()).displayProfile());
     }
     
     @Override
