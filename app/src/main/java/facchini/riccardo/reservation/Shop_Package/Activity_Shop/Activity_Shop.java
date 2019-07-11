@@ -28,6 +28,7 @@ import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.ReservationViewModel;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_History;
 import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_Home;
+import facchini.riccardo.reservation.Shop_Package.Fragment_Shop.Fragment_Shop_Profile;
 
 public class Activity_Shop extends AppCompatActivity
 {

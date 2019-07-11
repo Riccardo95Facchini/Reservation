@@ -21,29 +21,40 @@
 
             <ImageView
                 android:id="@+id/profilePic"
-                android:layout_width="210dp"
-                android:layout_height="179dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="32dp"
                 android:src="@drawable/default_avatar"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent=".15"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.4" />
+
+            <ImageButton
+                android:id="@+id/buttonChat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@null"
+                app:layout_constraintStart_toEndOf="@+id/profilePic"
+                app:layout_constraintTop_toTopOf="@+id/profilePic"
+                app:srcCompat="@android:drawable/ic_menu_send" />
 
             <TextView
                 android:id="@+id/textAddress"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:text="Via Roma 12 Piacenza 29121"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/buttonChat" />
+                app:layout_constraintTop_toBottomOf="@+id/ratingAvg" />
 
             <TextView
                 android:id="@+id/textPhoneMail"
@@ -62,7 +73,7 @@
                 style="@style/Widget.AppCompat.RatingBar.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:isIndicator="true"
                 app:layout_constraintStart_toStartOf="parent"
@@ -88,7 +99,8 @@
                 android:layout_marginStart="8dp"
                 android:text="(4.7/5) 13 Reviews "
                 app:layout_constraintBottom_toBottomOf="@+id/ratingAvg"
-                app:layout_constraintStart_toEndOf="@+id/ratingAvg" />
+                app:layout_constraintStart_toEndOf="@+id/ratingAvg"
+                app:layout_constraintTop_toTopOf="@+id/ratingAvg" />
 
             <TextView
                 android:id="@+id/textHours"
@@ -115,16 +127,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textHours" />
 
-            <Button
-                android:id="@+id/buttonChat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/colorPrimary"
-                android:text="@string/chat"
-                app:layout_constraintBottom_toBottomOf="@+id/textReviews"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/textReviews" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
