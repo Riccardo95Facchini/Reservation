@@ -43,7 +43,7 @@ public class Fragment_Shop_Home extends Fragment
     {
         super.onCreateView(inflater, container, savedInstanceState);
         getActivity().setTitle(R.string.reservations);
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return inflater.inflate(R.layout.fragment_shop_home, container, false);
     }
     
     @Override

@@ -77,6 +77,7 @@ public class CurrentUserViewModel extends ViewModel
     
     public void setTag(int tag)
     {
+        this.tag = tag;
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         
         switch (tag)

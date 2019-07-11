@@ -2,7 +2,9 @@ package facchini.riccardo.reservation.Shop_Package.Activity_Shop;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -32,10 +34,18 @@ public class Fragment_Shop_Profile extends Fragment
     
     private Shop shop;
     
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    {
+        super.onCreateView(inflater, container, savedInstanceState);
+        getActivity().setTitle(R.string.profile);
+        return inflater.inflate(R.layout.fragment_shop_profile, container, false);
+    }
+    
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
-        getActivity().setTitle(R.string.profile);
         textShopName = view.findViewById(R.id.textShopName);
         textHours = view.findViewById(R.id.textHours);
         textReviews = view.findViewById(R.id.textReviews);

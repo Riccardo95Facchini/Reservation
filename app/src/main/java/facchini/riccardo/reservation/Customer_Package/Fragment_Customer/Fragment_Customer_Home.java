@@ -51,24 +51,6 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     }
     
     @Override
-    public void onResume()
-    {
-        super.onResume();
-        
-        try
-        {
-            if (pref.getBoolean(getString(R.string.need_update_key), false))
-            {
-                pref.edit().putBoolean(getString(R.string.need_update_key), false).commit();
-                viewModel.updateViewModel();
-            }
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-    
-    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         recyclerView = view.findViewById(R.id.futureReservations);
@@ -134,6 +116,24 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
                 }
             }
         });
+    }
+    
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        
+        try
+        {
+            if (pref.getBoolean(getString(R.string.need_update_key), false))
+            {
+                pref.edit().putBoolean(getString(R.string.need_update_key), false).commit();
+                viewModel.updateViewModel();
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
     
     
