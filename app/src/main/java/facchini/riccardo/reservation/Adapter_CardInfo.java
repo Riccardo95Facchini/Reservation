@@ -18,7 +18,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Adapter_CardInfo extends RecyclerView.Adapter<Adapter_CardInfo.CardInfo_ViewHolder>
 {
@@ -46,7 +50,13 @@ public class Adapter_CardInfo extends RecyclerView.Adapter<Adapter_CardInfo.Card
         Info_Content content = contents.get(pos);
         
         holder.infoPic.setImageResource(content.getResourceId());
-        holder.infoText.setText(content.getResourceText());
+        
+        if (content.getHours() == null)
+            holder.infoText.setText(content.getResourceText());
+        else
+            Shop.displayHoursInTextViews(holder.infoText, holder.infoText2, content.getHours());
+            //holder.setHours(content.getHours());
+        
         
         if (content.getLatLng() != null)
             holder.initializeMap(content.getLatLng(), content.getName());
@@ -55,16 +65,17 @@ public class Adapter_CardInfo extends RecyclerView.Adapter<Adapter_CardInfo.Card
     class CardInfo_ViewHolder extends RecyclerView.ViewHolder implements OnMapReadyCallback
     {
         ImageView infoPic;
-        TextView infoText;
+        TextView infoText, infoText2;
         MapView map;
         String name;
         private LatLng latLng;
         
-        public CardInfo_ViewHolder(@NonNull View itemView)
+        CardInfo_ViewHolder(@NonNull View itemView)
         {
             super(itemView);
             infoPic = itemView.findViewById(R.id.infoPic);
             infoText = itemView.findViewById(R.id.infoText);
+            infoText2 = itemView.findViewById(R.id.infoText2);
             map = itemView.findViewById(R.id.map);
         }
         
@@ -86,6 +97,37 @@ public class Adapter_CardInfo extends RecyclerView.Adapter<Adapter_CardInfo.Card
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f));
             MarkerOptions options = new MarkerOptions().position(latLng).draggable(false).title(name);
             googleMap.addMarker(options).showInfoWindow();
+        }
+        
+        void setHours(Map<String, ArrayList<String>> hours)
+        {
+            infoText.setText("");
+            infoText2.setText("");
+            infoText2.setVisibility(View.VISIBLE);
+            
+            for (Map.Entry<String, ArrayList<String>> entry : hours.entrySet())
+            {
+                infoText.append(entry.getKey() + ":\n");
+                try
+                {
+                    if (!entry.getValue().get(0).equalsIgnoreCase("closed") && !entry.getValue().get(2).equalsIgnoreCase("closed"))
+                    {
+                        infoText2.append(String.format("%s-%s\n", entry.getValue().get(0), entry.getValue().get(1)));
+                        infoText.append("\n");
+                        infoText2.append(String.format("%s-%s\n", entry.getValue().get(2), entry.getValue().get(3)));
+                    } else if (!entry.getValue().get(0).equalsIgnoreCase("closed"))
+                        infoText2.append(String.format("%s-%s\n", entry.getValue().get(0), entry.getValue().get(1)));
+                    else if (!entry.getValue().get(3).equalsIgnoreCase("closed"))
+                        infoText2.append(String.format("%s-%s\n", entry.getValue().get(2), entry.getValue().get(3)));
+                    else
+                        infoText2.append(String.format("%s\n", "Closed"));
+                } catch (Exception e)
+                {
+                    infoText2.append(String.format("%s\n", "Closed"));
+                }
+                infoText.append("\n");
+                infoText2.append("\n");
+            }
         }
     }
     

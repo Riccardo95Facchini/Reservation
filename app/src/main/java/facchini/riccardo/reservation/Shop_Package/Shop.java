@@ -2,6 +2,8 @@ package facchini.riccardo.reservation.Shop_Package;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
@@ -89,8 +91,9 @@ public class Shop extends User
     public List<Info_Content> createInfoContentList()
     {
         List<Info_Content> contents = super.createInfoContentList();
-        contents.add(new Info_Content(R.drawable.ic_hours_color_32dp, displayHoursFormat()));
-        contents.add(new Info_Content(R.drawable.ic_location_on_primary_32dp, displayFullAddress(), name , new LatLng(latitude, longitude)));
+        //contents.add(new Info_Content(R.drawable.ic_hours_color_32dp, displayHoursFormat()));
+        contents.add(new Info_Content(R.drawable.ic_hours_color_32dp, hours));
+        contents.add(new Info_Content(R.drawable.ic_location_on_primary_32dp, displayFullAddress(), name, new LatLng(latitude, longitude)));
         return contents;
     }
     
@@ -159,15 +162,8 @@ public class Shop extends User
         return String.format("%s\n\n%s\n\nPhone: %s\nMail: %s", name, displayFullAddress(), phone, mail);
     }
     
-    public String displayProfile()
+    public static void displayHoursInTextViews(TextView infoText, TextView infoText2, Map<String, ArrayList<String>> hours)
     {
-        return displayInfo().concat("\n\nHours:\n").concat(displayHoursFormat());
-    }
-    
-    public String displayHoursFormat()
-    {
-        StringBuilder h = new StringBuilder();
-        
         ArrayList<String> days = new ArrayList<>();
         days.add("Sunday");
         days.add("Monday");
@@ -176,27 +172,58 @@ public class Shop extends User
         days.add("Thursday");
         days.add("Friday");
         days.add("Saturday");
-        ArrayList<String> entry;
         
-        for (int i = 0; i < 7; i++)
+        infoText.setText("");
+        infoText2.setText("");
+        infoText2.setVisibility(View.VISIBLE);
+        
+        for (String entry : days)
         {
-            entry = hours.get(days.get(i));
-            
+            infoText.append(entry + ":\n");
             try
             {
-                if (!entry.get(0).equalsIgnoreCase("closed") && !entry.get(2).equalsIgnoreCase("closed"))
-                    h.append(String.format("%s: \t %s-%s \t %s-%s\n", days.get(i),
-                            entry.get(0), entry.get(1), entry.get(2), entry.get(3)));
-                else if (!entry.get(0).equalsIgnoreCase("closed"))
-                    h.append(String.format("%s: \t %s-%s\n", days.get(i), entry.get(0), entry.get(1)));
-                else if (!entry.get(3).equalsIgnoreCase("closed"))
-                    h.append(String.format("%s: \t %s-%s\n", days.get(i), entry.get(0), entry.get(1)));
+                if (!hours.get(entry).get(0).equalsIgnoreCase("closed") && !hours.get(entry).get(2).equalsIgnoreCase("closed"))
+                {
+                    infoText2.append(String.format("%s-%s\n", hours.get(entry).get(0), hours.get(entry).get(1)));
+                    infoText.append("\n");
+                    infoText2.append(String.format("%s-%s\n", hours.get(entry).get(2), hours.get(entry).get(3)));
+                } else if (!hours.get(entry).get(0).equalsIgnoreCase("closed"))
+                    infoText2.append(String.format("%s-%s\n", hours.get(entry).get(0), hours.get(entry).get(1)));
+                else if (!hours.get(entry).get(3).equalsIgnoreCase("closed"))
+                    infoText2.append(String.format("%s-%s\n", hours.get(entry).get(2), hours.get(entry).get(3)));
                 else
-                    h.append(String.format("%s: \t %s\n", days.get(i), "Closed"));
+                    infoText2.append(String.format("%s\n", "Closed"));
             } catch (Exception e)
             {
-                h.append(String.format("%s: \t %s\n", days.get(i), "Closed"));
+                infoText2.append(String.format("%s\n", "Closed"));
             }
+            infoText.append("\n");
+            infoText2.append("\n");
+        }
+    }
+    
+    public String displayHoursFormat()
+    {
+        StringBuilder h = new StringBuilder();
+        
+        for (Map.Entry<String, ArrayList<String>> entry : hours.entrySet())
+        {
+            try
+            {
+                if (!entry.getValue().get(0).equalsIgnoreCase("closed") && !entry.getValue().get(2).equalsIgnoreCase("closed"))
+                    h.append(String.format("%s: \t\t %s-%s \t %s-%s\n", entry.getKey(),
+                            entry.getValue().get(0), entry.getValue().get(1), entry.getValue().get(2), entry.getValue().get(3)));
+                else if (!entry.getValue().get(0).equalsIgnoreCase("closed"))
+                    h.append(String.format("%s: \t\t %s-%s\n", entry.getKey(), entry.getValue().get(0), entry.getValue().get(1)));
+                else if (!entry.getValue().get(3).equalsIgnoreCase("closed"))
+                    h.append(String.format("%s: \t\t %s-%s\n", entry.getKey(), entry.getValue().get(2), entry.getValue().get(3)));
+                else
+                    h.append(String.format("%s: \t\t %s\n", entry.getKey(), "Closed"));
+            } catch (Exception e)
+            {
+                h.append(String.format("%s: \t %s\n", entry.getKey(), "Closed"));
+            }
+            
         }
         
         return h.toString();

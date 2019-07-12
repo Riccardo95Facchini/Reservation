@@ -118,7 +118,7 @@ public class Activity_Shop extends AppCompatActivity
             super.onBackPressed();
             
             if (lastFragment == PROFILE)
-                bottomMenu.getMenu().getItem(lastFragment).setCheckable(true);
+                bottomMenu.getMenu().getItem(bottomStack.peek()).setCheckable(true);
             
             lastFragment = bottomStack.pop();
             

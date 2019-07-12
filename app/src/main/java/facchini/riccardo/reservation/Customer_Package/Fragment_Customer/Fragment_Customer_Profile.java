@@ -71,7 +71,7 @@ public class Fragment_Customer_Profile extends Fragment
                 intent.putExtra("name", current.getName());
                 intent.putExtra("mail", current.getMail());
                 intent.putExtra("phone", current.getPhone());
-                intent.putExtra("storageUrl", current.getProfilePicUrl());
+                intent.putExtra("profilePicUrl", current.getProfilePicUrl());
                 intent.putExtra("editing", true);
                 startActivity(intent);
             }

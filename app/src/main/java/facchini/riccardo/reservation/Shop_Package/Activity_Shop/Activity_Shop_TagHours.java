@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import facchini.riccardo.reservation.Activity_Login;
+import facchini.riccardo.reservation.InitReservationUpdate;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
@@ -358,8 +359,7 @@ public class Activity_Shop_TagHours extends AppCompatActivity
             shop = new Shop(uid, name, mail, "", address, city, zip, phone, latitude, longitude,
                     0, 0, intLongitude, tags, hours); //TODO: add profilePicUrl
             shopsReference.document(uid).set(shop);
-            int reservations = 0;
-            db.collection("reservationsUpdate").document(uid).set(reservations);
+            db.collection("reservationsUpdate").document(uid).set(new InitReservationUpdate());
             startActivity(new Intent(this, Activity_Login.class));
         } else
         {

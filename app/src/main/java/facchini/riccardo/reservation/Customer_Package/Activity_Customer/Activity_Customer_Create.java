@@ -23,6 +23,7 @@ import com.google.firebase.storage.StorageTask;
 import facchini.riccardo.reservation.Activity_Login;
 import facchini.riccardo.reservation.Customer_Package.Customer;
 import facchini.riccardo.reservation.ImageUploader;
+import facchini.riccardo.reservation.InitReservationUpdate;
 import facchini.riccardo.reservation.R;
 
 public class Activity_Customer_Create extends AppCompatActivity
@@ -33,6 +34,7 @@ public class Activity_Customer_Create extends AppCompatActivity
     private String phone;
     private String profilePicUrl;
     private ImageUploader imageUploader;
+    private boolean editing;
     
     //Firestore
     private FirebaseFirestore db;
@@ -60,7 +62,7 @@ public class Activity_Customer_Create extends AppCompatActivity
         mail = intent.getStringExtra("mail");
         phone = intent.getStringExtra("phone");
         profilePicUrl = intent.getStringExtra("profilePicUrl");
-        boolean editing = intent.getBooleanExtra("editing", false);
+        editing = intent.getBooleanExtra("editing", false);
         
         //Initialize UI elements
         //Buttons
@@ -181,11 +183,11 @@ public class Activity_Customer_Create extends AppCompatActivity
     
     private void sendData()
     {
-        phone = phone.isEmpty() ? phoneText.getText().toString() : phone;
+        if (!editing)
+            db.collection("reservationsUpdate").document(uid).set(new InitReservationUpdate());
+        phone = phone == null || phone.isEmpty() ? phoneText.getText().toString() : phone;
         Customer newCustomer = new Customer(uid, nameText.getText().toString(), phone, mail, profilePicUrl);
         customers.document(uid).set(newCustomer);
-        int reservations = 0;
-        db.collection("reservationsUpdate").document(uid).set(reservations);
         startActivity(new Intent(this, Activity_Login.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }
