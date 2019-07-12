@@ -3,9 +3,6 @@ package facchini.riccardo.reservation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,6 +12,10 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -75,7 +76,7 @@ public class Activity_Login extends AppCompatActivity
         setTitle(R.string.loading);
         
         sharedPref = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
-    
+        
         firebaseAuth = FirebaseAuth.getInstance();
         
         uid = firebaseAuth.getUid();
@@ -83,8 +84,10 @@ public class Activity_Login extends AppCompatActivity
         if (uid != null && !uid.isEmpty())
         {
             isCustomer = sharedPref.getBoolean(getString(R.string.isCustomer_key), false);
-            isShop = !isCustomer;
-            userTypeDecision(sharedPref.getString(getString(R.string.current_user_username_key), ""), true);
+            isShop = sharedPref.getBoolean(getString(R.string.isShop_key), false);
+            
+            if (isCustomer || isShop)
+                userTypeDecision(sharedPref.getString(getString(R.string.current_user_username_key), ""), true);
         }
         
         //firebaseStorage = FirebaseStorage.getInstance();
@@ -239,6 +242,7 @@ public class Activity_Login extends AppCompatActivity
         {
             startActivity(new Intent(this, Activity_Customer.class));
             edit.putBoolean(getString(R.string.isCustomer_key), true).apply();
+            edit.putBoolean(getString(R.string.isShop_key), false).apply();
             if (!skipped)
                 firebaseAuth.removeAuthStateListener(authStateListener);
             finish();
@@ -246,6 +250,7 @@ public class Activity_Login extends AppCompatActivity
         {
             startActivity(new Intent(this, Activity_Shop.class));
             edit.putBoolean(getString(R.string.isCustomer_key), false).apply();
+            edit.putBoolean(getString(R.string.isShop_key), true).apply();
             if (!skipped)
                 firebaseAuth.removeAuthStateListener(authStateListener);
             finish();
@@ -254,6 +259,7 @@ public class Activity_Login extends AppCompatActivity
             //Stay here and make the user create a either a shop or a customer account
             disableProgressEnableButtons();
             edit.putBoolean(getString(R.string.isCustomer_key), false).apply();
+            edit.putBoolean(getString(R.string.isShop_key), false).apply();
             setTitle(R.string.registrations);
         }
     }
@@ -263,18 +269,11 @@ public class Activity_Login extends AppCompatActivity
      */
     private void disableProgressEnableButtons()
     {
-        runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                createCustomerButton.setVisibility(View.VISIBLE);
-                createShopButton.setVisibility(View.VISIBLE);
-                selectTypeText.setVisibility(View.VISIBLE);
-                startupProgressBar.setVisibility(View.GONE);
-                startupText.setVisibility(View.GONE);
-            }
-        });
+        createCustomerButton.setVisibility(View.VISIBLE);
+        createShopButton.setVisibility(View.VISIBLE);
+        selectTypeText.setVisibility(View.VISIBLE);
+        startupProgressBar.setVisibility(View.GONE);
+        startupText.setVisibility(View.GONE);
     }
     
     @Override
