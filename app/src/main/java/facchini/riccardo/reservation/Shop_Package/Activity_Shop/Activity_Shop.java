@@ -36,7 +36,7 @@ public class Activity_Shop extends AppCompatActivity
     
     private byte backButton;
     private int lastFragment;
-    private static final int HOME = 0, HISTORY = 2, PROFILE = 3;
+    private static final int HOME = 0, HISTORY = 1, PROFILE = 2;
     private Stack<Integer> bottomStack;
     
     private BottomNavigationView bottomMenu;
