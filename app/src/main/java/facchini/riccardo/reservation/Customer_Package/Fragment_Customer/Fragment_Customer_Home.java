@@ -75,7 +75,6 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
         
         noReservationsText.setVisibility(View.GONE);
         
-        
         progressBar.setVisibility(View.VISIBLE);
         
         final CountDownTimer timer = new CountDownTimer(5000, 500)

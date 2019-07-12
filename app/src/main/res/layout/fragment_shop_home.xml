@@ -19,6 +19,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+android:fontFamily="sans-serif"
         android:id="@+id/noReservations"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

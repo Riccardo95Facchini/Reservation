@@ -70,7 +70,7 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
         textReviews.setText(String.format("(%.2f/5) %d %s", shop.getAverageReviews(), shop.getNumReviews(), getString(R.string.reviews)));
         textPhoneMail.setText(String.format("Phone: %s\nMail: %s", shop.getPhone(), shop.getMail()));
         textHours.setText(shop.displayHoursFormat());
-        Glide.with(this).load(shop.getPic()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(profilePic);
+        Glide.with(this).load(shop.getProfilePicUrl()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(profilePic);
         ratingAvg.setRating((float) shop.getAverageReviews());
         
         ratingReview.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener()

@@ -95,4 +95,9 @@
     <string name="history">History</string>
     <string name="past_reservations">Past Reservations</string>
     <string name="shopInfo">Shop info</string>
+    <string name="name">Name</string>
+    <string name="upload_error">Something went wrong uploading the image</string>
+    <string name="enter_valid_mail_address">Enter a valid mail address</string>
+    <string name="wait_for_image_upload">Wait for image upload to finish</string>
+    <string name="error_empty">Can\'t be empty</string>
 </resources>

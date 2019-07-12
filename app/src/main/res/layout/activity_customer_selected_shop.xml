@@ -31,10 +31,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/nameText"
-                app:layout_constraintWidth_percent="0.4" />
+                app:layout_constraintWidth_percent="0.35"  />
 
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/nameText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -50,6 +51,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/shopInfoText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -63,6 +65,7 @@
                 tools:text="shopInfoText" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/shopHoursText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -91,7 +94,8 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:backgroundTint="@color/colorPrimary"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/button_custom_gradient"
                 android:text="@string/selectDate"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

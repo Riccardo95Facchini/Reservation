@@ -37,6 +37,11 @@
             android:label="@string/tagsAndHours" />
         <activity android:name=".Customer_Package.Activity_Customer.Activity_Customer" />
         <activity android:name=".Shop_Package.Activity_Shop.Activity_Shop" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBl5HIARSrlcJzKjiDc-YyT_CUmX3H5qBQ"/>
+
     </application>
 
 </manifest>

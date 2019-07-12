@@ -61,7 +61,7 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
         holder.textName.setText(shop.getName());
         holder.textAddress.setText(shop.displayFullAddress());
         holder.textWhen.setText(res.getDateFormatted());
-        Glide.with(context).load(shop.getPic()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
+        Glide.with(context).load(shop.getProfilePicUrl()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
     }
     
     @Override

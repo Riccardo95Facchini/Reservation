@@ -26,6 +26,7 @@
             android:layout_height="wrap_content">
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/tagsTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -47,7 +48,8 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/colorPrimary"
+                android:textColor="@color/white"
+                android:background="@drawable/button_custom_gradient"
                 android:text="@string/sendButtonText"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
@@ -69,6 +71,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tagsTextView" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/hoursText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -86,12 +89,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:backgroundTint="@color/colorOptionalButton"
+                android:background="@drawable/button_custom_shape"
                 android:text="@string/mon"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/hoursText" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textMon"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -109,12 +113,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:backgroundTint="@color/colorOptionalButton"
+                android:background="@drawable/button_custom_shape"
                 android:text="@string/tue"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/mondayButton" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textTue"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -132,12 +137,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:backgroundTint="@color/colorOptionalButton"
+                android:background="@drawable/button_custom_shape"
                 android:text="@string/wed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tuesdayButton" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textWed"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -155,12 +161,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:backgroundTint="@color/colorOptionalButton"
+                android:background="@drawable/button_custom_shape"
                 android:text="@string/thu"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/wednesdayButton" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textThu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -178,12 +185,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:backgroundTint="@color/colorOptionalButton"
+                android:background="@drawable/button_custom_shape"
                 android:text="@string/fri"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/thursdayButton" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textFri"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -201,12 +209,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:backgroundTint="@color/colorOptionalButton"
+                android:background="@drawable/button_custom_shape"
                 android:text="@string/sat"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/fridayButton" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textSat"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -224,12 +233,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:backgroundTint="@color/colorOptionalButton"
+                android:background="@drawable/button_custom_shape"
                 android:text="@string/sun"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/saturdayButton" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textSun"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

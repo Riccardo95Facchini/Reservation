@@ -11,5 +11,7 @@
     <color name="colorOptionalButton">#808080</color>
     <color name="colorBackground">#FFFFFF</color>
     <color name="colorCard">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 
 </resources>

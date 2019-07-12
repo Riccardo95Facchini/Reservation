@@ -57,7 +57,7 @@ public class Adapter_Customer_SearchCard extends RecyclerView.Adapter<Adapter_Cu
         holder.textAddress.setText(shop.displayFullAddress());
         holder.textDistance.setText(res.getFormatDistance());
         holder.ratingBar.setRating((float) shop.getAverageReviews());
-        Glide.with(context).load(shop.getPic()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
+        Glide.with(context).load(shop.getProfilePicUrl()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
         
     }
     

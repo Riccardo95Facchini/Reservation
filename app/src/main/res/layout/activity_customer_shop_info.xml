@@ -31,7 +31,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.4" />
+                app:layout_constraintWidth_percent="0.35"  />
 
             <ImageButton
                 android:id="@+id/buttonChat"
@@ -44,6 +44,7 @@
                 app:srcCompat="@android:drawable/ic_menu_send" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textAddress"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -57,6 +58,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/ratingAvg" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textPhoneMail"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -93,6 +95,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/textLeaveAReview" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textReviews"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -103,6 +106,7 @@
                 app:layout_constraintTop_toTopOf="@+id/ratingAvg" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textHours"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -115,6 +119,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/textPhoneMail" />
 
             <TextView
+android:fontFamily="sans-serif"
                 android:id="@+id/textLeaveAReview"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

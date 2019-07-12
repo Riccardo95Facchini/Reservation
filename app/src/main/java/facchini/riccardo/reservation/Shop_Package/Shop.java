@@ -3,6 +3,7 @@ package facchini.riccardo.reservation.Shop_Package;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -10,9 +11,12 @@ import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import facchini.riccardo.reservation.Converters;
+import facchini.riccardo.reservation.Info_Content;
+import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.User;
 
 /**
@@ -80,6 +84,15 @@ public class Shop extends User
     }
     
     //endregion Shop.Constructors
+    
+    @Override
+    public List<Info_Content> createInfoContentList()
+    {
+        List<Info_Content> contents = super.createInfoContentList();
+        contents.add(new Info_Content(R.drawable.ic_hours_color_32dp, displayHoursFormat()));
+        contents.add(new Info_Content(R.drawable.ic_location_on_primary_32dp, displayFullAddress(), name , new LatLng(latitude, longitude)));
+        return contents;
+    }
     
     //region Shop.ParcelableMethods
     
@@ -245,6 +258,7 @@ public class Shop extends User
     
     //region Shop.FromToArrayList
     
+    @Override
     public ArrayList<String> toArrayList()
     {
         ArrayList<String> list = new ArrayList<>();

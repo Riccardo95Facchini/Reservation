@@ -3,7 +3,6 @@ package facchini.riccardo.reservation.Shop_Package.Adapter_Shop;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +54,7 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
         holder.textName.setText(customer.getName());
         holder.textWhen.setText(res.getDateFormatted());
         holder.customerUid = customer.getUid();
-        Glide.with(context).load(customer.getPic()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
+        Glide.with(context).load(customer.getProfilePicUrl()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
     }
     
     @Override

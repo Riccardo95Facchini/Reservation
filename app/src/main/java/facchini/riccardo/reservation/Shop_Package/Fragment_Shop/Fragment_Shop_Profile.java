@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -14,23 +14,31 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import facchini.riccardo.reservation.Adapter_CardInfo;
 import facchini.riccardo.reservation.CurrentUserViewModel;
+import facchini.riccardo.reservation.Info_Content;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Shop_Package.Activity_Shop.Activity_Shop_Create;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Fragment_Shop_Profile extends Fragment
 {
-    private ImageButton buttonEdit;
-    
-    private TextView textShopName;
-    private TextView textHours;
-    private TextView textReviews;
-    private TextView textPhoneMail;
-    private TextView textAddress;
-    //private ImageView profilePic;  TODO: profile pic
+    private ImageView profilePic;
     private RatingBar ratingAvg;
+    private RecyclerView recyclerView;
+    private TextView textReviews;
+    
+    private Adapter_CardInfo adapterCardInfo;
+    private List<Info_Content> contents;
     
     private CurrentUserViewModel viewModel;
     
@@ -48,24 +56,16 @@ public class Fragment_Shop_Profile extends Fragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
-        textShopName = view.findViewById(R.id.textShopName);
-        textHours = view.findViewById(R.id.textHours);
+        profilePic = view.findViewById(R.id.profilePic);
         textReviews = view.findViewById(R.id.textReviews);
-        textPhoneMail = view.findViewById(R.id.textPhoneMail);
-        textAddress = view.findViewById(R.id.textAddress);
-        buttonEdit = view.findViewById(R.id.buttonEdit);
-        //profilePic = view.findViewById(R.id.shopPic);  TODO: profile pic
         ratingAvg = view.findViewById(R.id.ratingAvg);
-    }
-    
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
-    {
-        super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(getActivity()).get(CurrentUserViewModel.class);
+        recyclerView = view.findViewById(R.id.info);
+        ImageButton buttonEdit = view.findViewById(R.id.buttonEdit);
         
-        shop = (Shop) viewModel.getCurrentUser().getValue();
-        fillProfile();
+        contents = new ArrayList<>();
+        adapterCardInfo = new Adapter_CardInfo(getContext(), contents);
+        recyclerView.setAdapter(adapterCardInfo);
+        
         
         buttonEdit.setOnClickListener(new View.OnClickListener()
         {
@@ -82,15 +82,22 @@ public class Fragment_Shop_Profile extends Fragment
         });
     }
     
-    private void fillProfile()
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
-        textShopName.setText(shop.getName());
-        textAddress.setText(String.format("%s %s %s", shop.getAddress(),
-                shop.getCity(), shop.getZip()));
+        super.onActivityCreated(savedInstanceState);
+        viewModel = ViewModelProviders.of(getActivity()).get(CurrentUserViewModel.class);
+        
+        shop = (Shop) viewModel.getCurrentUser().getValue();
+        
+        Glide.with(this).load(shop.getProfilePicUrl()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(profilePic);
+        
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        
         textReviews.setText(String.format("(%.2f/5) %d %s", shop.getAverageReviews(), shop.getNumReviews(), getString(R.string.reviews)));
-        textPhoneMail.setText(String.format("Phone: %s\nMail: %s", shop.getPhone(), shop.getMail()));
-        textHours.setText(shop.displayHoursFormat());
-        //shopPic.setImageResource();
         ratingAvg.setRating((float) shop.getAverageReviews());
+        contents.addAll(viewModel.getCurrentUser().getValue().createInfoContentList());
+        
     }
 }

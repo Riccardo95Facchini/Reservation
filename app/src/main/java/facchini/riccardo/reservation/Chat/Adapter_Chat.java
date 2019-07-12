@@ -51,7 +51,7 @@ public class Adapter_Chat extends RecyclerView.Adapter<Adapter_Chat.ChatEntry_Vi
         else
             holder.imageNew.setVisibility(View.GONE);
         
-        //holder.profilePic.setImageResource();
+        //holder.profilePicUrl.setImageResource();
         holder.textViewChatWith.setText(chat.getOtherName());
         holder.textViewWhen.setText(chat.getDateFormatted());
     }
