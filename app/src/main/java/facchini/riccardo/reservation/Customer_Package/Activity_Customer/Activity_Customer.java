@@ -47,6 +47,7 @@ public class Activity_Customer extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        
         backButton = 0;
         bottomStack = new Stack<>();
         setContentView(R.layout.activity_customer);

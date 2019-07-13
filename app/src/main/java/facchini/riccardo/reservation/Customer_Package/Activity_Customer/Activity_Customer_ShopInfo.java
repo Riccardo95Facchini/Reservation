@@ -26,7 +26,7 @@ import java.util.List;
 import facchini.riccardo.reservation.Adapter_CardInfo;
 import facchini.riccardo.reservation.Info_Content;
 import facchini.riccardo.reservation.R;
-import facchini.riccardo.reservation.RatingDialog;
+import facchini.riccardo.reservation.Dialog_Rating;
 import facchini.riccardo.reservation.Review;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
@@ -103,7 +103,7 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
     
     private void startRateDialog()
     {
-        final RatingDialog ratingDialog = new RatingDialog(this, R.style.RatingDialogTheme, pastRating);
+        final Dialog_Rating ratingDialog = new Dialog_Rating(this, R.style.RatingDialogTheme, pastRating);
         
         ratingDialog.getRating().setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener()
         {
@@ -145,7 +145,7 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
      * Sends the review and sets the boolean to force the update, still it may be faster than the calling of the server side function.
      * There is no actual way to implement a scalable update system since the listeners would constantly launch during a real deploy.
      */
-    private void sendReview(int rating, RatingDialog ratingDialog)
+    private void sendReview(int rating, Dialog_Rating ratingDialog)
     {
         if (reviewId.isEmpty())
         {

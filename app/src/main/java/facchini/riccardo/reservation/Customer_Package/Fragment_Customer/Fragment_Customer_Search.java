@@ -1,15 +1,10 @@
 package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,14 +24,18 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 import facchini.riccardo.reservation.CurrentUserViewModel;
 import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_SelectedShop;
@@ -66,14 +65,11 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     private SharedPreferences sharedPreferences;
     
     //Location
+    private final static int AUTOCOMPLETE_REQUEST_CODE = 1;
     private Location myLocation;
     private int distance = 1;
     
     private double deltaLng, deltaLat;
-    
-    //Firestore
-    FirebaseFirestore db;
-    CollectionReference shopsCollection;
     
     @Nullable
     @Override
@@ -129,9 +125,6 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
         });
         
         progressBar.setVisibility(View.GONE);
-        
-        db = FirebaseFirestore.getInstance();
-        shopsCollection = db.collection("shops");
         
         searchText.setOnKeyListener(new View.OnKeyListener()
         {
@@ -204,68 +197,31 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
      */
     private void getLocation()
     {
-        final String lastLocationString = sharedPreferences.getString(getString(R.string.last_location_string_key), "");
+        String oldAddress = sharedPreferences.getString(getString(R.string.last_location_string_key), "");
+        if (!Places.isInitialized())
+            Places.initialize(getContext().getApplicationContext(), "AIzaSyBl5HIARSrlcJzKjiDc-YyT_CUmX3H5qBQ");
         
-        final EditText input = new EditText(getContext());
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        input.setText(lastLocationString);
-        final Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
-        
-        //TODO: implement google places
-        new AlertDialog.Builder(getContext()).setCancelable(false).setView(input)
-                .setTitle(getString(R.string.addressSearch))
-                .setMessage(getString(R.string.addressSearchInput))
-                .setPositiveButton("Set", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        myLocation = new Location("myLocation");
-                        if (!input.getText().toString().isEmpty() && input.getText().toString().equals(lastLocationString))
-                        {
-                            try
-                            {
-                                myLocation.setLatitude(sharedPreferences.getFloat(getString(R.string.last_latitude_key), 0f));
-                                myLocation.setLongitude(sharedPreferences.getFloat(getString(R.string.last_longitude_key), 0f));
-                            } catch (Exception e)
-                            {
-                                Toast.makeText(getContext(), "Error, address could not be found", Toast.LENGTH_SHORT).show();
-                                myLocation = null;
-                                searchText.clearFocus();
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(getString(R.string.last_location_string_key), "");
-                            }
-                        } else
-                        {
-                            try
-                            {
-                                Address selectedAddress = geocoder.getFromLocationName(input.getText().toString(), 1).get(0);
-                                myLocation.setLatitude(selectedAddress.getLatitude());
-                                myLocation.setLongitude(selectedAddress.getLongitude());
-                                
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(getString(R.string.last_location_string_key), input.getText().toString());
-                                editor.putFloat(getString(R.string.last_latitude_key), (float) selectedAddress.getLatitude());
-                                editor.putFloat(getString(R.string.last_longitude_key), (float) selectedAddress.getLongitude());
-                                editor.apply();
-                                
-                            } catch (Exception e)
-                            {
-                                Toast.makeText(getContext(), "Error, address could not be found", Toast.LENGTH_SHORT).show();
-                                myLocation = null;
-                                searchText.clearFocus();
-                            }
-                        }
-                    }
-                }).setNegativeButton("Back", new DialogInterface.OnClickListener()
+        List<Place.Field> fields = Arrays.asList(Place.Field.ADDRESS, Place.Field.LAT_LNG);
+        Intent autocomplete = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields).setInitialQuery(oldAddress).build(getContext());
+        startActivityForResult(autocomplete, AUTOCOMPLETE_REQUEST_CODE);
+    }
+    
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == AutocompleteActivity.RESULT_OK)
         {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                searchText.clearFocus();
-                myLocation = null;
-            }
-        }).show();
+            myLocation = new Location("myLocation");
+            Place place = Autocomplete.getPlaceFromIntent(data);
+            String address = place.getAddress();
+            LatLng latLng = place.getLatLng();
+            
+            myLocation.setLatitude(latLng.latitude);
+            myLocation.setLongitude(latLng.longitude);
+            
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(getString(R.string.last_location_string_key), address).apply();
+        }
     }
     
     /**
@@ -278,14 +234,8 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
         progressBar.setVisibility(View.VISIBLE);
         getDeltas();
         foundShops.clear();
-        try
-        {
-            searchViewModel.getSearchResults().getValue().clear();
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    
+        searchViewModel.reset();
+        
         final Fragment_Customer_Search listener = this;
         
         Observer observer = new Observer<List<SearchResult>>()

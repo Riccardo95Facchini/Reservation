@@ -107,5 +107,7 @@ public class SearchViewModel extends ViewModel
         
     }
     
+    public void reset() {searchResults = new MutableLiveData<>();}
+    
     public MutableLiveData<List<SearchResult>> getSearchResults() {return searchResults;}
 }

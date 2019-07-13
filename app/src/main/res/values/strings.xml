@@ -103,4 +103,6 @@
     <string name="error_empty">Can\'t be empty</string>
     <string name="rate">Rate</string>
     <string name="rating">Rating</string>
+    <string name="address_search">Address Search</string>
+    <string name="search_address">Search address</string>
 </resources>

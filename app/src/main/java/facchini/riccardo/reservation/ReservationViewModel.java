@@ -191,8 +191,6 @@ public class ReservationViewModel extends ViewModel
         
         for (final QueryDocumentSnapshot doc : snap)
         {
-            Log.d("RES: ", String.valueOf(doc.getLong("time")));
-            Log.d("RES: ", doc.getString("shopName"));
             res.add(new ReservationFirestore(doc.getId(), doc.getString("shopUid"), doc.getString("shopName"),
                     doc.getString("shopPic"), doc.getString("where"), doc.getLong("time")));
             
