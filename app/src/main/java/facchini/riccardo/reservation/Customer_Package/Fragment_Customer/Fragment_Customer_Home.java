@@ -200,6 +200,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
                     Bundle b = new Bundle();
                     b.putParcelable("Selected", shop);
                     intent.putExtras(b);
+                    intent.putExtra("name", currentUserViewModel.getCurrentUser().getValue().getName());
                     getContext().startActivity(intent);
                     currentUserViewModel.getSelectedShop().removeObserver(this);
                     currentUserViewModel.getSelectedShop().setValue(null);

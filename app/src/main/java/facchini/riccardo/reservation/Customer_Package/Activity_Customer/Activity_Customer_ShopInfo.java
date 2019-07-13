@@ -1,5 +1,6 @@
 package facchini.riccardo.reservation.Customer_Package.Activity_Customer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -7,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,9 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import facchini.riccardo.reservation.Adapter_CardInfo;
+import facchini.riccardo.reservation.Chat.Activity_Chat;
+import facchini.riccardo.reservation.Dialog_Rating;
 import facchini.riccardo.reservation.Info_Content;
 import facchini.riccardo.reservation.R;
-import facchini.riccardo.reservation.Dialog_Rating;
 import facchini.riccardo.reservation.Review;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
@@ -38,9 +41,9 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
     
     private Shop shop;
     private String userUid;
+    private String name;
     private String reviewId;
     private long pastRating;
-//    private SharedPreferences pref;
     
     private Adapter_CardInfo adapterCardInfo;
     private List<Info_Content> contents;
@@ -51,20 +54,20 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
         setContentView(R.layout.fragment_shop_profile);
         
         reviewsRef = FirebaseFirestore.getInstance().collection("reviews");
-//        pref = getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
         userUid = FirebaseAuth.getInstance().getUid();
         
         Bundle b = getIntent().getExtras();
         if (b != null)
             shop = b.getParcelable("Selected");
+        name = getIntent().getStringExtra("name");
         
         setTitle(shop.getName());
         checkReviewExists();
         
         Button buttonRate = findViewById(R.id.buttonRate);
         TextView textReviews = findViewById(R.id.textReviews);
-        ImageView profilePic = findViewById(R.id.profilePic);
         RatingBar ratingAvg = findViewById(R.id.ratingAvg);
+        ImageView profilePic = findViewById(R.id.profilePic);
         ImageButton buttonAction = findViewById(R.id.buttonAction);
         recyclerView = findViewById(R.id.info);
         
@@ -87,7 +90,7 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                //startChat(); TODO: start chat
+                startChat();
             }
         });
         
@@ -114,6 +117,15 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
             }
         });
         ratingDialog.show();
+    }
+    
+    private void startChat()
+    {
+        Intent chatIntent = new Intent(Activity_Customer_ShopInfo.this, Activity_Chat.class);
+        chatIntent.putExtra("thisUsername", name);
+        chatIntent.putExtra("otherUid", shop.getUid());
+        chatIntent.putExtra("otherUsername", shop.getName());
+        startActivity(chatIntent);
     }
     
     /**
@@ -152,6 +164,8 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
             reviewsRef.document().set(new Review(rating, shop.getUid(), userUid));
         } else
             reviewsRef.document(reviewId).update("reviewScore", rating);
+        
+        Toast.makeText(this, getString(R.string.revire_sent), Toast.LENGTH_SHORT).show();
         
         //pref.edit().putBoolean(getString(R.string.need_update_key), true).commit();
         ratingDialog.cancel();

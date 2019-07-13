@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,7 +19,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
@@ -36,8 +42,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import facchini.riccardo.reservation.Adapter_CardInfo;
 import facchini.riccardo.reservation.Chat.Activity_Chat;
 import facchini.riccardo.reservation.Fragment_DatePicker;
+import facchini.riccardo.reservation.Info_Content;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
 import facchini.riccardo.reservation.Shop_Package.Shop;
@@ -48,17 +56,16 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
     FirebaseFirestore db;
     CollectionReference reservationsCollection;
     
+    private RecyclerView recyclerView;
+    private Adapter_CardInfo adapterCardInfo;
+    private List<Info_Content> contents;
+    
     private Shop selectedShop;
     private ArrayAdapter<String> adapter;
     private Calendar selectedDate;
     private String name, picUrl;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-    
-    private TextView shopNameText, shopInfoText, shopHoursText;
-    private Button selectDateButton;
-    private ImageButton startChatButton;
-    
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -77,17 +84,27 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         name = intent.getStringExtra("name");
         picUrl = intent.getStringExtra("picUrl");
         
+        setTitle(selectedShop.getName());
         
-        shopNameText = findViewById(R.id.nameText);
-        shopInfoText = findViewById(R.id.shopInfoText);
-        shopHoursText = findViewById(R.id.shopHoursText);
-        selectDateButton = findViewById(R.id.selectDateButton);
-        startChatButton = findViewById(R.id.startChatButton);
+        Button selectDateButton = findViewById(R.id.selectDateButton);
+        ImageView profilePic = findViewById(R.id.profilePic);
+        ImageButton buttonAction = findViewById(R.id.buttonAction);
+        TextView textReviews = findViewById(R.id.textReviews);
+        RatingBar ratingAvg = findViewById(R.id.ratingAvg);
+        recyclerView = findViewById(R.id.info);
         
-        shopNameText.setText(selectedShop.getName());
-        shopInfoText.setText(String.format("City: %s \tAddress: %s", selectedShop.getCity(),
-                selectedShop.getAddress()));
-        shopHoursText.setText(selectedShop.displayHoursFormat());
+        contents = new ArrayList<>();
+        adapterCardInfo = new Adapter_CardInfo(this, contents);
+        recyclerView.setAdapter(adapterCardInfo);
+        
+        buttonAction.setImageResource(R.drawable.ic_chat_primary_color_32dp);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        contents.addAll(selectedShop.createInfoContentList());
+        
+        Glide.with(this).load(selectedShop.getProfilePicUrl()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(profilePic);
+        textReviews.setText(String.format("(%.2f/5) %d %s", selectedShop.getAverageReviews(), selectedShop.getNumReviews(), getString(R.string.reviews)));
+        ratingAvg.setRating((float) selectedShop.getAverageReviews());
         
         selectDateButton.setOnClickListener(new View.OnClickListener()
         {
@@ -99,7 +116,7 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
             }
         });
         
-        startChatButton.setOnClickListener(new View.OnClickListener()
+        buttonAction.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
