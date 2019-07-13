@@ -101,4 +101,5 @@
     <string name="enter_valid_mail_address">Enter a valid mail address</string>
     <string name="wait_for_image_upload">Wait for image upload to finish</string>
     <string name="error_empty">Can\'t be empty</string>
+    <string name="rate">Rate</string>
 </resources>
