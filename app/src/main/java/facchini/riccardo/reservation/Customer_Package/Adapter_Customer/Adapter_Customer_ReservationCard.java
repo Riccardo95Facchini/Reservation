@@ -21,6 +21,7 @@ import java.util.List;
 import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_ShopInfo;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.Reservation_Package.OnReservationListener;
 import facchini.riccardo.reservation.Reservation_Package.Reservation;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
@@ -30,6 +31,7 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
     private Context context;
     private List<Reservation> reservationCustomerHomeList;
     private OnItemClickListener itemListener;
+    private OnReservationListener infoListener;
     
     public Adapter_Customer_ReservationCard(Context context, List<Reservation> reservationCustomerHomeList)
     {
@@ -37,9 +39,10 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
         this.reservationCustomerHomeList = reservationCustomerHomeList;
     }
     
-    public void setOnItemClickListener(OnItemClickListener itemListener)
+    public void setOnItemClickListener(OnItemClickListener itemListener, OnReservationListener infoListener)
     {
         this.itemListener = itemListener;
+        this.infoListener = infoListener;
     }
     
     @NonNull
@@ -48,7 +51,7 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
     {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.card_reservation, null);
-        return new Reservation_Customer_ViewHolder(view, itemListener);
+        return new Reservation_Customer_ViewHolder(view, itemListener, infoListener);
     }
     
     @Override
@@ -74,8 +77,9 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
         TextView textName, textAddress, textWhen;
         ImageButton infoButton;
         ImageView profilePic;
+        OnReservationListener infoListener;
         
-        public Reservation_Customer_ViewHolder(@NonNull View itemView, final OnItemClickListener itemClickListener)
+        public Reservation_Customer_ViewHolder(@NonNull View itemView, final OnItemClickListener itemClickListener, final OnReservationListener infoListener)
         {
             super(itemView);
             
@@ -84,14 +88,16 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
             textWhen = itemView.findViewById(R.id.textWhen);
             infoButton = itemView.findViewById(R.id.resButton);
             profilePic = itemView.findViewById(R.id.profilePic);
+            this.infoListener = infoListener;
             
             infoButton.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
-                    Shop shop = (Shop) reservationCustomerHomeList.get(getAdapterPosition()).getOtherUser();
-                    startShopInfoActivity(shop);
+                    infoListener.onInfoClick(getAdapterPosition());
+//                    Shop shop = (Shop) reservationCustomerHomeList.get(getAdapterPosition()).getOtherUser();
+//                    startShopInfoActivity(shop);
                 }
             });
             
@@ -109,18 +115,6 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
                     return true;
                 }
             });
-        }
-        
-        /**
-         * @param shop The shop for which the info are requested
-         */
-        private void startShopInfoActivity(Shop shop)
-        {
-            Intent intent = new Intent(context, Activity_Customer_ShopInfo.class);
-            Bundle b = new Bundle();
-            b.putParcelable("Selected", shop);
-            intent.putExtras(b);
-            context.startActivity(intent);
         }
     }
 }

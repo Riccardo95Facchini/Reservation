@@ -3,6 +3,7 @@ package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -23,13 +24,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_ShopInfo;
 import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_ReservationCard;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.ReservationViewModel;
+import facchini.riccardo.reservation.Reservation_Package.OnReservationListener;
 import facchini.riccardo.reservation.Reservation_Package.Reservation;
 
-public class Fragment_Customer_Home extends Fragment implements OnItemClickListener
+public class Fragment_Customer_Home extends Fragment implements OnItemClickListener, OnReservationListener
 {
     private ReservationViewModel viewModel;
     private SharedPreferences pref;
@@ -150,7 +153,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
             reservations.addAll(res);
             progressBar.setVisibility(View.GONE);
             recyclerView.setAdapter(adapterCustomerHome);
-            adapterCustomerHome.setOnItemClickListener(this);
+            adapterCustomerHome.setOnItemClickListener(this, this);
         }
     }
     
@@ -176,5 +179,15 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
                 //Do nothing
             }
         }).show();
+    }
+    
+    @Override
+    public void onInfoClick(int position)
+    {
+        Intent intent = new Intent(getContext(), Activity_Customer_ShopInfo.class);
+        Bundle b = new Bundle();
+        b.putParcelable("Selected", reservations.get(position).getOtherUser());
+        intent.putExtras(b);
+        getContext().startActivity(intent);
     }
 }

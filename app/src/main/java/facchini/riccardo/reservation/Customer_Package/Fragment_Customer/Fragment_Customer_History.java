@@ -3,6 +3,7 @@ package facchini.riccardo.reservation.Customer_Package.Fragment_Customer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -33,13 +34,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_ShopInfo;
 import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_ReservationCard;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
+import facchini.riccardo.reservation.Reservation_Package.OnReservationListener;
 import facchini.riccardo.reservation.Reservation_Package.Reservation;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
-public class Fragment_Customer_History extends Fragment implements OnItemClickListener
+public class Fragment_Customer_History extends Fragment implements OnItemClickListener, OnReservationListener
 {
     //Firestore
     private FirebaseFirestore db;
@@ -47,7 +50,7 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
     
     private Calendar now;
     private String customerUid;
-    private List<Reservation> resList;
+    private List<Reservation> reservations;
     private SharedPreferences pref;
     
     private RecyclerView recyclerView;
@@ -98,9 +101,9 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
         recyclerView = view.findViewById(R.id.pastReservations);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        
-        resList = new ArrayList<>();
-        adapterCustomerHistory = new Adapter_Customer_ReservationCard(getContext(), resList);
+    
+        reservations = new ArrayList<>();
+        adapterCustomerHistory = new Adapter_Customer_ReservationCard(getContext(), reservations);
         recyclerView.setAdapter(adapterCustomerHistory);
         
         noReservationsText = view.findViewById(R.id.noReservations);
@@ -160,11 +163,11 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
                 public void onSuccess(DocumentSnapshot documentSnapshot)
                 {
                     if (documentSnapshot.exists())
-                        resList.add(
+                        reservations.add(
                                 new Reservation(doc.getId(), ((Timestamp) doc.get("time")).toDate(),
                                         documentSnapshot.toObject(Shop.class)));
                     
-                    if (resList.size() == snap.size())
+                    if (reservations.size() == snap.size())
                         orderList();
                 }
             });
@@ -176,11 +179,11 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
      */
     private void orderList()
     {
-        Collections.sort(resList, Collections.reverseOrder(reservationComparator));
+        Collections.sort(reservations, Collections.reverseOrder(reservationComparator));
         
-        adapterCustomerHistory = new Adapter_Customer_ReservationCard(getContext(), resList);
+        adapterCustomerHistory = new Adapter_Customer_ReservationCard(getContext(), reservations);
         recyclerView.setAdapter(adapterCustomerHistory);
-        adapterCustomerHistory.setOnItemClickListener(this);
+        adapterCustomerHistory.setOnItemClickListener(this, this);
         
         progressBar.setVisibility(View.GONE);
     }
@@ -200,7 +203,7 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
     @Override
     public void onItemClick(final int position)
     {
-        Reservation res = resList.get(position);
+        Reservation res = reservations.get(position);
         new AlertDialog.Builder(getContext()).setCancelable(true)
                 .setTitle(getString(R.string.areYouSure))
                 .setMessage(getString(R.string.deleteReservationFor).concat(res.getOtherUser().getName()).concat(getString(R.string.onWithTabs)).concat(res.getDateFormatted()))
@@ -209,7 +212,7 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        reservationsCollection.document(resList.get(position).getResUid()).delete();
+                        reservationsCollection.document(reservations.get(position).getResUid()).delete();
                         getActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragmentContainer, new Fragment_Customer_History()).commit();
                     }
@@ -221,5 +224,15 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
                 //Do nothing
             }
         }).show();
+    }
+    
+    @Override
+    public void onInfoClick(int position)
+    {
+        Intent intent = new Intent(getContext(), Activity_Customer_ShopInfo.class);
+        Bundle b = new Bundle();
+        b.putParcelable("Selected", reservations.get(position).getOtherUser());
+        intent.putExtras(b);
+        getContext().startActivity(intent);
     }
 }
