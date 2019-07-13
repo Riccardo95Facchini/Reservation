@@ -8,18 +8,19 @@ import java.util.HashMap;
 
 public class ChatData implements Comparable<ChatData>
 {
-    private String thisName, otherName, otherUid, lastText, photoRef;
+    private String thisName, otherName, otherUid, lastText, thisPhoto, otherPhoto;
     private boolean isRead;
     private Date lastMsgDate;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM HH:mm");
     
-    public ChatData(String thisName, String otherName, String otherUid, String lastText, String photoRef, Date lastMsgDate)
+    public ChatData(String thisName, String otherName, String otherUid, String lastText, String thisPhoto, String otherPhoto, Date lastMsgDate)
     {
         this.thisName = thisName;
         this.otherName = otherName;
         this.otherUid = otherUid;
         this.lastText = lastText;
-        this.photoRef = photoRef;
+        this.thisPhoto = thisPhoto;
+        this.otherPhoto = otherPhoto;
         this.isRead = false;
         this.lastMsgDate = lastMsgDate;
     }
@@ -30,7 +31,8 @@ public class ChatData implements Comparable<ChatData>
         this.otherName = (String) map.get("otherName");
         this.otherUid = (String) map.get("otherUid");
         this.lastText = (String) map.get("lastText");
-        this.photoRef = (String) map.get("photoRef");
+        this.thisPhoto = (String) map.get("thisPhoto");
+        this.otherPhoto = (String) map.get("otherPhoto");
         
         try
         {
@@ -56,11 +58,13 @@ public class ChatData implements Comparable<ChatData>
     
     public String getLastText() {return lastText;}
     
-    public String getPhotoRef() {return photoRef;}
+    public String getThisPhoto() {return thisPhoto;}
+    
+    public Date getLastMsgDate() {return lastMsgDate;}
+    
+    public String getOtherPhoto() {return otherPhoto;}
     
     public boolean isRead() {return isRead;}
-    
-    public Date getlastMsgDate() {return lastMsgDate;}
     
     public void setLastText(String lastText)
     {
@@ -77,9 +81,7 @@ public class ChatData implements Comparable<ChatData>
         this.lastMsgDate = lastMsgDate;
     }
     
-    
-    
-    public String getDateFormatted() { return dateFormat.format(lastMsgDate); }
+    public String dateFormatted() { return dateFormat.format(lastMsgDate); }
     
     @Override
     public int compareTo(ChatData o)

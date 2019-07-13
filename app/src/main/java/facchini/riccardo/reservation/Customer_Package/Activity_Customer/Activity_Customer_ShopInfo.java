@@ -43,6 +43,7 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
     private String userUid;
     private String name;
     private String reviewId;
+    private String picUrl;
     private long pastRating;
     
     private Adapter_CardInfo adapterCardInfo;
@@ -56,10 +57,12 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
         reviewsRef = FirebaseFirestore.getInstance().collection("reviews");
         userUid = FirebaseAuth.getInstance().getUid();
         
-        Bundle b = getIntent().getExtras();
+        Intent intent = getIntent();
+        Bundle b = intent.getExtras();
         if (b != null)
             shop = b.getParcelable("Selected");
-        name = getIntent().getStringExtra("name");
+        name = intent.getStringExtra("name");
+        picUrl = intent.getStringExtra("picUrl");
         
         setTitle(shop.getName());
         checkReviewExists();
@@ -125,6 +128,8 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
         chatIntent.putExtra("thisUsername", name);
         chatIntent.putExtra("otherUid", shop.getUid());
         chatIntent.putExtra("otherUsername", shop.getName());
+        chatIntent.putExtra("thisPhoto", picUrl);
+        chatIntent.putExtra("otherPhoto", shop.getProfilePicUrl());
         startActivity(chatIntent);
     }
     

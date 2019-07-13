@@ -2,7 +2,6 @@ package facchini.riccardo.reservation.Chat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.Firebase;
@@ -27,7 +28,6 @@ import java.util.Map;
 
 import facchini.riccardo.reservation.R;
 
-
 public class Activity_Chat extends AppCompatActivity
 {
     private LinearLayout layout;
@@ -38,6 +38,7 @@ public class Activity_Chat extends AppCompatActivity
     
     private boolean justOpened = true;
     private String thisUid, otherUid, thisUsername, otherUsername, nodeName;
+    private String thisPhoto, otherPhoto;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -55,6 +56,8 @@ public class Activity_Chat extends AppCompatActivity
         thisUsername = pastIntent.getStringExtra("thisUsername");
         otherUid = pastIntent.getStringExtra("otherUid");
         otherUsername = pastIntent.getStringExtra("otherUsername");
+        thisPhoto = pastIntent.getStringExtra("thisPhoto");
+        otherPhoto = pastIntent.getStringExtra("otherPhoto");
         
         Firebase.setAndroidContext(this);
         
@@ -141,13 +144,13 @@ public class Activity_Chat extends AppCompatActivity
     private void updateDatabase(String messageText)
     {
         HashMap<String, ChatData> mapThis = new HashMap<>();
-        ChatData thisData = new ChatData(thisUsername, otherUsername, otherUid, messageText, "", new Date());
+        ChatData thisData = new ChatData(thisUsername, otherUsername, otherUid, messageText, thisPhoto, otherPhoto, new Date());
         thisData.setRead(true);
         mapThis.put(otherUid, thisData);
         FirebaseFirestore.getInstance().collection("chats").document(thisUid).set(mapThis, SetOptions.merge());
         
         HashMap<String, ChatData> mapOther = new HashMap<>();
-        ChatData otherData = new ChatData(otherUsername, thisUsername, thisUid, messageText, "", new Date());
+        ChatData otherData = new ChatData(otherUsername, thisUsername, thisUid, messageText, otherPhoto, thisPhoto, new Date());
         mapOther.put(thisUid, otherData);
         FirebaseFirestore.getInstance().collection("chats").document(otherUid).set(mapOther, SetOptions.merge());
         

@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+
 import java.util.List;
 
 import facchini.riccardo.reservation.OnItemClickListener;
@@ -51,9 +54,9 @@ public class Adapter_Chat extends RecyclerView.Adapter<Adapter_Chat.ChatEntry_Vi
         else
             holder.imageNew.setVisibility(View.GONE);
         
-        //holder.profilePicUrl.setImageResource();
+        Glide.with(context).load(chat.getOtherPhoto()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
         holder.textViewChatWith.setText(chat.getOtherName());
-        holder.textViewWhen.setText(chat.getDateFormatted());
+        holder.textViewWhen.setText(chat.dateFormatted());
     }
     
     @Override

@@ -242,6 +242,8 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
                     Bundle b = new Bundle();
                     b.putParcelable("Selected", shop);
                     intent.putExtras(b);
+                    intent.putExtra("name", currentUserViewModel.getCurrentUser().getValue().getName());
+                    intent.putExtra("picUrl", currentUserViewModel.getCurrentUser().getValue().getProfilePicUrl());
                     getContext().startActivity(intent);
                     currentUserViewModel.getSelectedShop().removeObserver(this);
                     currentUserViewModel.getSelectedShop().setValue(null);

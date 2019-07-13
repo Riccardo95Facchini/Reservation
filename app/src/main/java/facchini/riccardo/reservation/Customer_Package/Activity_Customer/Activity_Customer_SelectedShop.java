@@ -132,6 +132,8 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         chatIntent.putExtra("thisUsername", name);
         chatIntent.putExtra("otherUid", selectedShop.getUid());
         chatIntent.putExtra("otherUsername", selectedShop.getName());
+        chatIntent.putExtra("thisPhoto", picUrl);
+        chatIntent.putExtra("otherPhoto", selectedShop.getProfilePicUrl());
         startActivity(chatIntent);
     }
     

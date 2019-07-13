@@ -19,7 +19,6 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import java.util.List;
 
 import facchini.riccardo.reservation.Chat.Activity_Chat;
-import facchini.riccardo.reservation.Customer_Package.Customer;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
 
@@ -53,6 +52,8 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
         holder.textName.setText(res.getCustomerName());
         holder.textWhen.setText(res.timeFormatted());
         holder.customerUid = res.getCustomerUid();
+        holder.otherPhoto = res.getCustomerPic();
+        holder.thisPhoto = res.getShopPic();
         Glide.with(context).load(res.getCustomerPic()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
     }
     
@@ -68,6 +69,7 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
         ImageButton resButton;
         ImageView profilePic;
         String customerUid;
+        String otherPhoto, thisPhoto;
         
         public Reservation_Shop_ViewHolder(@NonNull View itemView)
         {
@@ -81,7 +83,7 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
             
             textAddress.setVisibility(View.GONE);
             resButton.setImageResource(R.drawable.ic_chat_primary_color_32dp);
-    
+            
             resButton.setOnClickListener(new View.OnClickListener()
             {
                 @Override
@@ -105,6 +107,8 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
             chatIntent.putExtra("thisUsername", thisUsername);
             chatIntent.putExtra("otherUid", customerUid);
             chatIntent.putExtra("otherUsername", textName.getText());
+            chatIntent.putExtra("thisPhoto", thisPhoto);
+            chatIntent.putExtra("otherPhoto", otherPhoto);
             v.getContext().startActivity(chatIntent);
         }
     }
