@@ -88,16 +88,9 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
     
     private void startRateDialog()
     {
-        RatingDialog ratingDialog = new RatingDialog(this, R.style.RatingDialogTheme);
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.dialog_rating, null);
-        ratingDialog.setContentView(view);
-        ratingDialog.setTitle("Rating");
-        RatingBar rating = ratingDialog.findViewById(R.id.rating);
+        RatingDialog ratingDialog = new RatingDialog(this, R.style.RatingDialogTheme, pastRating);
         
-        if (pastRating > 0)
-            rating.setRating(pastRating);
-        rating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener()
+        ratingDialog.getRating().setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener()
         {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser)
