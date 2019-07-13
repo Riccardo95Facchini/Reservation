@@ -99,13 +99,16 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         
+        resList = new ArrayList<>();
+        adapterCustomerHistory = new Adapter_Customer_ReservationCard(getContext(), resList);
+        recyclerView.setAdapter(adapterCustomerHistory);
+        
         noReservationsText = view.findViewById(R.id.noReservations);
         noReservationsText.setVisibility(View.GONE);
         
         progressBar = view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
         
-        resList = new ArrayList<>();
     }
     
     @Override

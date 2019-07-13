@@ -71,6 +71,8 @@ public class Fragment_Shop_History extends Fragment
         recyclerView.setVisibility(View.VISIBLE);
         
         resList = new ArrayList<>();
+        adapterShopHistory = new Adapter_Shop_Home(getContext(), resList);
+        recyclerView.setAdapter(adapterShopHistory);
         
         noReservationsText = view.findViewById(R.id.noReservations);
         noReservationsText.setVisibility(View.GONE);

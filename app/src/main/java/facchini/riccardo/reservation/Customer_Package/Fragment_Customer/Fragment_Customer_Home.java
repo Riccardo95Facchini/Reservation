@@ -72,6 +72,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
         
         reservations = new ArrayList<>();
         adapterCustomerHome = new Adapter_Customer_ReservationCard(getContext(), reservations);
+        recyclerView.setAdapter(adapterCustomerHome);
         
         noReservationsText.setVisibility(View.GONE);
         

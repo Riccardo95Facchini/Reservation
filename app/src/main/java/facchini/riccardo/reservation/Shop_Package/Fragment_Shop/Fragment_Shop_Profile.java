@@ -60,14 +60,14 @@ public class Fragment_Shop_Profile extends Fragment
         textReviews = view.findViewById(R.id.textReviews);
         ratingAvg = view.findViewById(R.id.ratingAvg);
         recyclerView = view.findViewById(R.id.info);
-        ImageButton buttonEdit = view.findViewById(R.id.buttonEdit);
+        ImageButton buttonAction = view.findViewById(R.id.buttonAction);
         
         contents = new ArrayList<>();
         adapterCardInfo = new Adapter_CardInfo(getContext(), contents);
         recyclerView.setAdapter(adapterCardInfo);
-        
-        
-        buttonEdit.setOnClickListener(new View.OnClickListener()
+    
+    
+        buttonAction.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)

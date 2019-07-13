@@ -31,7 +31,6 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
     private List<Reservation> reservationCustomerHomeList;
     private OnItemClickListener itemListener;
     
-    
     public Adapter_Customer_ReservationCard(Context context, List<Reservation> reservationCustomerHomeList)
     {
         this.context = context;
@@ -113,20 +112,10 @@ public class Adapter_Customer_ReservationCard extends RecyclerView.Adapter<Adapt
         }
         
         /**
-         * Puts shop into a bundle in the intent and launches it
-         *
          * @param shop The shop for which the info are requested
          */
         private void startShopInfoActivity(Shop shop)
         {
-//            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//            View popupLayout = inflater.inflate(R.layout.popup_info, null);
-//
-//            PopupWindow pw = new PopupWindow(popupLayout);
-//
-//            pw.showAtLocation(context., Gravity.CENTER, 0, 0);
-//
-//
             Intent intent = new Intent(context, Activity_Customer_ShopInfo.class);
             Bundle b = new Bundle();
             b.putParcelable("Selected", shop);

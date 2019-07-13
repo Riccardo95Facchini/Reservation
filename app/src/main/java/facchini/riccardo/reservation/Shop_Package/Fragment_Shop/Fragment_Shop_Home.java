@@ -68,6 +68,7 @@ public class Fragment_Shop_Home extends Fragment
         
         reservations = new ArrayList<>();
         adapterShopHome = new Adapter_Shop_Home(getContext(), reservations);
+        recyclerView.setAdapter(adapterShopHome);
         
         
         final CountDownTimer timer = new CountDownTimer(5000, 500)

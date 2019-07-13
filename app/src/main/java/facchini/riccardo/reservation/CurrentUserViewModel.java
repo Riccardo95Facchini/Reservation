@@ -18,6 +18,7 @@ import facchini.riccardo.reservation.Shop_Package.Shop;
 public class CurrentUserViewModel extends ViewModel
 {
     private MutableLiveData<User> currentUser;
+    private MutableLiveData<Shop> selectedShop;
     private CollectionReference userCollection;
     
     private String thisUid;
@@ -30,6 +31,7 @@ public class CurrentUserViewModel extends ViewModel
     {
         tag = -1;
         currentUser = new MutableLiveData<>();
+        selectedShop = new MutableLiveData<>();
         thisUid = FirebaseAuth.getInstance().getUid();
     }
     
@@ -72,8 +74,16 @@ public class CurrentUserViewModel extends ViewModel
     
     public MutableLiveData<User> getCurrentUser() {return currentUser;}
     
+    public MutableLiveData<Shop> getSelectedShop() {return selectedShop;}
+    
+    public int getTag() {return tag;}
+    
     //endregion ReservationViewModel.Getters
     
+    //region ReservationViewModel.Setters
+    
+    public void setSelectedShop(Shop selectedShop) {
+        this.selectedShop.setValue(selectedShop); }
     
     public void setTag(int tag)
     {
@@ -91,4 +101,6 @@ public class CurrentUserViewModel extends ViewModel
         }
         addFirestoreListener();
     }
+    
+    //endregionReservationViewModel.Setters
 }

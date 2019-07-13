@@ -22,14 +22,33 @@
         app:layout_constraintWidth_percent="0.35"  />
 
     <ImageButton
-        android:id="@+id/buttonEdit"
-        android:layout_width="0dp"
+        android:id="@+id/buttonAction"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:background="@null"
         android:src="@drawable/ic_edit_color_32dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/profilePic"
         app:layout_constraintTop_toTopOf="@+id/profilePic" />
+
+    <Button
+        android:id="@+id/buttonRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/button_custom_gradient"
+        android:text="@string/rate"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/profilePic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/profilePic"
+        app:layout_constraintTop_toBottomOf="@+id/buttonAction" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rating"
