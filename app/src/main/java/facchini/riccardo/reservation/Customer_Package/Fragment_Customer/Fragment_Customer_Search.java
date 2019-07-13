@@ -24,17 +24,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +44,7 @@ import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_C
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.SearchResult;
+import facchini.riccardo.reservation.SearchViewModel;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Fragment_Customer_Search extends Fragment implements OnItemClickListener
@@ -61,8 +58,9 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     private TextView distanceText;
     
     private CurrentUserViewModel currentUserViewModel;
+    private SearchViewModel searchViewModel;
     
-    private ArrayList<SearchResult> foundShops = new ArrayList<>();
+    private ArrayList<SearchResult> foundShops;
     private Adapter_Customer_SearchCard adapter;
     
     private SharedPreferences sharedPreferences;
@@ -81,8 +79,8 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
+        super.onCreateView(inflater, container, savedInstanceState);
         getActivity().setTitle(R.string.search);
-        
         return inflater.inflate(R.layout.fragment_customer_search, container, false);
     }
     
@@ -91,6 +89,13 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     {
         super.onActivityCreated(savedInstanceState);
         currentUserViewModel = ViewModelProviders.of(getActivity()).get(CurrentUserViewModel.class);
+        searchViewModel = ViewModelProviders.of(this).get(SearchViewModel.class);
+        
+        foundShopsView.setHasFixedSize(true);
+        foundShopsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        
+        foundShops = new ArrayList<>();
+        adapter = new Adapter_Customer_SearchCard(getContext(), foundShops);
     }
     
     @Override
@@ -100,13 +105,11 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
         
         searchText = view.findViewById(R.id.searchText);
         searchButton = view.findViewById(R.id.searchButton);
-        
+        progressBar = view.findViewById(R.id.progressBar);
         foundShopsView = view.findViewById(R.id.foundShopsView);
-        foundShopsView.setHasFixedSize(true);
-        foundShopsView.setLayoutManager(new LinearLayoutManager(getContext()));
-        
         distanceSeekBar = view.findViewById(R.id.distanceSeekBar);
         distanceText = view.findViewById(R.id.distanceText);
+        
         distanceText.setText(getString(R.string.searchDistance).concat(String.valueOf(distance)).concat("Km"));
         
         distanceSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
@@ -125,7 +128,6 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
         
-        progressBar = view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
         
         db = FirebaseFirestore.getInstance();
@@ -209,6 +211,7 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
         input.setText(lastLocationString);
         final Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
         
+        //TODO: implement google places
         new AlertDialog.Builder(getContext()).setCancelable(false).setView(input)
                 .setTitle(getString(R.string.addressSearch))
                 .setMessage(getString(R.string.addressSearchInput))
@@ -272,102 +275,42 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
      */
     private void searchTag(String text)
     {
-        text = text.replaceAll("[^a-zA-Z\\s]", " ")
-                .replaceAll("\\s+", " ").toLowerCase().trim();
-        
         progressBar.setVisibility(View.VISIBLE);
-        foundShops.clear();
-        
         getDeltas();
-        
-        if (myLocation != null)
+        foundShops.clear();
+        try
         {
-            final double minLat = myLocation.getLatitude() - deltaLat,
-                    maxLat = myLocation.getLatitude() + deltaLat,
-                    minLng = myLocation.getLongitude() - deltaLng,
-                    maxLng = myLocation.getLongitude() + deltaLng;
-            
-            int minIntLng = (int) minLng;
-            int maxIntLng = (int) maxLng;
-            
-            Task queryOne, queryTwo, queryThree;
-            Task<List<QuerySnapshot>> allTasks;
-            if (minIntLng != maxIntLng)
-            {
-                queryOne = shopsCollection.whereArrayContains("tags", text)
-                        .whereGreaterThanOrEqualTo("latitude", minLat)
-                        .whereLessThanOrEqualTo("latitude", maxLat).whereEqualTo("intLongitude", minIntLng)
-                        .get();
-                
-                queryTwo = shopsCollection.whereArrayContains("tags", text)
-                        .whereGreaterThanOrEqualTo("latitude", minLat)
-                        .whereLessThanOrEqualTo("latitude", maxLat).whereEqualTo("intLongitude", maxIntLng)
-                        .get();
-                if (minIntLng + 1 < maxIntLng)
-                {
-                    queryThree = shopsCollection.whereArrayContains("tags", text)
-                            .whereGreaterThanOrEqualTo("latitude", minLat)
-                            .whereLessThanOrEqualTo("latitude", maxLat).whereEqualTo("intLongitude", minIntLng + 1)
-                            .get();
-                    allTasks = Tasks.whenAllSuccess(queryOne, queryTwo, queryThree);
-                } else
-                    allTasks = Tasks.whenAllSuccess(queryOne, queryTwo);
-                
-            } else
-            {
-                queryOne = shopsCollection.whereArrayContains("tags", text)
-                        .whereGreaterThanOrEqualTo("latitude", minLat)
-                        .whereLessThanOrEqualTo("latitude", maxLat).whereEqualTo("intLongitude", minIntLng)
-                        .get();
-                
-                allTasks = Tasks.whenAllSuccess(queryOne);
-            }
-            
-            allTasks.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>()
-            {
-                @Override
-                public void onSuccess(List<QuerySnapshot> querySnapshots)
-                {
-                    Location shopLocation = new Location("ShopLocation");
-                    
-                    for (QuerySnapshot snapshot : querySnapshots)
-                    {
-                        for (QueryDocumentSnapshot doc : snapshot)
-                        {
-                            Shop shop = new Shop(doc.getData());
-                            
-                            if (!(shop.getLongitude() > maxLng) && !(shop.getLongitude() < minLng))
-                            {
-                                shopLocation.setLatitude(shop.getLatitude());
-                                shopLocation.setLongitude(shop.getLongitude());
-                                float dist = myLocation.distanceTo(shopLocation);
-                                
-                                if (dist <= (distance * 1000))
-                                    foundShops.add(new SearchResult(shop, dist));
-                            }
-                        }
-                    }
-                    
-                    if (foundShops.isEmpty())
-                    {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), getString(R.string.noShopsFound), Toast.LENGTH_SHORT).show();
-                    } else
-                    {
-                        setAdapter();
-                        progressBar.setVisibility(View.GONE);
-                    }
-                }
-            });
+            searchViewModel.getSearchResults().getValue().clear();
+        } catch (Exception e)
+        {
+            e.printStackTrace();
         }
-    }
     
-    private void setAdapter()
-    {
-        Collections.sort(foundShops, searchResultComparator);
-        adapter = new Adapter_Customer_SearchCard(getContext(), foundShops);
-        adapter.setOnItemClickListener(this);
-        foundShopsView.setAdapter(adapter);
+        final Fragment_Customer_Search listener = this;
+        
+        Observer observer = new Observer<List<SearchResult>>()
+        {
+            @Override
+            public void onChanged(List<SearchResult> searchResults)
+            {
+                foundShops.addAll(searchResults);
+                if (foundShops.isEmpty())
+                {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), getString(R.string.noShopsFound), Toast.LENGTH_SHORT).show();
+                } else
+                {
+                    Collections.sort(foundShops, searchResultComparator);
+                    foundShopsView.setAdapter(adapter);
+                    adapter.setOnItemClickListener(listener);
+                    progressBar.setVisibility(View.GONE);
+                }
+                searchViewModel.getSearchResults().removeObserver(this);
+            }
+        };
+        
+        searchViewModel.getSearchResults().observe(getActivity(), observer);
+        searchViewModel.queryForTag(text, distance, deltaLat, deltaLng, myLocation);
     }
     
     /**
