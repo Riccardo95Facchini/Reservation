@@ -17,19 +17,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.ReservationViewModel;
-import facchini.riccardo.reservation.Reservation_Package.Reservation;
+import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
 import facchini.riccardo.reservation.Shop_Package.Adapter_Shop.Adapter_Shop_Home;
 
 public class Fragment_Shop_Home extends Fragment
 {
     private ReservationViewModel viewModel;
-    private List<Reservation> reservations;
+    private List<ReservationFirestore> reservations;
     
     private RecyclerView recyclerView;
     private Adapter_Shop_Home adapterShopHome;
@@ -85,10 +83,10 @@ public class Fragment_Shop_Home extends Fragment
             }
         }.start();
         
-        viewModel.getNextReservations().observe(getActivity(), new Observer<List<Reservation>>()
+        viewModel.getNextReservations().observe(getActivity(), new Observer<List<ReservationFirestore>>()
         {
             @Override
-            public void onChanged(List<Reservation> reservations)
+            public void onChanged(List<ReservationFirestore> reservations)
             {
                 if (timer != null)
                     timer.cancel();
@@ -112,7 +110,7 @@ public class Fragment_Shop_Home extends Fragment
         
     }
     
-    private void showReservations(List<Reservation> res)
+    private void showReservations(List<ReservationFirestore> res)
     {
         reservations.clear();
         if (res == null || res.isEmpty())
@@ -134,7 +132,7 @@ public class Fragment_Shop_Home extends Fragment
      */
     private void orderList()
     {
-        Collections.sort(reservations, reservationComparator);
+        //Collections.sort(reservations, reservationComparator);
         adapterShopHome = new Adapter_Shop_Home(getContext(), reservations);
         recyclerView.setAdapter(adapterShopHome);
     }
@@ -142,12 +140,12 @@ public class Fragment_Shop_Home extends Fragment
     /**
      * Defined comparator for reservations to order them
      */
-    public Comparator<Reservation> reservationComparator = new Comparator<Reservation>()
-    {
-        @Override
-        public int compare(Reservation o1, Reservation o2)
-        {
-            return o1.getDate().compareTo(o2.getDate());
-        }
-    };
+//    public Comparator<ReservationFirestore> reservationComparator = new Comparator<ReservationFirestore>()
+//    {
+//        @Override
+//        public int compare(ReservationFirestore o1, ReservationFirestore o2)
+//        {
+//            return o1.getDate().compareTo(o2.getDate());
+//        }
+//    };
 }

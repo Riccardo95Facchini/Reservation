@@ -21,16 +21,16 @@ import java.util.List;
 import facchini.riccardo.reservation.Chat.Activity_Chat;
 import facchini.riccardo.reservation.Customer_Package.Customer;
 import facchini.riccardo.reservation.R;
-import facchini.riccardo.reservation.Reservation_Package.Reservation;
+import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
 
 public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Reservation_Shop_ViewHolder>
 {
     
     private Context context;
     //private String customerUid;
-    private List<Reservation> reservationCustomerHomeList;
+    private List<ReservationFirestore> reservationCustomerHomeList;
     
-    public Adapter_Shop_Home(Context context, List<Reservation> reservationCustomerHomeList)
+    public Adapter_Shop_Home(Context context, List<ReservationFirestore> reservationCustomerHomeList)
     {
         this.context = context;
         this.reservationCustomerHomeList = reservationCustomerHomeList;
@@ -48,13 +48,12 @@ public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Re
     @Override
     public void onBindViewHolder(@NonNull Reservation_Shop_ViewHolder holder, int pos)
     {
-        Reservation res = reservationCustomerHomeList.get(pos);
-        Customer customer = (Customer) res.getOtherUser();
+        ReservationFirestore res = reservationCustomerHomeList.get(pos);
         
-        holder.textName.setText(customer.getName());
-        holder.textWhen.setText(res.getDateFormatted());
-        holder.customerUid = customer.getUid();
-        Glide.with(context).load(customer.getProfilePicUrl()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
+        holder.textName.setText(res.getCustomerName());
+        holder.textWhen.setText(res.timeFormatted());
+        holder.customerUid = res.getCustomerUid();
+        Glide.with(context).load(res.getCustomerPic()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(holder.profilePic);
     }
     
     @Override

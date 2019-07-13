@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -15,6 +14,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -22,13 +22,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import facchini.riccardo.reservation.Customer_Package.Customer;
-import facchini.riccardo.reservation.Reservation_Package.Reservation;
-import facchini.riccardo.reservation.Shop_Package.Shop;
+import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
 
 public class ReservationViewModel extends ViewModel
 {
-    private MutableLiveData<List<Reservation>> nextReservations, pastReservations;
+    private MutableLiveData<List<ReservationFirestore>> nextReservations, pastReservations;
     private MutableLiveData<Boolean> isNextEmpty, isPastEmpty;
     private CollectionReference customersCollection, shopsCollection, reservationsCollection, updatesCollection;
     private String thisUid;
@@ -75,6 +73,23 @@ public class ReservationViewModel extends ViewModel
     {
         queryNextReservations();
         queryPastReservations();
+        //fix();
+    }
+    
+    private void fix()
+    {
+        reservationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
+        {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots)
+            {
+                for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments())
+                {
+                    final String uid = doc.getId();
+                    reservationsCollection.document(uid).delete();
+                }
+            }
+        });
     }
     
     //region ReservationViewModel.Query
@@ -91,7 +106,7 @@ public class ReservationViewModel extends ViewModel
                 break;
         }
         
-        reservationsCollection.whereEqualTo(search, thisUid).whereGreaterThan("time", Calendar.getInstance().getTime()).orderBy("time")
+        reservationsCollection.whereEqualTo(search, thisUid).whereGreaterThan("time", Calendar.getInstance().getTime().getTime()).orderBy("time", Query.Direction.ASCENDING)
                 .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
         {
             @Override
@@ -127,7 +142,7 @@ public class ReservationViewModel extends ViewModel
                 break;
         }
         
-        reservationsCollection.whereEqualTo(search, thisUid).whereLessThan("time", Calendar.getInstance().getTime()).orderBy("time")
+        reservationsCollection.whereEqualTo(search, thisUid).whereLessThan("time", Calendar.getInstance().getTime().getTime()).orderBy("time", Query.Direction.DESCENDING)
                 .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
         {
             @Override
@@ -150,7 +165,7 @@ public class ReservationViewModel extends ViewModel
         });
     }
     
-    private void fillReservations(QuerySnapshot snap, MutableLiveData<List<Reservation>> liveData)
+    private void fillReservations(QuerySnapshot snap, MutableLiveData<List<ReservationFirestore>> liveData)
     {
         if (liveData.getValue() != null)
             liveData.getValue().clear();
@@ -168,9 +183,9 @@ public class ReservationViewModel extends ViewModel
         
     }
     
-    private void fillWithShops(final QuerySnapshot snap, final MutableLiveData<List<Reservation>> liveData)
+    private void fillWithShops(final QuerySnapshot snap, final MutableLiveData<List<ReservationFirestore>> liveData)
     {
-        final List<Reservation> res = new ArrayList<>();
+        final List<ReservationFirestore> res = new ArrayList<>();
         
         for (final QueryDocumentSnapshot doc : snap)
         {
@@ -180,8 +195,8 @@ public class ReservationViewModel extends ViewModel
                 public void onSuccess(DocumentSnapshot documentSnapshot)
                 {
                     if (documentSnapshot.exists())
-                        res.add(new Reservation(doc.getId(), ((Timestamp) doc.get("time")).toDate(),
-                                documentSnapshot.toObject(Shop.class)));
+                        res.add(new ReservationFirestore(doc.getId(), doc.getString("shopUid"), doc.getString("shopName"),
+                                doc.getString("shopPic"), doc.getString("where"), doc.getLong("time")));
                     
                     if (res.size() == snap.size())
                         liveData.setValue(res);
@@ -190,14 +205,14 @@ public class ReservationViewModel extends ViewModel
         }
     }
     
-    private void fillWithCustomers(final QuerySnapshot snap, final MutableLiveData<List<Reservation>> liveData)
+    private void fillWithCustomers(final QuerySnapshot snap, final MutableLiveData<List<ReservationFirestore>> liveData)
     {
-        final List<Reservation> res = new ArrayList<>();
+        final List<ReservationFirestore> res = new ArrayList<>();
         
         for (final QueryDocumentSnapshot doc : snap)
         {
-            res.add(new Reservation(doc.getId(), ((Timestamp) doc.get("time")).toDate(),
-                    new Customer((String) doc.get("customerUid"), (String) doc.get("customerName"), "")));
+            res.add(new ReservationFirestore(doc.getString("customerUid"), doc.getString("customerPic"),
+                    doc.getString("customerName"), doc.getLong("time")));
             
             if (res.size() == snap.size())
                 liveData.setValue(res);
@@ -215,15 +230,9 @@ public class ReservationViewModel extends ViewModel
     
     //region ReservationViewModel.Getters
     
-    public MutableLiveData<List<Reservation>> getNextReservations()
-    {
-        return nextReservations;
-    }
+    public MutableLiveData<List<ReservationFirestore>> getNextReservations() { return nextReservations; }
     
-    public MutableLiveData<List<Reservation>> getPastReservations()
-    {
-        return pastReservations;
-    }
+    public MutableLiveData<List<ReservationFirestore>> getPastReservations() { return pastReservations; }
     
     public MutableLiveData<Boolean> getIsNextEmpty() {return isNextEmpty;}
     

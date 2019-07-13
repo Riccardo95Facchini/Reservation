@@ -24,6 +24,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,6 +42,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import facchini.riccardo.reservation.CurrentUserViewModel;
 import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_SelectedShop;
 import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_SearchCard;
 import facchini.riccardo.reservation.OnItemClickListener;
@@ -57,6 +59,8 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     private ProgressBar progressBar;
     private SeekBar distanceSeekBar;
     private TextView distanceText;
+    
+    private CurrentUserViewModel currentUserViewModel;
     
     private ArrayList<SearchResult> foundShops = new ArrayList<>();
     private Adapter_Customer_SearchCard adapter;
@@ -86,6 +90,7 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+        currentUserViewModel = ViewModelProviders.of(getActivity()).get(CurrentUserViewModel.class);
     }
     
     @Override
@@ -184,8 +189,8 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
         Bundle b = new Bundle();
         b.putParcelable("Selected", selected);
         intent.putExtras(b);
-        intent.putExtra("uid", selected.getUid());
-        intent.putExtra("name", selected.getName());
+        intent.putExtra("name", currentUserViewModel.getCurrentUser().getValue().getName());
+        intent.putExtra("picUrl", currentUserViewModel.getCurrentUser().getValue().getProfilePicUrl());
         intent.setClass(getContext(), Activity_Customer_SelectedShop.class);
         startActivity(intent);
     }

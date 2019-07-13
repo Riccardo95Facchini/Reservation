@@ -15,12 +15,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -30,27 +31,28 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+import facchini.riccardo.reservation.CurrentUserViewModel;
 import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_ShopInfo;
 import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_ReservationCard;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.OnReservationListener;
-import facchini.riccardo.reservation.Reservation_Package.Reservation;
+import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
 import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Fragment_Customer_History extends Fragment implements OnItemClickListener, OnReservationListener
 {
     //Firestore
     private FirebaseFirestore db;
-    private CollectionReference customersCollection, shopsCollection, reservationsCollection;
+    private CollectionReference reservationsCollection;
+    
+    private CurrentUserViewModel currentUserViewModel;
     
     private Calendar now;
     private String customerUid;
-    private List<Reservation> reservations;
+    private List<ReservationFirestore> reservations;
     private SharedPreferences pref;
     
     private RecyclerView recyclerView;
@@ -92,8 +94,6 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
         
         pref = getContext().getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
         customerUid = FirebaseAuth.getInstance().getUid();
-        customersCollection = db.collection("customers");
-        shopsCollection = db.collection("shops");
         reservationsCollection = db.collection("reservations");
         
         now = Calendar.getInstance();
@@ -101,7 +101,7 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
         recyclerView = view.findViewById(R.id.pastReservations);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-    
+        
         reservations = new ArrayList<>();
         adapterCustomerHistory = new Adapter_Customer_ReservationCard(getContext(), reservations);
         recyclerView.setAdapter(adapterCustomerHistory);
@@ -118,6 +118,8 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+    
+        currentUserViewModel = ViewModelProviders.of(getActivity()).get(CurrentUserViewModel.class);
         
         reservationsCollection.whereEqualTo("customerUid", customerUid).whereLessThan("time", now.getTime()).orderBy("time")
                 .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
@@ -157,20 +159,20 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
         for (final QueryDocumentSnapshot doc : snap)
         {
             //TODO: make it more efficient, no need to load each one in its entirety (change reservation structure to include essentials)
-            shopsCollection.document((String) doc.get("shopUid")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
-            {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot)
-                {
-                    if (documentSnapshot.exists())
-                        reservations.add(
-                                new Reservation(doc.getId(), ((Timestamp) doc.get("time")).toDate(),
-                                        documentSnapshot.toObject(Shop.class)));
-                    
-                    if (reservations.size() == snap.size())
-                        orderList();
-                }
-            });
+//            shopsCollection.document((String) doc.get("shopUid")).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+//            {
+//                @Override
+//                public void onSuccess(DocumentSnapshot documentSnapshot)
+//                {
+//                    if (documentSnapshot.exists())
+//                        reservations.add(
+//                                new ReservationFirestore(doc.getId(), (Long) doc.get("time"),
+//                                        documentSnapshot.toObject(Shop.class)));
+//
+//                    if (reservations.size() == snap.size())
+//                        orderList();
+//                }
+//            });
         }
     }
     
@@ -179,7 +181,7 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
      */
     private void orderList()
     {
-        Collections.sort(reservations, Collections.reverseOrder(reservationComparator));
+        //Collections.sort(reservations, Collections.reverseOrder(reservationComparator));
         
         adapterCustomerHistory = new Adapter_Customer_ReservationCard(getContext(), reservations);
         recyclerView.setAdapter(adapterCustomerHistory);
@@ -191,28 +193,27 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
     /**
      * Defined comparator for reservations to order them
      */
-    public Comparator<Reservation> reservationComparator = new Comparator<Reservation>()
-    {
-        @Override
-        public int compare(Reservation o1, Reservation o2)
-        {
-            return o1.getDate().compareTo(o2.getDate());
-        }
-    };
-    
+//    public Comparator<ReservationFirestore> reservationComparator = new Comparator<ReservationFirestore>()
+//    {
+//        @Override
+//        public int compare(ReservationFirestore o1, ReservationFirestore o2)
+//        {
+//            return o1.getDate().compareTo(o2.getDate());
+//        }
+//    };
     @Override
     public void onItemClick(final int position)
     {
-        Reservation res = reservations.get(position);
+        final ReservationFirestore res = reservations.get(position);
         new AlertDialog.Builder(getContext()).setCancelable(true)
                 .setTitle(getString(R.string.areYouSure))
-                .setMessage(getString(R.string.deleteReservationFor).concat(res.getOtherUser().getName()).concat(getString(R.string.onWithTabs)).concat(res.getDateFormatted()))
+                .setMessage(getString(R.string.deleteReservationFor).concat(res.getShopName()).concat(getString(R.string.onWithTabs)).concat(res.timeFormatted()))
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        reservationsCollection.document(reservations.get(position).getResUid()).delete();
+                        reservationsCollection.document(res.getUid()).delete();
                         getActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragmentContainer, new Fragment_Customer_History()).commit();
                     }
@@ -229,10 +230,24 @@ public class Fragment_Customer_History extends Fragment implements OnItemClickLi
     @Override
     public void onInfoClick(int position)
     {
-        Intent intent = new Intent(getContext(), Activity_Customer_ShopInfo.class);
-        Bundle b = new Bundle();
-        b.putParcelable("Selected", reservations.get(position).getOtherUser());
-        intent.putExtras(b);
-        getContext().startActivity(intent);
+        currentUserViewModel.querySelectedShop(reservations.get(position).getShopUid());
+        Observer observer = new Observer<Shop>()
+        {
+            @Override
+            public void onChanged(Shop shop)
+            {
+                if (shop != null)
+                {
+                    Intent intent = new Intent(getContext(), Activity_Customer_ShopInfo.class);
+                    Bundle b = new Bundle();
+                    b.putParcelable("Selected", shop);
+                    intent.putExtras(b);
+                    getContext().startActivity(intent);
+                    currentUserViewModel.getSelectedShop().removeObserver(this);
+                    currentUserViewModel.getSelectedShop().setValue(null);
+                }
+            }
+        };
+        currentUserViewModel.getSelectedShop().observe(getActivity(), observer);
     }
 }

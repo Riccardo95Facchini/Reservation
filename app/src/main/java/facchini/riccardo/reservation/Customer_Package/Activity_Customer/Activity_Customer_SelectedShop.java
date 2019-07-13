@@ -51,7 +51,7 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
     private Shop selectedShop;
     private ArrayAdapter<String> adapter;
     private Calendar selectedDate;
-    private String name, surname;
+    private String name, picUrl;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     
@@ -75,7 +75,7 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
             selectedShop = b.getParcelable("Selected");
         
         name = intent.getStringExtra("name");
-        surname = intent.getStringExtra("surname");
+        picUrl = intent.getStringExtra("picUrl");
         
         
         shopNameText = findViewById(R.id.nameText);
@@ -112,7 +112,7 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
     private void startChat()
     {
         Intent chatIntent = new Intent(Activity_Customer_SelectedShop.this, Activity_Chat.class);
-        chatIntent.putExtra("thisUsername", String.format("%s %s", name, surname));
+        chatIntent.putExtra("thisUsername", name);
         chatIntent.putExtra("otherUid", selectedShop.getUid());
         chatIntent.putExtra("otherUsername", selectedShop.getName());
         startActivity(chatIntent);
@@ -329,15 +329,13 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
             fullDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(date);
         } catch (ParseException e)
         {
-            //TODO: handle exception
             e.printStackTrace();
         }
         
-        String customerName = String.format("%s %s", name, surname);
-        
         String thisUid = FirebaseAuth.getInstance().getUid();
         
-        final ReservationFirestore reservationFirestore = new ReservationFirestore(selectedShop.getUid(), thisUid, customerName, fullDate);
+        final ReservationFirestore reservationFirestore = new ReservationFirestore(selectedShop.getUid(), selectedShop.getName(),
+                selectedShop.getProfilePicUrl(), thisUid, picUrl, name, selectedShop.getAddress(), fullDate.getTime());
         db.collection("reservations").add(reservationFirestore).addOnSuccessListener(new OnSuccessListener<DocumentReference>()
         {
             @Override

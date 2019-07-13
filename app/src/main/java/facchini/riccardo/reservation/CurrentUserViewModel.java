@@ -21,6 +21,8 @@ public class CurrentUserViewModel extends ViewModel
     private MutableLiveData<Shop> selectedShop;
     private CollectionReference userCollection;
     
+    FirebaseFirestore db;
+    
     private String thisUid;
     
     private int tag;
@@ -30,6 +32,7 @@ public class CurrentUserViewModel extends ViewModel
     public CurrentUserViewModel()
     {
         tag = -1;
+        db = FirebaseFirestore.getInstance();
         currentUser = new MutableLiveData<>();
         selectedShop = new MutableLiveData<>();
         thisUid = FirebaseAuth.getInstance().getUid();
@@ -69,6 +72,17 @@ public class CurrentUserViewModel extends ViewModel
         });
     }
     
+    public void querySelectedShop(String shopUid)
+    {
+        db.collection("shops").document(shopUid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+        {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot)
+            {
+                selectedShop.setValue(new Shop(documentSnapshot.getData()));
+            }
+        });
+    }
     
     //region ReservationViewModel.Getters
     
@@ -82,13 +96,14 @@ public class CurrentUserViewModel extends ViewModel
     
     //region ReservationViewModel.Setters
     
-    public void setSelectedShop(Shop selectedShop) {
-        this.selectedShop.setValue(selectedShop); }
+    public void setSelectedShop(Shop selectedShop)
+    {
+        this.selectedShop.setValue(selectedShop);
+    }
     
     public void setTag(int tag)
     {
         this.tag = tag;
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         
         switch (tag)
         {

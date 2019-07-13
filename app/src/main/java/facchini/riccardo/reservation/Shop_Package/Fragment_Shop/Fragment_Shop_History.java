@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -23,13 +22,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import facchini.riccardo.reservation.Customer_Package.Customer;
 import facchini.riccardo.reservation.R;
-import facchini.riccardo.reservation.Reservation_Package.Reservation;
+import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
 import facchini.riccardo.reservation.Shop_Package.Adapter_Shop.Adapter_Shop_Home;
 import facchini.riccardo.reservation.User;
 
@@ -41,7 +38,7 @@ public class Fragment_Shop_History extends Fragment
     
     private Calendar now;
     private String shopUid;
-    private List<Reservation> resList;
+    private List<ReservationFirestore> resList;
     
     private RecyclerView recyclerView;
     private Adapter_Shop_Home adapterShopHistory;
@@ -120,8 +117,8 @@ public class Fragment_Shop_History extends Fragment
         
         for (final QueryDocumentSnapshot doc : snap)
         {
-            Customer c = new Customer((User) doc.get("otherUser"));
-            resList.add(new Reservation(doc.getId(), ((Timestamp) doc.get("time")).toDate(), c));
+            resList.add(new ReservationFirestore(doc.getString("customerUid"), doc.getString("customerPic"),
+                    doc.getString("customerName"), doc.getLong("time")));
             
             if (resList.size() == snap.size())
                 orderList();
@@ -133,7 +130,7 @@ public class Fragment_Shop_History extends Fragment
      */
     private void orderList()
     {
-        Collections.sort(resList, Collections.reverseOrder(reservationComparator));
+        //Collections.sort(resList, Collections.reverseOrder(reservationComparator));
         adapterShopHistory = new Adapter_Shop_Home(getContext(), resList);
         recyclerView.setAdapter(adapterShopHistory);
     }
@@ -141,12 +138,12 @@ public class Fragment_Shop_History extends Fragment
     /**
      * Defined comparator for reservations to order them
      */
-    public Comparator<Reservation> reservationComparator = new Comparator<Reservation>()
-    {
-        @Override
-        public int compare(Reservation o1, Reservation o2)
-        {
-            return o1.getDate().compareTo(o2.getDate());
-        }
-    };
+//    public Comparator<ReservationFirestore> reservationComparator = new Comparator<ReservationFirestore>()
+//    {
+//        @Override
+//        public int compare(ReservationFirestore o1, ReservationFirestore o2)
+//        {
+//            return o1.getDate().compareTo(o2.getDate());
+//        }
+//    };
 }

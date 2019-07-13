@@ -24,19 +24,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import facchini.riccardo.reservation.CurrentUserViewModel;
 import facchini.riccardo.reservation.Customer_Package.Activity_Customer.Activity_Customer_ShopInfo;
 import facchini.riccardo.reservation.Customer_Package.Adapter_Customer.Adapter_Customer_ReservationCard;
 import facchini.riccardo.reservation.OnItemClickListener;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.ReservationViewModel;
 import facchini.riccardo.reservation.Reservation_Package.OnReservationListener;
-import facchini.riccardo.reservation.Reservation_Package.Reservation;
+import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
+import facchini.riccardo.reservation.Shop_Package.Shop;
 
 public class Fragment_Customer_Home extends Fragment implements OnItemClickListener, OnReservationListener
 {
-    private ReservationViewModel viewModel;
+    private ReservationViewModel reservationViewModel;
+    private CurrentUserViewModel currentUserViewModel;
     private SharedPreferences pref;
-    private List<Reservation> reservations;
+    private List<ReservationFirestore> reservations;
     
     private RecyclerView recyclerView;
     private Adapter_Customer_ReservationCard adapterCustomerHome;
@@ -66,7 +69,8 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     {
         super.onActivityCreated(savedInstanceState);
         
-        viewModel = ViewModelProviders.of(getActivity()).get(ReservationViewModel.class);
+        reservationViewModel = ViewModelProviders.of(getActivity()).get(ReservationViewModel.class);
+        currentUserViewModel = ViewModelProviders.of(getActivity()).get(CurrentUserViewModel.class);
         
         pref = getContext().getSharedPreferences(getString(R.string.reservations_preferences), Context.MODE_PRIVATE);
         
@@ -90,15 +94,15 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
             @Override
             public void onFinish()
             {
-                if (viewModel.getNextReservations().getValue() == null || viewModel.getNextReservations().getValue().isEmpty())
+                if (reservationViewModel.getNextReservations().getValue() == null || reservationViewModel.getNextReservations().getValue().isEmpty())
                     showReservations(null);
             }
         }.start();
         
-        viewModel.getNextReservations().observe(getActivity(), new Observer<List<Reservation>>()
+        reservationViewModel.getNextReservations().observe(getActivity(), new Observer<List<ReservationFirestore>>()
         {
             @Override
-            public void onChanged(List<Reservation> reservations)
+            public void onChanged(List<ReservationFirestore> reservations)
             {
                 if (timer != null)
                     timer.cancel();
@@ -106,7 +110,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
             }
         });
         
-        viewModel.getIsNextEmpty().observe(getActivity(), new Observer<Boolean>()
+        reservationViewModel.getIsNextEmpty().observe(getActivity(), new Observer<Boolean>()
         {
             @Override
             public void onChanged(Boolean isEmpty)
@@ -131,7 +135,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
             if (pref.getBoolean(getString(R.string.need_update_key), false))
             {
                 pref.edit().putBoolean(getString(R.string.need_update_key), false).commit();
-                viewModel.updateViewModel();
+                reservationViewModel.updateViewModel();
             }
         } catch (Exception e)
         {
@@ -140,7 +144,7 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     }
     
     
-    private void showReservations(List<Reservation> res)
+    private void showReservations(List<ReservationFirestore> res)
     {
         reservations.clear();
         if (res == null || res.isEmpty())
@@ -160,16 +164,16 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     @Override
     public void onItemClick(final int position)
     {
-        final Reservation res = viewModel.getNextReservations().getValue().get(position);
+        final ReservationFirestore res = reservationViewModel.getNextReservations().getValue().get(position);
         new AlertDialog.Builder(getContext()).setCancelable(true)
                 .setTitle(getString(R.string.areYouSure))
-                .setMessage(getString(R.string.deleteReservationFor).concat(res.getOtherUser().getName()).concat(getString(R.string.onWithTabs)).concat(res.getDateFormatted()))
+                .setMessage(getString(R.string.deleteReservationFor).concat(res.getShopName()).concat(getString(R.string.onWithTabs)).concat(res.timeFormatted()))
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        viewModel.delete(res.getResUid(), res.getOtherUser().getUid());
+                        reservationViewModel.delete(res.getUid(), res.getShopUid());
                     }
                 }).setNegativeButton("No", new DialogInterface.OnClickListener()
         {
@@ -184,10 +188,24 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
     @Override
     public void onInfoClick(int position)
     {
-        Intent intent = new Intent(getContext(), Activity_Customer_ShopInfo.class);
-        Bundle b = new Bundle();
-        b.putParcelable("Selected", reservations.get(position).getOtherUser());
-        intent.putExtras(b);
-        getContext().startActivity(intent);
+        currentUserViewModel.querySelectedShop(reservations.get(position).getShopUid());
+        Observer observer = new Observer<Shop>()
+        {
+            @Override
+            public void onChanged(Shop shop)
+            {
+                if (shop != null)
+                {
+                    Intent intent = new Intent(getContext(), Activity_Customer_ShopInfo.class);
+                    Bundle b = new Bundle();
+                    b.putParcelable("Selected", shop);
+                    intent.putExtras(b);
+                    getContext().startActivity(intent);
+                    currentUserViewModel.getSelectedShop().removeObserver(this);
+                    currentUserViewModel.getSelectedShop().setValue(null);
+                }
+            }
+        };
+        currentUserViewModel.getSelectedShop().observe(getActivity(), observer);
     }
 }
