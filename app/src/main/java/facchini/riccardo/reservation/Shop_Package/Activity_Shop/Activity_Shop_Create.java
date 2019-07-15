@@ -207,7 +207,7 @@ public class Activity_Shop_Create extends AppCompatActivity
         {
             int intLongitude = (int) longitude;
             Bundle b = new Bundle();
-            Shop shop = new Shop(uid, name, mail, address, profilePicUrl, city, zip, phone, latitude,
+            Shop shop = new Shop(uid, name, phone, mail, profilePicUrl, address, city, zip, latitude,
                     longitude, currentShop.getAverageReviews(), currentShop.getNumReviews(), intLongitude, currentShop.getTags(), currentShop.getHours());
             b.putParcelable("CurrentShop", shop);
             intent.putExtras(b);

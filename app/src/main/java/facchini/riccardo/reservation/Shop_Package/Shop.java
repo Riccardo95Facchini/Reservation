@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import facchini.riccardo.reservation.Converters;
 import facchini.riccardo.reservation.Info_Content;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.User;
@@ -157,11 +156,6 @@ public class Shop extends User
         return String.format("%s %s %s", address, city, zip);
     }
     
-    public String displayInfo()
-    {
-        return String.format("%s\n\n%s\n\nPhone: %s\nMail: %s", name, displayFullAddress(), phone, mail);
-    }
-    
     public static void displayHoursInTextViews(TextView infoText, TextView infoText2, Map<String, ArrayList<String>> hours)
     {
         ArrayList<String> days = new ArrayList<>();
@@ -202,41 +196,6 @@ public class Shop extends User
         }
     }
     
-    public String displayHoursFormat()
-    {
-        StringBuilder h = new StringBuilder();
-        
-        for (Map.Entry<String, ArrayList<String>> entry : hours.entrySet())
-        {
-            try
-            {
-                if (!entry.getValue().get(0).equalsIgnoreCase("closed") && !entry.getValue().get(2).equalsIgnoreCase("closed"))
-                    h.append(String.format("%s: \t\t %s-%s \t %s-%s\n", entry.getKey(),
-                            entry.getValue().get(0), entry.getValue().get(1), entry.getValue().get(2), entry.getValue().get(3)));
-                else if (!entry.getValue().get(0).equalsIgnoreCase("closed"))
-                    h.append(String.format("%s: \t\t %s-%s\n", entry.getKey(), entry.getValue().get(0), entry.getValue().get(1)));
-                else if (!entry.getValue().get(3).equalsIgnoreCase("closed"))
-                    h.append(String.format("%s: \t\t %s-%s\n", entry.getKey(), entry.getValue().get(2), entry.getValue().get(3)));
-                else
-                    h.append(String.format("%s: \t\t %s\n", entry.getKey(), "Closed"));
-            } catch (Exception e)
-            {
-                h.append(String.format("%s: \t %s\n", entry.getKey(), "Closed"));
-            }
-            
-        }
-        
-        return h.toString();
-    }
-    
-    private String format(Long time)
-    {
-        if (time < 0)
-            return "Closed";
-        else
-            return df.format(Converters.fromTimestamp(time));
-    }
-    
     public String displayHoursDay(String day)
     {
         try
@@ -251,15 +210,6 @@ public class Shop extends User
     //endregion Shop.Display
     
     //region Shop.Getters
-
-//    public List<Long> selectedDayHours(int day)
-//    {
-//        ArrayList<Long> ret = new ArrayList<>();
-//        for (int j = day * 4; j < (day + 1) * 4; j++)
-//            ret.add(hours.get(j));
-//
-//        return ret;
-//    }
     
     public String getAddress() {return address;}
     

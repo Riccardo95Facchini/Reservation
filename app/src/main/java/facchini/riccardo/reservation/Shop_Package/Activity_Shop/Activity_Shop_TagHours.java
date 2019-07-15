@@ -51,7 +51,7 @@ public class Activity_Shop_TagHours extends AppCompatActivity
     
     private Shop currentShop = null;
     private boolean editing = false;
-    private String uid, mail, phone, name, address, city, zip;
+    private String uid, mail, phone, name, address, city, zip, profilePicUrl;
     private double latitude, longitude;
     
     private ArrayAdapter<String> adapter;
@@ -312,6 +312,7 @@ public class Activity_Shop_TagHours extends AppCompatActivity
             phone = intent.getStringExtra("phone");
             name = intent.getStringExtra("name");
             address = intent.getStringExtra("address");
+            profilePicUrl = intent.getStringExtra("profilePicUrl");
             city = intent.getStringExtra("city");
             zip = intent.getStringExtra("zip");
             latitude = intent.getDoubleExtra("latitude", 0);
@@ -356,23 +357,23 @@ public class Activity_Shop_TagHours extends AppCompatActivity
         if (!editing)
         {
             int intLongitude = (int) longitude;
-            shop = new Shop(uid, name, mail, "", address, city, zip, phone, latitude, longitude,
-                    0, 0, intLongitude, tags, hours); //TODO: add profilePicUrl
+            shop = new Shop(uid, name, phone, mail, profilePicUrl, address, city, zip, latitude, longitude,
+                    0, 0, intLongitude, tags, hours);
             shopsReference.document(uid).set(shop);
             db.collection("reservationsUpdate").document(uid).set(new InitReservationUpdate());
             startActivity(new Intent(this, Activity_Login.class));
         } else
         {
             uid = currentShop.getUid();
-            shop = new Shop(uid, currentShop.getName(), currentShop.getMail(), currentShop.getProfilePicUrl(), currentShop.getAddress(),
-                    currentShop.getCity(), currentShop.getZip(), currentShop.getPhone(),
+            
+            shop = new Shop(uid, currentShop.getName(), currentShop.getPhone(), currentShop.getMail(), currentShop.getProfilePicUrl(),
+                    currentShop.getAddress(), currentShop.getCity(), currentShop.getZip(),
                     currentShop.getLatitude(), currentShop.getLongitude(), currentShop.getAverageReviews(),
                     currentShop.getNumReviews(), currentShop.getIntLongitude(), tags, hours);
             
             shopsReference.document(uid).set(shop);
             setResult(Activity.RESULT_OK);
             finish();
-            //startActivity(new Intent(this, Activity_Shop.class));
         }
     }
     
