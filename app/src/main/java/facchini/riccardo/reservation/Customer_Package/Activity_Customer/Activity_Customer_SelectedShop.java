@@ -63,7 +63,7 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
     
     private Shop selectedShop;
     private ArrayAdapter<String> adapter;
-    private Calendar selectedDate;
+    private Calendar selectedDate, now;
     private String name, picUrl;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
@@ -76,6 +76,11 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         
         db = FirebaseFirestore.getInstance();
         reservationsCollection = db.collection("reservations");
+        
+        now = Calendar.getInstance();
+        now.set(Calendar.MINUTE, 0);
+        now.set(Calendar.SECOND, 0);
+        now.set(Calendar.MILLISECOND, 0);
         
         Intent intent = getIntent();
         Bundle b = intent.getExtras();
@@ -258,11 +263,34 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         
         try
         {
+            if (selectedDate.get(Calendar.YEAR) == now.get(Calendar.YEAR) && selectedDate.get(Calendar.MONTH) == now.get(Calendar.MONTH)
+                    && selectedDate.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH) && selectedDate.get(Calendar.DAY_OF_WEEK) == now.get(Calendar.DAY_OF_WEEK))
+            {
+                long l = selectedDate.getTime().getTime();
+                l += timeFormat.parse(finish).getTime();
+                
+                if (l < now.getTime().getTime())
+                    return;
+                
+                Calendar plusHalf = Calendar.getInstance();
+                plusHalf.setTime(now.getTime());
+                
+                if (plusHalf.get(Calendar.MINUTE) > 30)
+                {
+                    plusHalf.add(Calendar.HOUR, 1);
+                    plusHalf.set(Calendar.MINUTE, 0);
+                } else
+                    plusHalf.set(Calendar.MINUTE, 30);
+                
+                start = timeFormat.format(plusHalf.getTime());
+            }
+            
             calStart.setTime(timeFormat.parse(start));
             
-        } catch (ParseException e)
+        } catch (Exception e)
         {
             e.printStackTrace();
+            return;
         }
         
         while (!(timeFormat.format(calStart.getTime()).equals(finish)))
@@ -353,7 +381,7 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         }
         
         String thisUid = FirebaseAuth.getInstance().getUid();
-    
+        
         new Notification(selectedShop.getUid(), name, Notification.NOTIFICATION_RESERVATION, "", this);
         final ReservationFirestore reservationFirestore = new ReservationFirestore(selectedShop.getUid(), selectedShop.getName(),
                 selectedShop.getProfilePicUrl(), thisUid, picUrl, name, selectedShop.getAddress(), fullDate.getTime());
