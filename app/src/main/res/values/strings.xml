@@ -105,5 +105,6 @@
     <string name="rating">Rating</string>
     <string name="address_search">Address Search</string>
     <string name="search_address">Search address</string>
-    <string name="revire_sent">Review sent!</string>
+    <string name="review_sent">Review sent!</string>
+    <string name="new_reservation_from">New reservation from: </string>
 </resources>

@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Arrays;
 
@@ -240,6 +241,7 @@ public class Activity_Login extends AppCompatActivity
         
         if (isCustomer)
         {
+            FirebaseMessaging.getInstance().subscribeToTopic(uid);
             startActivity(new Intent(this, Activity_Customer.class));
             edit.putBoolean(getString(R.string.isCustomer_key), true).apply();
             edit.putBoolean(getString(R.string.isShop_key), false).apply();
@@ -248,6 +250,7 @@ public class Activity_Login extends AppCompatActivity
             finish();
         } else if (isShop)
         {
+            FirebaseMessaging.getInstance().subscribeToTopic(uid);
             startActivity(new Intent(this, Activity_Shop.class));
             edit.putBoolean(getString(R.string.isCustomer_key), false).apply();
             edit.putBoolean(getString(R.string.isShop_key), true).apply();
@@ -298,6 +301,13 @@ public class Activity_Login extends AppCompatActivity
      */
     private void onSignedOutCleanup()
     {
+        try
+        {
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(uid);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         detachDatabaseReadListener();
         isShop = false;
         isCustomer = false;

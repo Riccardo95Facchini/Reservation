@@ -170,7 +170,7 @@ public class Activity_Customer_ShopInfo extends AppCompatActivity
         } else
             reviewsRef.document(reviewId).update("reviewScore", rating);
         
-        Toast.makeText(this, getString(R.string.revire_sent), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.review_sent), Toast.LENGTH_SHORT).show();
         
         //pref.edit().putBoolean(getString(R.string.need_update_key), true).commit();
         ratingDialog.cancel();

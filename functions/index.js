@@ -33,3 +33,32 @@ exports.newShopReview = functions.firestore.document('reviews/{randomId}').onWri
         });
     });
 });
+
+//Send notification
+exports.sendNotification = functions.firestore.document('notificationRequests/{notificationUid}').onCreate((snap, context) => {
+
+    var toSend = {
+        notification: {
+            title: snap.data().title,
+            body: snap.data().body
+        }
+    };
+
+    var deleteDoc = admin.firestore().collection('notificationRequests').doc(context.params.notificationUid).delete();
+    deleteDoc.then(res => {
+        console.log('Delete: ', res);
+        return true;
+    }).catch((error) => {
+        console.log('Error sending message:', error);
+        return false;
+    });
+
+    admin.messaging().sendToTopic(snap.data().recipientUid, toSend).then((response) => {
+        console.log('Successfully sent message:', response);
+        return true;
+    }).catch((error) => {
+        console.log('Error sending message:', error);
+        return false;
+    });
+    return true;
+});

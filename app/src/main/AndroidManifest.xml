@@ -40,7 +40,13 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBl5HIARSrlcJzKjiDc-YyT_CUmX3H5qBQ"/>
+            android:value="AIzaSyBl5HIARSrlcJzKjiDc-YyT_CUmX3H5qBQ" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorPrimary" />
 
     </application>
 

@@ -46,6 +46,7 @@ import facchini.riccardo.reservation.Adapter_CardInfo;
 import facchini.riccardo.reservation.Chat.Activity_Chat;
 import facchini.riccardo.reservation.Fragment_DatePicker;
 import facchini.riccardo.reservation.Info_Content;
+import facchini.riccardo.reservation.Notification;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
 import facchini.riccardo.reservation.Shop_Package.Shop;
@@ -352,7 +353,8 @@ public class Activity_Customer_SelectedShop extends AppCompatActivity implements
         }
         
         String thisUid = FirebaseAuth.getInstance().getUid();
-        
+    
+        new Notification(selectedShop.getUid(), name, Notification.NOTIFICATION_RESERVATION, "", this);
         final ReservationFirestore reservationFirestore = new ReservationFirestore(selectedShop.getUid(), selectedShop.getName(),
                 selectedShop.getProfilePicUrl(), thisUid, picUrl, name, selectedShop.getAddress(), fullDate.getTime());
         db.collection("reservations").add(reservationFirestore).addOnSuccessListener(new OnSuccessListener<DocumentReference>()

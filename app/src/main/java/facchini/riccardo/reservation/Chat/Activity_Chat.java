@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import facchini.riccardo.reservation.Notification;
 import facchini.riccardo.reservation.R;
 
 public class Activity_Chat extends AppCompatActivity
@@ -159,6 +160,8 @@ public class Activity_Chat extends AppCompatActivity
         map.put("user", thisUsername);
         reference.push().setValue(map);
         messageArea.setText("");
+    
+        new Notification(otherUid, thisUsername, Notification.NOTIFICATION_CHAT, messageText, this);
     }
     
     /**
