@@ -1,12 +1,13 @@
 package facchini.riccardo.reservation.Chat;
 
 import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -98,6 +99,8 @@ public class Activity_Chat_Homepage extends AppCompatActivity
                     intent.putExtra("thisUsername", chatData.getThisName());
                     intent.putExtra("otherUid", chatData.getOtherUid());
                     intent.putExtra("otherUsername", chatData.getOtherName());
+                    intent.putExtra("thisPhoto", chatData.getThisPhoto());
+                    intent.putExtra("otherPhoto", chatData.getOtherPhoto());
                     startActivity(intent);
                 } catch (Exception e)
                 {

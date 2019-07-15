@@ -53,7 +53,7 @@ public class Fragment_Customer_Profile extends Fragment
         profilePic = view.findViewById(R.id.profilePic);
         recyclerView = view.findViewById(R.id.info);
         ImageButton buttonEdit = view.findViewById(R.id.buttonEdit);
-    
+        
         contents = new ArrayList<>();
         adapterCardInfo = new Adapter_CardInfo(getContext(), contents);
         recyclerView.setAdapter(adapterCardInfo);
@@ -78,6 +78,12 @@ public class Fragment_Customer_Profile extends Fragment
         });
     }
     
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        Glide.with(this).load(viewModel.getCurrentUser().getValue().getProfilePicUrl()).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(profilePic);
+    }
     
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)

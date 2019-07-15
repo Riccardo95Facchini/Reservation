@@ -32,13 +32,15 @@ import facchini.riccardo.reservation.R;
 public class Activity_Chat extends AppCompatActivity
 {
     private LinearLayout layout;
-    private ImageView sendButton;
     private EditText messageArea;
     private ScrollView scrollView;
     private Firebase reference;
     
     private boolean justOpened = true;
-    private String thisUid, otherUid, thisUsername, otherUsername, nodeName;
+    private String thisUid;
+    private String otherUid;
+    private String thisUsername;
+    private String otherUsername;
     private String thisPhoto, otherPhoto;
     
     @Override
@@ -48,7 +50,7 @@ public class Activity_Chat extends AppCompatActivity
         setContentView(R.layout.activity_chat);
         
         layout = findViewById(R.id.layout1);
-        sendButton = findViewById(R.id.sendButton);
+        ImageView sendButton = findViewById(R.id.sendButton);
         messageArea = findViewById(R.id.messageArea);
         scrollView = findViewById(R.id.scrollView);
         
@@ -65,6 +67,7 @@ public class Activity_Chat extends AppCompatActivity
         setTitle(otherUsername);
         
         //First smaller string
+        String nodeName;
         if (thisUid.compareTo(otherUid) <= 0)
             nodeName = thisUid + "_" + otherUid;
         else

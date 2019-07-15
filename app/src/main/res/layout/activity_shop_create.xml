@@ -21,38 +21,48 @@
         app:layout_constraintVertical_bias="0.0">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-android:fontFamily="sans-serif"
-                android:id="@+id/textTop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+            <ImageView
+                android:id="@+id/profilePic"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-
-                android:text="@string/createCustomerText"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:layout_marginEnd="32dp"
+                android:src="@drawable/default_avatar"
+                app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.35" />
+
+            <ProgressBar
+                android:id="@+id/uploadBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/profilePic"
+                app:layout_constraintStart_toStartOf="@+id/profilePic"
+                app:layout_constraintTop_toBottomOf="@+id/profilePic" />
 
             <EditText
                 android:id="@+id/nameText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
                 android:ems="10"
                 android:hint="@string/shopNameHint"
                 android:inputType="textPersonName"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textTop" />
+                app:layout_constraintTop_toBottomOf="@+id/uploadBar" />
 
             <EditText
                 android:id="@+id/address1Text"
@@ -67,19 +77,6 @@ android:fontFamily="sans-serif"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/nameText" />
-
-            <EditText
-                android:id="@+id/address2Text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
-                android:ems="10"
-                android:hint="@string/address2Text"
-                android:inputType="textPostalAddress"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/address1Text"
-                app:layout_constraintWidth_percent="0.5" />
 
             <EditText
                 android:id="@+id/phoneText"
@@ -115,13 +112,13 @@ android:fontFamily="sans-serif"
                 android:id="@+id/zipText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:ems="10"
                 android:hint="@string/zipText"
                 android:inputType="number"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/address2Text"
-                app:layout_constraintWidth_percent="0.3"/>
+                app:layout_constraintTop_toTopOf="@+id/cityText"
+                app:layout_constraintWidth_percent="0.3" />
 
             <EditText
                 android:id="@+id/cityText"
@@ -133,10 +130,9 @@ android:fontFamily="sans-serif"
                 android:ems="10"
                 android:hint="@string/cityHint"
                 android:inputType="text"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintEnd_toStartOf="@+id/zipText"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/address2Text" />
+                app:layout_constraintTop_toBottomOf="@+id/address1Text" />
 
             <Button
                 android:id="@+id/continueButton"
@@ -145,9 +141,9 @@ android:fontFamily="sans-serif"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="8dp"
-                android:textColor="@color/white"
                 android:background="@drawable/button_custom_gradient"
                 android:text="@string/continueButton"
+                android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"

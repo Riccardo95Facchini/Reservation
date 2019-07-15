@@ -1,5 +1,6 @@
 package facchini.riccardo.reservation.Shop_Package.Fragment_Shop;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -41,8 +42,9 @@ public class Fragment_Shop_Profile extends Fragment
     private List<Info_Content> contents;
     
     private CurrentUserViewModel viewModel;
-    
     private Shop shop;
+    
+    private static final int EDIT_REQUEST = 0;
     
     @Nullable
     @Override
@@ -65,8 +67,8 @@ public class Fragment_Shop_Profile extends Fragment
         contents = new ArrayList<>();
         adapterCardInfo = new Adapter_CardInfo(getContext(), contents);
         recyclerView.setAdapter(adapterCardInfo);
-    
-    
+        
+        
         buttonAction.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -77,10 +79,22 @@ public class Fragment_Shop_Profile extends Fragment
                 b.putParcelable("CurrentShop", shop);
                 intent.putExtras(b);
                 intent.setClass(getContext(), Activity_Shop_Create.class);
-                startActivity(intent);
+                startActivityForResult(intent,EDIT_REQUEST);
             }
         });
     }
+    
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == EDIT_REQUEST && resultCode == Activity.RESULT_OK)
+        {
+            String newPic = data.getStringExtra("newPic");
+            Glide.with(this).load(newPic).placeholder(R.drawable.default_avatar).fitCenter().centerCrop().transform(new CircleCrop()).into(profilePic);
+        }
+    }
+    
     
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
