@@ -22,14 +22,13 @@ import facchini.riccardo.reservation.Chat.Activity_Chat;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
 
-public class Adapter_Shop_Home extends RecyclerView.Adapter<Adapter_Shop_Home.Reservation_Shop_ViewHolder>
+public class Adapter_Shop_ReservationCard extends RecyclerView.Adapter<Adapter_Shop_ReservationCard.Reservation_Shop_ViewHolder>
 {
     
     private Context context;
-    //private String customerUid;
     private List<ReservationFirestore> reservationCustomerHomeList;
     
-    public Adapter_Shop_Home(Context context, List<ReservationFirestore> reservationCustomerHomeList)
+    public Adapter_Shop_ReservationCard(Context context, List<ReservationFirestore> reservationCustomerHomeList)
     {
         this.context = context;
         this.reservationCustomerHomeList = reservationCustomerHomeList;

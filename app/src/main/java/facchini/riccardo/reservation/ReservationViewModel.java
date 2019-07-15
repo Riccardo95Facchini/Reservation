@@ -1,7 +1,5 @@
 package facchini.riccardo.reservation;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -30,7 +28,7 @@ public class ReservationViewModel extends ViewModel
 {
     private MutableLiveData<List<ReservationFirestore>> nextReservations, pastReservations;
     private MutableLiveData<Boolean> isNextEmpty, isPastEmpty;
-    private CollectionReference customersCollection, shopsCollection, reservationsCollection, updatesCollection;
+    private CollectionReference reservationsCollection, updatesCollection;
     private String thisUid;
     FirebaseFirestore db;
     
@@ -42,8 +40,6 @@ public class ReservationViewModel extends ViewModel
     {
         tag = -1;
         db = FirebaseFirestore.getInstance();
-        shopsCollection = db.collection("shops");
-        customersCollection = db.collection("customers");
         reservationsCollection = db.collection("reservations");
         updatesCollection = db.collection("reservationsUpdate");
         thisUid = FirebaseAuth.getInstance().getUid();
@@ -75,23 +71,6 @@ public class ReservationViewModel extends ViewModel
     {
         queryNextReservations();
         queryPastReservations();
-        //fix();
-    }
-    
-    private void fix()
-    {
-        reservationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
-        {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots)
-            {
-                for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments())
-                {
-                    final String uid = doc.getId();
-                    reservationsCollection.document(uid).delete();
-                }
-            }
-        });
     }
     
     //region ReservationViewModel.Query
@@ -114,12 +93,13 @@ public class ReservationViewModel extends ViewModel
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots)
             {
-                fillReservations(queryDocumentSnapshots, nextReservations);
-                
                 if (queryDocumentSnapshots.isEmpty())
                     isNextEmpty.setValue(true);
                 else
+                {
+                    fillReservations(queryDocumentSnapshots, nextReservations);
                     isNextEmpty.setValue(false);
+                }
             }
         }).addOnFailureListener(new OnFailureListener()
         {
@@ -150,12 +130,13 @@ public class ReservationViewModel extends ViewModel
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots)
             {
-                fillReservations(queryDocumentSnapshots, pastReservations);
-                
                 if (queryDocumentSnapshots.isEmpty())
                     isPastEmpty.setValue(true);
                 else
+                {
+                    fillReservations(queryDocumentSnapshots, pastReservations);
                     isPastEmpty.setValue(false);
+                }
             }
         }).addOnFailureListener(new OnFailureListener()
         {

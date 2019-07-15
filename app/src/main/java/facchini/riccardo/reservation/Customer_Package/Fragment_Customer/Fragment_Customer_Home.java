@@ -82,7 +82,6 @@ public class Fragment_Customer_Home extends Fragment implements OnItemClickListe
         recyclerView.setAdapter(adapterCustomerHome);
         
         noReservationsText.setVisibility(View.GONE);
-        
         progressBar.setVisibility(View.VISIBLE);
         
         final CountDownTimer timer = new CountDownTimer(5000, 500)

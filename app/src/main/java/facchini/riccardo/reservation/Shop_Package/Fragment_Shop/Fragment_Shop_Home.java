@@ -22,7 +22,7 @@ import java.util.List;
 import facchini.riccardo.reservation.R;
 import facchini.riccardo.reservation.ReservationViewModel;
 import facchini.riccardo.reservation.Reservation_Package.ReservationFirestore;
-import facchini.riccardo.reservation.Shop_Package.Adapter_Shop.Adapter_Shop_Home;
+import facchini.riccardo.reservation.Shop_Package.Adapter_Shop.Adapter_Shop_ReservationCard;
 
 public class Fragment_Shop_Home extends Fragment
 {
@@ -30,7 +30,7 @@ public class Fragment_Shop_Home extends Fragment
     private List<ReservationFirestore> reservations;
     
     private RecyclerView recyclerView;
-    private Adapter_Shop_Home adapterShopHome;
+    private Adapter_Shop_ReservationCard adapterShopHome;
     
     private TextView noReservationsText;
     private ProgressBar progressBar;
@@ -65,7 +65,7 @@ public class Fragment_Shop_Home extends Fragment
         progressBar.setVisibility(View.VISIBLE);
         
         reservations = new ArrayList<>();
-        adapterShopHome = new Adapter_Shop_Home(getContext(), reservations);
+        adapterShopHome = new Adapter_Shop_ReservationCard(getContext(), reservations);
         recyclerView.setAdapter(adapterShopHome);
         
         
@@ -126,26 +126,4 @@ public class Fragment_Shop_Home extends Fragment
             recyclerView.setAdapter(adapterShopHome);
         }
     }
-    
-    /**
-     * Orders list to be displayed and adds elements to the adapter
-     */
-    private void orderList()
-    {
-        //Collections.sort(reservations, reservationComparator);
-        adapterShopHome = new Adapter_Shop_Home(getContext(), reservations);
-        recyclerView.setAdapter(adapterShopHome);
-    }
-    
-    /**
-     * Defined comparator for reservations to order them
-     */
-//    public Comparator<ReservationFirestore> reservationComparator = new Comparator<ReservationFirestore>()
-//    {
-//        @Override
-//        public int compare(ReservationFirestore o1, ReservationFirestore o2)
-//        {
-//            return o1.getDate().compareTo(o2.getDate());
-//        }
-//    };
 }
