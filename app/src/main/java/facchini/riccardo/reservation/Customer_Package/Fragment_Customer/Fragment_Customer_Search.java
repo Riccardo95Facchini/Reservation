@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -147,12 +148,31 @@ public class Fragment_Customer_Search extends Fragment implements OnItemClickLis
             }
         });
         
+        searchText.setOnEditorActionListener(new TextView.OnEditorActionListener()
+        {
+            
+            @Override
+            public boolean onEditorAction(TextView v, int actionId,
+                                          KeyEvent event)
+            {
+                if (event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+                {
+                    InputMethodManager inputManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    return true;
+                }
+                return false;
+            }
+        });
+        
         searchButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 String text = searchText.getText().toString().trim();
+                InputMethodManager inputManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                 
                 if (!text.isEmpty())
                 {
