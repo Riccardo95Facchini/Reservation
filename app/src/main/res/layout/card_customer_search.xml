@@ -33,13 +33,13 @@
                 app:srcCompat="@drawable/default_avatar" />
 
             <TextView
-android:fontFamily="sans-serif"
                 android:id="@+id/textName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="2dp"
                 android:ellipsize="end"
+                android:fontFamily="sans-serif"
                 android:maxLines="1"
                 android:text="Giuseppe Rossi"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
@@ -50,13 +50,13 @@ android:fontFamily="sans-serif"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-android:fontFamily="sans-serif"
                 android:id="@+id/textAddress"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:ellipsize="end"
+                android:fontFamily="sans-serif"
                 android:maxLines="1"
                 android:text="Via Roma 72 Piacenza"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
@@ -65,11 +65,11 @@ android:fontFamily="sans-serif"
                 app:layout_constraintTop_toBottomOf="@+id/textDistance" />
 
             <TextView
-android:fontFamily="sans-serif"
                 android:id="@+id/textDistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif"
                 android:text="Distance: 7Km"
                 app:layout_constraintStart_toStartOf="@+id/textName"
                 app:layout_constraintTop_toBottomOf="@+id/textName" />

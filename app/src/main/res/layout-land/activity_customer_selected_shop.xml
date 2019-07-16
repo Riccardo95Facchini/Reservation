@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Shop_Package.Fragment_Shop.Fragment_Shop_Profile">
-
+    tools:context=".Customer_Package.Activity_Customer.Activity_Customer_SelectedShop">
 
     <ImageView
         android:id="@+id/profilePic"
@@ -19,7 +18,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.35" />
+        app:layout_constraintWidth_percent="0.15" />
+
+    <Button
+        android:id="@+id/selectDateButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/button_custom_gradient"
+        android:text="@string/selectDate"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rating" />
 
     <ImageButton
         android:id="@+id/buttonAction"
@@ -32,23 +45,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/profilePic"
         app:layout_constraintTop_toTopOf="@+id/profilePic" />
-
-    <Button
-        android:id="@+id/buttonRate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/button_custom_gradient"
-        android:text="@string/rate"
-        android:textColor="@color/white"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/profilePic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/profilePic"
-        app:layout_constraintTop_toBottomOf="@+id/buttonAction" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rating"
@@ -92,7 +88,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rating" />
+        app:layout_constraintTop_toBottomOf="@+id/selectDateButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
