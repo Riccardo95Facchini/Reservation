@@ -1,5 +1,9 @@
-\usepackage{soul}
 \usepackage{tikz}
+\usepackage{dirtree}
+
+
+\usepackage{contour}
+\usepackage[normalem]{ulem}
 
 \usetikzlibrary{calc}
 \usetikzlibrary{decorations.pathmorphing}
@@ -22,6 +26,14 @@
 
 \newcommand{\highlight@BeginHighlight}{
   \coordinate (begin highlight) at (0,0) ;
+}
+
+\renewcommand{\ULdepth}{1.8pt}
+\contourlength{0.6pt}
+
+\newcommand{\textul}[1]{%
+  \uline{\phantom{#1}}%
+  \llap{\contour{white}{#1}}%
 }
 
 \newcommand{\highlight@EndHighlight}{
