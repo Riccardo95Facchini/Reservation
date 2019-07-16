@@ -1,21 +1,42 @@
-\subsection{Introduction}
-In this section, it will be described the main algorithms of the system, which is the search of a shop in the area.
-
-\subsubsection{Distance Calculation}
+In this section will be described the main algorithms of the system, which are the search of a shop in the area and the next reservations query.
+\subsection{Distance Calculation}
 Since the GPS system is heavy on battery consumption, it's not always reliable (especially when just turned on) and the user may want to search in a different location than where he/she is right now, when the customer wants to start a search a dialog shown in \autoref{fig:addressSearch} asking for the address is shown, then the only needed values of \textbf{latitude} and the \textbf{longitude} are extracted.\\
 Given the maximum \textbf{distance} the user wants the search to be done, the deltas for both the latitude and the longitude can be computed as follows:\\
 \begin{center}
-$ deltaLat = (distance/earthRadius) * (180 * Math.PI) $\\
+$ deltaLat = (distance/earthRadius) * (180 * Math.PI) $\\\vspace{0.5cm}
 $ deltaLng = Math.toDegrees((dist / (earthRadius * Math.cos(Math.toRadians(currentLat))))) $
 \end{center}
-
-\subsubsection{Queries}
+\subsection{Queries}
+Firestore allows for some query functionalities, these can be used to retrieve data even when the the UID is not sufficient to identify the requested information.
+\subsubsection{Shop Search Query}
 Due to a limitation of Firestore, queries are made by searching for shops with the given tag, the latitude inside the min and max values (found respectively by subtracting and adding to the current latitude the value of deltaLat) and then a third parameter called \textit{intLongitude} is used, corresponding to the longitude truncated.\\
 This has to be done since Firestore doesn't allow for queries with different search parameters except for equals, so instead of doing two queries (one for latitude and one for longitude) and then merging the common values, one query is done limiting the search to only one longitude and then the values retrieved are checked locally if they are inside the range. In the edge cases where the search spans over more than one longitude integer value, then more than one query will be made with the different values set, each query will return a different set than the others obviously so it must only be checked if the shops are in the correct range and no control between queries result has to be done.\\
 Here is the example of the first (and usually only) query:\\
 \begin{center}
-\textit{shopsCollection.whereArrayContains("tags", searchedText)\\
+\textit{shopsCollection\\
+.whereArrayContains("tags", searchedText)\\
 .whereGreaterThanOrEqualTo("latitude", minLat)\\
 .whereLessThanOrEqualTo("latitude", maxLat)\\
-.whereEqualTo("intLongitude", minIntLng).get();}
+.whereEqualTo("intLongitude", minIntLng)\\
+.get();}
 \end{center}
+\clearpage
+\subsubsection{Reservations Query}
+The next/past reservations are queried once when the application is opened and after that a listener is placed on the current user entry in the \textbf{reservationsUpdate} collection, when a change occurs the trigger will result in a new query of both future and past reservations, the ViewModel will then handle the update of the Live Data lists and the views will automatically update once the observed value changes and the trigger is fired.\\
+Here for example is show the query that will find the next reservations for a customer:
+\begin{center}
+\textit{reservationsCollection\\
+.whereEqualTo("customerUid", thisUid)\\
+.whereGreaterThan("time", now.getTime())\\
+.orderBy("time", Query.Direction.ASCENDING)\\
+.get();}
+\end{center}
+And one for the past reservations of a shop:
+\begin{center}
+\textit{reservationsCollection\\
+.whereEqualTo("shopUid", thisUid)\\
+.whereLessThan("time", now.getTime())\\
+.orderBy("time", Query.Direction.DESCENDING)\\
+.get();}
+\end{center}
+The duplicated elements in the \textit{reservation} stored object allow for one single query and therefore (given the asynchronous nature of Firebase requests) there is no need to locally order the results, unlike when a get request for each shop/customer that has to be displayed in the reservation card has to be done in the case of non-duplicated data. It should be remembered that duplicated data when needed is actually recommended by the Firebase team since the JSON database is much faster than a relational one when reads are in the majority of the actions performed (also the lack of classic relational functionalities like foreign keys make almost impossible to avoid duplicating data).
